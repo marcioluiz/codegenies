@@ -126,7 +126,7 @@ def start(project_name, analyst_properties):
             if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
                 file_path = os.path.join(development_dir, "codigo.py")
             elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-                file_path = os.path.join(development_dir, "codigo.jsx")
+                file_path = os.path.join(development_dir, "codigo.js")
             with open(file_path, 'w') as f:
                 f.write(code)
 
