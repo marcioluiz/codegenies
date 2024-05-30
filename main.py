@@ -25,9 +25,9 @@ def start(project_name, analyst_properties):
     clean_pycache(os.path.dirname(__file__))
 
     # Inicializando o Ollama
-    llm_anl = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Llama-3 para fazer o papel de Analyst
+    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")  # Modelo Phi-3 para fazer o papel de Analyst
     llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")  # Modelo Codegemma para fazer o papel de Developer
-    llm_sq = Ollama(model="mistral")  # Modelo Mistral para fazer o papel de Squadleader
+    llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Lama-3 para fazer o papel de Squadleader
 
     ## BEGIN 100% Working 
     # Inicializando o analista
@@ -107,8 +107,8 @@ def start(project_name, analyst_properties):
         elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
             structure_prompt = f"Gere toda a estrutura de pastas e arquivos necessária para o desenvolvimento do {developer.name} conforme o Bakclog de Tarefas {frontend_backlog}"
 
-        developer.generate_structure(structure_prompt)
-        structure = developer.output 
+        analyst.generate_structure(structure_prompt)
+        structure = analyst.output 
         if structure is not None:
             file_path = os.path.join(development_dir, "estrutura.txt")
             with open(file_path, 'w') as f:
@@ -116,9 +116,9 @@ def start(project_name, analyst_properties):
 
         # Desenvolvimento do código
         if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            code_prompt = f"Gere todo o código necessário conforme o backlog de atividades de backend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {backend_backlog}"
+            code_prompt = f"Gere todo o código necessário utilizando o framework escolhuido conforme o backlog de atividades de backend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {backend_backlog}"
         elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            code_prompt = f"Gere todo o código necessário conforme o backlog de atividades de frontend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {frontend_backlog}"
+            code_prompt = f"Gere todo o código necessário utilizando o framework escolhuido conforme o backlog de atividades de frontend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {frontend_backlog}"
 
         developer.develop_code(code_prompt)
         code = developer.output
@@ -134,8 +134,8 @@ def start(project_name, analyst_properties):
     test_dir = os.path.join(project_base_path, "dev", "tester")
     os.makedirs(test_dir, exist_ok=True)
     test_structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para os testes. Bakclog de Tarefas {test_backlog}"
-    tester.generate_structure(test_structure_prompt)
-    test_structure = tester.output
+    analyst.generate_structure(test_structure_prompt)
+    test_structure = analyst.output
     if test_structure is not None:
         file_path = os.path.join(test_dir, "estrutura_teste.txt")
         with open(file_path, 'w') as f:
