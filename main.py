@@ -20,6 +20,53 @@ def create_directories(project_base_path):
     for base_dir in base_dirs:
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
 
+def process_backlog(developer, backlog, development_dir):
+    import re
+    
+    def is_new_task_line(line):
+        return bool(re.match(r'^[A-Za-z0-9]+\.', line.strip()))
+
+    tasks = backlog.splitlines()
+    current_task = []
+    for line in tasks:
+        if is_new_task_line(line) and current_task:
+            task_text = "\n".join(current_task).strip()
+            process_task(developer, task_text, development_dir)
+            current_task = [line]
+        else:
+            current_task.append(line)
+    
+    if current_task:
+        task_text = "\n".join(current_task).strip()
+        process_task(developer, task_text, development_dir)
+
+def process_task(developer, task, development_dir):
+    # Geração da estrutura para cada tarefa
+    structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task}"
+    print(f"Processando estrutura para a tarefa: {task}")
+    try:
+        structure = developer.generate_structure(structure_prompt)
+    except Exception as e:
+        print(f"Erro ao gerar a estrutura para a tarefa '{task}': {e}")
+        return
+
+    structure_file_path = os.path.join(development_dir, f"estrutura_{task[:30]}.txt")
+    with open(structure_file_path, 'w') as f:
+        f.write(structure if isinstance(structure, str) else json.dumps(structure, indent=2))
+
+    # Desenvolvimento do código para cada tarefa
+    code_prompt = f"Gere o código necessário para a tarefa: {task}"
+    print(f"Processando código para a tarefa: {task}")
+    try:
+        code = developer.develop_code(code_prompt)
+    except Exception as e:
+        print(f"Erro ao gerar o código para a tarefa '{task}': {e}")
+        return
+
+    code_file_path = os.path.join(development_dir, f"codigo_{task[:30]}.py")
+    with open(code_file_path, 'w') as f:
+        f.write(code if isinstance(code, str) else json.dumps(code, indent=2))
+
 def start(project_name, analyst_properties):
     # Limpar pastas __pycache__
     clean_pycache(os.path.dirname(__file__))
@@ -101,53 +148,22 @@ def start(project_name, analyst_properties):
         development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
 
-        # Geração da estrutura
+        # Processar backlog de atividades individualmente
         if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            structure_prompt = f"Gere toda a estrutura de pastas e arquivos necessária para o desenvolvimento do {developer.name} conforme o Bakclog de Tarefas {backend_backlog}"
+            print("Processando backlog de backend:")
+            print(backend_backlog)  # Adicionando depuração para o backlog de backend
+            process_backlog(developer, backend_backlog, development_dir)
         elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            structure_prompt = f"Gere toda a estrutura de pastas e arquivos necessária para o desenvolvimento do {developer.name} conforme o Bakclog de Tarefas {frontend_backlog}"
-
-        analyst.generate_structure(structure_prompt)
-        structure = analyst.output 
-        if structure is not None:
-            file_path = os.path.join(development_dir, "estrutura.txt")
-            with open(file_path, 'w') as f:
-                f.write(structure)
-
-        # Desenvolvimento do código
-        if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            code_prompt = f"Gere todo o código necessário utilizando o framework escolhuido conforme o backlog de atividades de backend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {backend_backlog}"
-        elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            code_prompt = f"Gere todo o código necessário utilizando o framework escolhuido conforme o backlog de atividades de frontend e preencha o conteúdo do arquivo com o código. Bakclog de Tarefas {frontend_backlog}"
-
-        developer.develop_code(code_prompt)
-        code = developer.output
-        if code is not None:
-            if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-                file_path = os.path.join(development_dir, "codigo.py")
-            elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-                file_path = os.path.join(development_dir, "codigo.js")
-            with open(file_path, 'w') as f:
-                f.write(code)
+            print("Processando backlog de frontend:")
+            print(frontend_backlog)  # Adicionando depuração para o backlog de frontend
+            process_backlog(developer, frontend_backlog, development_dir)
 
     # Desenvolvimento dos testes
     test_dir = os.path.join(project_base_path, "dev", "tester")
     os.makedirs(test_dir, exist_ok=True)
-    test_structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para os testes. Bakclog de Tarefas {test_backlog}"
-    analyst.generate_structure(test_structure_prompt)
-    test_structure = analyst.output
-    if test_structure is not None:
-        file_path = os.path.join(test_dir, "estrutura_teste.txt")
-        with open(file_path, 'w') as f:
-            f.write(test_structure)
-
-    test_code_prompt = f"Preencha o conteúdo dos arquivos de teste gerados conforme o relatório de backlog e outros relatórios necessários. Bakclog de Tarefas {test_backlog}"
-    tester.develop_tests(test_code_prompt)
-    tests = tester.output 
-    if tests is not None:
-        file_path = os.path.join(test_dir, "teste.py")
-        with open(file_path, 'w') as f:
-            f.write(tests)
+    print("Processando backlog de testes:")
+    print(test_backlog)  # Adicionando depuração para o backlog de testes
+    process_backlog(tester, test_backlog, test_dir)
 
     # Criando o README do Projeto
     readme_content = f"# {project_name}\n\n[Insira a descrição do projeto aqui]"
