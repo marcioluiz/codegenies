@@ -2,10 +2,9 @@
 
 import os
 import inspect
-import json
 import shutil
 from agents import Analyst, SquadLeader, Developer, Tester
-from graph import Graph
+from graph import Graph, build_task_graph, process_task_graph
 from langchain_community.llms import Ollama
 
 def clean_pycache(root_dir):
@@ -20,53 +19,6 @@ def create_directories(project_base_path):
     base_dirs = ["agents", "reports", "dev"]
     for base_dir in base_dirs:
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
-
-def process_backlog(developer, backlog, development_dir):
-    import re
-    
-    def is_new_task_line(line):
-        return bool(re.match(r'^[A-Za-z0-9]+\.', line.strip()))
-
-    tasks = backlog.splitlines()
-    current_task = []
-    for line in tasks:
-        if is_new_task_line(line) and current_task:
-            task_text = "\n".join(current_task).strip()
-            process_task(developer, task_text, development_dir)
-            current_task = [line]
-        else:
-            current_task.append(line)
-    
-    if current_task:
-        task_text = "\n".join(current_task).strip()
-        process_task(developer, task_text, development_dir)
-
-def process_task(developer, task, development_dir):
-    # Geração da estrutura para cada tarefa
-    structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task}"
-    print(f"Processando estrutura para a tarefa: {task}")
-    try:
-        structure = developer.generate_structure(structure_prompt)
-    except Exception as e:
-        print(f"Erro ao gerar a estrutura para a tarefa '{task}': {e}")
-        return
-
-    structure_file_path = os.path.join(development_dir, f"estrutura_{task[:30]}.txt")
-    with open(structure_file_path, 'w') as f:
-        f.write(structure if isinstance(structure, str) else json.dumps(structure, indent=2))
-
-    # Desenvolvimento do código para cada tarefa
-    code_prompt = f"Gere o código necessário para a tarefa: {task}"
-    print(f"Processando código para a tarefa: {task}")
-    try:
-        code = developer.develop_code(code_prompt)
-    except Exception as e:
-        print(f"Erro ao gerar o código para a tarefa '{task}': {e}")
-        return
-
-    code_file_path = os.path.join(development_dir, f"codigo_{task[:30]}.py")
-    with open(code_file_path, 'w') as f:
-        f.write(code if isinstance(code, str) else json.dumps(code, indent=2))
 
 def start(project_name, analyst_properties):
     # Limpar pastas __pycache__
@@ -143,28 +95,24 @@ def start(project_name, analyst_properties):
     ## END 100% Working 
     
     ## TO-DO solve problems with code
-    # Desenvolvimento
+    # Criando os grafos das tarefas
+    backend_task_graph = build_task_graph(backend_backlog)
+    frontend_task_graph = build_task_graph(frontend_backlog)
+    test_task_graph = build_task_graph(test_backlog)
+
     developers = [backend_developer, frontend_developer]
     for developer in developers:
         development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
 
-        # Processar backlog de atividades individualmente
         if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            print("Processando backlog de backend:")
-            print(backend_backlog)  # Adicionando depuração para o backlog de backend
-            process_backlog(developer, backend_backlog, development_dir)
+            process_task_graph(backend_developer, backend_task_graph, development_dir, 'py')
         elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            print("Processando backlog de frontend:")
-            print(frontend_backlog)  # Adicionando depuração para o backlog de frontend
-            process_backlog(developer, frontend_backlog, development_dir)
+            process_task_graph(frontend_developer, frontend_task_graph, development_dir, 'js')
 
-    # Desenvolvimento dos testes
     test_dir = os.path.join(project_base_path, "dev", "tester")
     os.makedirs(test_dir, exist_ok=True)
-    print("Processando backlog de testes:")
-    print(test_backlog)  # Adicionando depuração para o backlog de testes
-    process_backlog(tester, test_backlog, test_dir)
+    process_task_graph(tester, test_task_graph, test_dir, 'py')
 
     # Criando o README do Projeto
     readme_content = f"# {project_name}\n\n[Insira a descrição do projeto aqui]"
