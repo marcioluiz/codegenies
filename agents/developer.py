@@ -4,8 +4,9 @@ import re
 from .base_agent import BaseAgent
 
 class Developer(BaseAgent):
-    def __init__(self, llm, name):
+    def __init__(self, llm, name, interactive=True):
         super().__init__(name, llm)
+        self.interactive = interactive
 
     def develop_code(self, prompt):
         instructions = (
@@ -15,7 +16,10 @@ class Developer(BaseAgent):
         )
         final_prompt = f"{prompt}\n\n{instructions}"
         code = self.evaluate(final_prompt)
-        final_code = self.interact(code)
+        if self.interactive:
+            final_code = self.interact(code)
+        else:
+            final_code = code
         return self._parse_code_response(final_code)
 
     def _parse_code_response(self, response):

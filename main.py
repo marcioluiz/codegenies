@@ -21,6 +21,11 @@ def create_directories(project_base_path):
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
 
 def start(project_name, analyst_properties):
+    
+    # Define um processo interativo
+    interactive = input("Executar o processo interativo? (s/n): ").strip().lower() == 's'
+    
+
     # Limpar pastas __pycache__
     clean_pycache(os.path.dirname(__file__))
 
@@ -31,17 +36,17 @@ def start(project_name, analyst_properties):
 
     ## BEGIN 100% Working 
     # Inicializando o analista
-    analyst = Analyst(llm_anl, analyst_properties)
+    analyst = Analyst(llm_anl, analyst_properties, interactive=interactive)
     analyst.generate_report()
     analyst_report = analyst.output
 
     # Inicializando o líder de equipe
-    squad_leader = SquadLeader(llm_sq)
+    squad_leader = SquadLeader(llm_sq, interactive=interactive)
 
     # Criando os agentes desenvolvedores e tester
-    backend_developer = Developer(llm_dev, "Desenvolvedor Backend")
-    frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend")
-    tester = Tester(llm_dev)
+    backend_developer = Developer(llm_dev, "Desenvolvedor Backend", interactive=interactive)
+    frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend", interactive=interactive)
+    tester = Tester(llm_dev, interactive=interactive)
 
     # Criando o grafo
     agents = {
