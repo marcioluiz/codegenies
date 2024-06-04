@@ -65,7 +65,7 @@ class Developer(BaseAgent):
             else:
                 f.write(structure)
 
-        code_prompt = f"Gere o código necessário para a tarefa: {task}"
+        code_prompt = f"Gere o código necessário para a tarefa: {task} observando também a estrutra criada para a mesma: {structure}"
         print(f"Processando código para a tarefa: {task}")
         try:
             code = self.develop_code(code_prompt)
@@ -104,10 +104,19 @@ class Developer(BaseAgent):
         if not match_filename:
             print("Nenhum nome de arquivo encontrado após o padrão 'criar arquivo' ou 'create file'. Usando nome padrão.")
             return f"new_file.{extension}"
+        elif match_filename:
+            filename = match_filename.group(1)
+            filename_with_extension = f"{filename}.{extension}"
+            return filename_with_extension
+        
+        # Expressão regular para encontrar o padrão "arquivo.ext"
+        pattern_filename_ext = re.compile(r'["\'**]*(.*)\.(\w+)', re.IGNORECASE)
+        match_filename_ext = pattern_filename_ext.search(code_after_instruction)
 
-        filename = match_filename.group(1)
-        filename_with_extension = f"{filename}.{extension}"
-        return filename_with_extension
+        if match_filename_ext:
+            filename = match_filename_ext.group(1)
+            filename_with_extension = f"{filename}.{extension}"
+            return filename_with_extension
 
     def process_backlog(self, backlog, development_dir, extension):
         def is_new_task_line(line):
