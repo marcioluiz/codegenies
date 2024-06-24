@@ -30,6 +30,23 @@ class Developer(BaseAgent):
         else:
             return {"Código": response}
 
+    def generate_structure(self, prompt):
+        structure = self.evaluate(prompt)
+        if self.interactive:
+            final_structure = self.interact(structure)
+        else:
+            final_structure = structure
+        return self._parse_structure_response(final_structure)
+    
+    def _parse_structure_response(self, response):
+        if isinstance(response, str):
+            return {"Estrutura": response}
+        elif isinstance(response, dict):
+            return response
+        else:
+            return {"Estrutura": response}
+
+
     def save_content(self, dir_path, filename, content):
         """
         Salva o conteúdo do desenvolvedor em um arquivo.
@@ -46,7 +63,17 @@ class Developer(BaseAgent):
             file.write(content)
         return content
 
-    def process_task(self, task, development_dir, extension):
+    def _sanitize_task_name(self, task):
+        """
+        Sanitizes the task name to create a valid filename.
+        """
+        return re.sub(r'[^a-zA-Z0-9]', '_', task[:30])
+    
+    def process_task(self, task, development_dir, extension, subnodes=None):
+        """
+        Processes a task, generating the required structure and code.
+        Handles nested subnodes if provided.
+        """
         structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task}"
         print(f"Processando estrutura para a tarefa: {task}")
         try:
@@ -81,41 +108,53 @@ class Developer(BaseAgent):
                     f.write(f"{key}: {value}\n")
             else:
                 f.write(code)
+        
+        # Process subnodes if provided
+        if subnodes:
+            for subnode in subnodes:
+                subnode_task_name = subnode.name
+                subnode_development_dir = os.path.join(development_dir, task_name)
+                os.makedirs(subnode_development_dir, exist_ok=True)
+                self.process_task(subnode_task_name, subnode_development_dir, extension, subnode.subnodes)
 
-    def get_filename_from_code(self, code, extension):
+    def get_filename_from_code(self, code, extension=None):
         if not isinstance(code, str):
             code = str(code)
 
-        # Expressão regular para encontrar o padrão "criar arquivo" ou "create file"
-        pattern_instruction = re.compile(r'(?:criar arquivo|create file)[\s:]*["\'**]*', re.IGNORECASE)
-        match_instruction = pattern_instruction.search(code)
-        
-        if not match_instruction:
-            print("Nenhum padrão 'criar arquivo' ou 'create file' encontrado no código. Usando nome padrão.")
-            return f"new_file.{extension}"
-
-        # Extrai a parte do código após o padrão "criar arquivo" ou "create file"
-        code_after_instruction = code[match_instruction.end():]
-
-        # Expressão regular para extrair o nome do arquivo após o padrão "criar arquivo" ou "create file"
-        pattern_filename = re.compile(r'["\'**]*([^"\':*]+)\.(\w+)', re.IGNORECASE)
-        match_filename = pattern_filename.search(code_after_instruction)
-
-        if not match_filename:
-            print("Nenhum nome de arquivo encontrado após o padrão 'criar arquivo' ou 'create file'. Usando nome padrão.")
-            return f"new_file.{extension}"
-        elif match_filename:
-            filename = match_filename.group(1)
-            filename_with_extension = f"{filename}.{extension}"
-            return filename_with_extension
-        
         # Expressão regular para encontrar o padrão "arquivo.ext"
-        pattern_filename_ext = re.compile(r'["\'**]*(.*)\.(\w+)', re.IGNORECASE)
-        match_filename_ext = pattern_filename_ext.search(code_after_instruction)
+        pattern_filename_ext = re.compile(r'["\'##]*(.*)\.(\w+)', re.IGNORECASE)
+        match_filename_ext = pattern_filename_ext.search(code)
 
         if match_filename_ext:
             filename = match_filename_ext.group(1)
             filename_with_extension = f"{filename}.{extension}"
+            return filename_with_extension
+
+        # Expressão regular para encontrar o padrão "criar arquivo" ou "create file"
+        pattern_instruction = re.compile(r'(?:criar arquivo|create file)[\s:]*["\'##]*', re.IGNORECASE)
+        match_instruction = pattern_instruction.search(code)
+        
+        if not match_instruction:
+            print("Nenhum padrão 'criar arquivo' ou 'create file' encontrado no código.")
+            return None
+        else:
+            # Extrai a parte do código após o padrão "criar arquivo" ou "create file"
+            code_after_instruction = code[match_instruction.end():]
+
+            # Expressão regular para extrair o nome do arquivo após o padrão "criar arquivo" ou "create file"
+            pattern_filename = re.compile(r'["\'##]*([^"\':*]+)\.(\w+)', re.IGNORECASE)
+            match_filename = pattern_filename.search(code_after_instruction)
+
+            if not match_filename:
+                print("Nenhum nome de arquivo encontrado após o padrão 'criar arquivo' ou 'create file'. Usando nome padrão.")
+                return f"new_file.{extension}"
+
+            filename = match_filename.group(1)
+            file_extension = match_filename.group(2)
+
+            # Usar a extensão fornecida no argumento da função, se não for None, caso contrário, usar a encontrada no código
+            final_extension = extension if extension else file_extension
+            filename_with_extension = f"{filename}.{final_extension}"
             return filename_with_extension
 
     def process_backlog(self, backlog, development_dir, extension):
@@ -165,12 +204,6 @@ class Developer(BaseAgent):
                 print(f"Classe identificada: {task.strip()}")
             elif 'create function' in task.lower():
                 print(f"Função identificada: {task.strip()}")
-    
-    def _sanitize_task_name(self, task):
-        """
-        Sanitizes the task name to create a valid filename.
-        """
-        return re.sub(r'[^a-zA-Z0-9]', '_', task[:30])
 
     def get_source_code(self):
         return super().get_source_code()

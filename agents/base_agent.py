@@ -30,30 +30,33 @@ class BaseAgent:
 
         Returns:
             str: O conteúdo do agente.
-        """
-        with open(os.path.join(dir_path, filename), 'w') as file:
-            file.write(content)
-        
-        return content
-
-    def generate_structure(self, prompt):
-        return self.evaluate(prompt)
-
-    def develop_code(self, prompt):
-        return self.evaluate(prompt)
+        """   
+        try:
+            with open(os.path.join(dir_path, filename), 'w') as file:
+                file.write(content)
+            return content
+        except IOError as e:
+            print(f"Error saving content: {e}")
+            return ""
 
     def validate_content(self, content, prompt):
         validation_prompt = f"\nValidar o seguinte conteúdo: {content}. {prompt}"
         return self.evaluate(validation_prompt)
 
-    def validate_structure(self, prompt):
-        return self.evaluate(prompt)
-
     def interact(self, prompt):
+        """
+        Interage com o usuário para refinar a resposta.
+
+        Args:
+            initial_response (str): A resposta inicial do modelo de linguagem.
+
+        Returns:
+            str: A resposta refinada.
+        """
         response = prompt
         print(f"\nInteração com o agente: {self.name} para alterar a resposta do modelo de linguagem acima.")
-        integrate = input("\nDeseja alerar a resposta do modelo? (s/n): ")
-        if integrate.lower() == 's':
+        interact = input("\nDeseja alerar a resposta do modelo? (s/n): ")
+        if interact.lower() == 's':
             response = ''
             user_input = input("\nAção humana Possivelmente necessária. \nPor favor, insira mais um prompt para refinar o resultado anterior: ")
             refined_prompt = user_input + "\n"  + prompt
