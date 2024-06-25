@@ -1,6 +1,5 @@
 # agents/base_agent.py
 import inspect
-import os
 
 class BaseAgent:
     def __init__(self, name, llm):
@@ -18,10 +17,6 @@ class BaseAgent:
         except Exception as e:
             print(f"Erro ao avaliar o prompt: {e}")
             return None
-
-    def validate_content(self, content, prompt):
-        validation_prompt = f"\nValidar o seguinte conteúdo: {content}. {prompt}"
-        return self.evaluate(validation_prompt)
 
     def interact(self, prompt):
         """
