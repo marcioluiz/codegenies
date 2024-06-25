@@ -57,9 +57,6 @@ def start(project_name, analyst_properties):
         "Tester": tester
     }
 
-    graph = Graph()
-    graph.build_graph(agents)
-
     # Criando a estrutura de pastas na raiz do diretório de build
     project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
     create_directories(project_base_path)

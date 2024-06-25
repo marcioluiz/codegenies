@@ -19,26 +19,6 @@ class BaseAgent:
             print(f"Erro ao avaliar o prompt: {e}")
             return None
 
-    def save_content(self, dir_path, filename, content):
-        """
-        Salva o conteúdo do agente em um arquivo.
-
-        Args:
-            dir_path (str): O diretório onde o arquivo será salvo.
-            filename (str): O nome do arquivo.
-            content (str): O conteúdo a ser salvo no arquivo.
-
-        Returns:
-            str: O conteúdo do agente.
-        """   
-        try:
-            with open(os.path.join(dir_path, filename), 'w') as file:
-                file.write(content)
-            return content
-        except IOError as e:
-            print(f"Error saving content: {e}")
-            return ""
-
     def validate_content(self, content, prompt):
         validation_prompt = f"\nValidar o seguinte conteúdo: {content}. {prompt}"
         return self.evaluate(validation_prompt)

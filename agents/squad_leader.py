@@ -123,22 +123,5 @@ class SquadLeader(BaseAgent):
         else:
             return {"Relatório Geral": response}
         
-    def save_content(self, dir_path, filename, content):
-        """
-        Salva o conteúdo do líder de equipe em um arquivo.
-
-        Args:
-            dir_path (str): O diretório onde o arquivo será salvo.
-            filename (str): O nome do arquivo.
-            content (str): O conteúdo a ser salvo no arquivo.
-
-        Returns:
-            str: O conteúdo do líder de equipe.
-        """
-        with open(os.path.join(dir_path, filename), 'w') as file:
-            file.write(content)
-        
-        return content
-        
     def get_source_code(self):
         return super().get_source_code()  # Obtém o código-fonte da classe base
