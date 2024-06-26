@@ -90,56 +90,87 @@ class Developer(BaseAgent):
             open(file_path, 'w').close()
             print(f"Arquivo criado: {file_path}")
 
-        elif parent_category.lower().startswith("criar classes e funções"):
+        elif parent_category.lower().startswith("criar classes e funções") or \
+                parent_category.lower().startswith("funções") or \
+                parent_category.lower().startswith("serviços") or \
+                parent_category.lower().startswith("migrations") or \
+                parent_category.lower().startswith("métodos") or \
+                parent_category.lower().startswith("rotas") or \
+                parent_category.lower().startswith("testes") or \
+                task.startswith("##"):
             # Criar código dentro de um arquivo existente ou novo
-            task_description = task.replace('*', '').strip()
-            structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task_description}"
-            print(f"Processando estrutura para a tarefa: {task_description}")
-            try:
-                structure = self.generate_structure(structure_prompt)
-            except Exception as e:
-                print(f"Erro ao gerar a estrutura para a tarefa '{task_description}': {e}")
-                return
-
-            os.makedirs(development_dir, exist_ok=True)
-            task_name = self._sanitize_task_name(task_description)
-            structure_file_path = os.path.join(development_dir, f"estrutura_{task_name}.txt")
-            with open(structure_file_path, 'w') as f:
-                if isinstance(structure, dict):
-                    for key, value in structure.items():
-                        f.write(f"{key}: {value}\n")
+            if task.startswith("##"):
+                # Processar nó pai com ## como um arquivo
+                file_name = task.replace('##', '').strip()
+                match = re.search(r'([^\\/*?:"<>|]+)\.([a-zA-Z]+)$', file_name)
+                if match:
+                    file_name = match.group(0)
                 else:
-                    f.write(structure)
+                    print(f"Nome de arquivo inválido: {file_name}. Usando nome padrão.")
+                    file_name = f"new_file.{extension}"
+                file_name = self._sanitize_task_name(file_name)
+                file_path = os.path.join(development_dir, file_name)
+                open(file_path, 'w').close()
+                print(f"Arquivo criado: {file_path}")
 
-            code_prompt = f"Gere o código necessário para a tarefa: {task_description} observando também a estrutura criada para a mesma: {structure}"
-            print(f"Processando código para a tarefa: {task_description}")
-            try:
-                code = self.develop_code(code_prompt)
-            except Exception as e:
-                print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
-                return
-
-            # Geração de um nome de arquivo mais curto e significativo
-            sanitized_task_name = re.sub(r'[^a-zA-Z0-9]', '_', task_description)
-            filename = f"{sanitized_task_name}.{extension}"
-            code_file_path = os.path.join(development_dir, filename)
-
-            with open(code_file_path, 'w') as f:
-                if isinstance(code, dict):
-                    for key, value in code.items():
-                        f.write(f"{key}: {value}\n")
+                # Processar sub-nós como funções/classes dentro do arquivo criado
+                if node.subnodes:
+                    for subnode in node.subnodes:
+                        subnode_task_name = subnode.name
+                        subnode_development_dir = os.path.join(development_dir, task.replace('##', '').strip())
+                        self.process_task(subnode, subnode_development_dir, extension, task)
                 else:
-                    f.write(code)
+                    task_description = task.replace('*', '').strip()
+                    structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task_description}"
+                    print(f"Processando estrutura para a tarefa: {task_description}")
+                    try:
+                        structure = self.generate_structure(structure_prompt)
+                    except Exception as e:
+                        print(f"Erro ao gerar a estrutura para a tarefa '{task_description}': {e}")
+                        return
 
-            print(f"Código gerado e salvo em: {code_file_path}")
+                    os.makedirs(development_dir, exist_ok=True)
+                    task_name = self._sanitize_task_name(task_description)
+                    structure_file_path = os.path.join(development_dir, f"estrutura_{task_name}.txt")
+                    with open(structure_file_path, 'w') as f:
+                        if isinstance(structure, dict):
+                            for key, value in structure.items():
+                                f.write(f"{key}: {value}\n")
+                        else:
+                            f.write(structure)
 
-            # Processar sub-nós, se houver
-            if node.subnodes:
-                for subnode in node.subnodes:
-                    subnode_task_name = subnode.name
-                    subnode_development_dir = os.path.join(development_dir, task_name)
-                    os.makedirs(subnode_development_dir, exist_ok=True)
-                    self.process_task(subnode, subnode_development_dir, extension, task_description)
+                    code_prompt = f"Gere o código necessário para a tarefa: {task_description} observando também a estrutura criada para a mesma: {structure}"
+                    print(f"Processando código para a tarefa: {task_description}")
+                    try:
+                        code = self.develop_code(code_prompt)
+                    except Exception as e:
+                        print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
+                        return
 
+                    # Geração de um nome de arquivo mais curto e significativo
+                    sanitized_task_name = re.sub(r'[^a-zA-Z0-9]', '_', task_description)
+                    filename = f"{sanitized_task_name}.{extension}"
+                    code_file_path = os.path.join(development_dir, filename)
+
+                    with open(code_file_path, 'w') as f:
+                        if isinstance(code, dict):
+                            for key, value in code.items():
+                                f.write(f"{key}: {value}\n")
+                        else:
+                            f.write(code)
+
+                    print(f"Código gerado e salvo em: {code_file_path}")
+
+                    # Processar sub-nós, se houver
+                    if node.subnodes:
+                        for subnode in node.subnodes:
+                            subnode_task_name = subnode.name
+                            subnode_development_dir = os.path.join(development_dir, task_name)
+                            os.makedirs(subnode_development_dir, exist_ok=True)
+                            self.process_task(subnode, subnode_development_dir, extension, task_description)
+
+        else:
+            print(f"Categoria de tarefa desconhecida: {parent_category}")
+    
     def get_source_code(self):
         return super().get_source_code()

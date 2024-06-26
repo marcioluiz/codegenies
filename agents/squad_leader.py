@@ -9,7 +9,11 @@ class SquadLeader(BaseAgent):
         self.interactive = interactive
 
     def generate_general_report(self, analyst_report):
-        instructions = "Seja um bom analista de requisitos e crie um relatório bem completo. Com base no relatório do analista acima, gere um relatório geral do projeto, abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e uso geral do framework escolhido conforme relatório acima, bem como todas as tarefas associadas."
+        instructions = ("Seja um bom analista de requisitos e crie um relatório bem completo."
+                        "Com base no relatório do analista acima, gere um relatório geral do projeto, "
+                        "abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e "
+                        "uso geral do framework escolhido conforme relatório acima, bem como todas as tarefas associadas."
+        )
         prompt = f"{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
         if self.interactive:
@@ -19,7 +23,9 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_backend_backlog(self, analyst_report):
-        backlog_model_backend = """
+        backend_backlog_model = """
+            MODELO DE BACKLOG BACKEND
+
             **Criar Pastas**
             1. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
             2. ##pastas/controllers: pasta para armazenar os controladores do projeto.
@@ -54,8 +60,16 @@ class SquadLeader(BaseAgent):
                 * função hashPassword(): para hashear a senha do usuário.
                 * função verifyPassword(): para verificar a senha do usuário.
            """
-        instructions = "Com base no modelo e no relatório do Analista acima, gere o backlog de atividades de backend abordando tudo o que há pra ser desenvolvido no módulo de Backend: listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto. Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias. Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter. Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        prompt = f"{backlog_model_backend}\n\n{analyst_report}\n\n{instructions}"
+        instructions = (
+            "Com base no modelo e no relatório do Analista acima,"
+            "gere o backlog de atividades de backend abordando tudo o que há pra ser desenvolvido no módulo de Backend: "
+            "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
+            "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
+            "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
+            "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
+            "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+        )
+        prompt = f"{backend_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
         if self.interactive:
             final_response = self.interact(response)
@@ -64,7 +78,9 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_frontend_backlog(self, analyst_report):
-        backlog_model_frontend = """
+        frontend_backlog_model = """
+            MODELO DE BACKLOG FRONTEND
+            
             **Criar Pastas**
             1. ##pastas/testes: pasta para armazenar todos os arquivos relacionados a testes.
             2. ##pastas/feature-tests: pasta para armazenar os testes de funcionalidade do projeto.
@@ -93,8 +109,16 @@ class SquadLeader(BaseAgent):
                 * função connectToDBTest(): para testar a conexão com o banco de dados.
                 * função disconnectFromDBTest(): para testar o desligamento da conexão com o banco de dados.
             """
-        instructions = "Com base no modelo e no relatório do Analista acima, gere o backlog de atividades de frontend abordando tudo o que há pra ser desenvolvido no módulo de Frontend: listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto. Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias. Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter. Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        prompt = f"{backlog_model_frontend}\n\n{analyst_report}\n\n{instructions}"
+        instructions = (
+            "Com base no modelo e no relatório do Analista acima,"
+            "gere o backlog de atividades de frontend abordando tudo o que há pra ser desenvolvido no módulo de Frontend: "
+            "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
+            "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
+            "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
+            "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
+            "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+        )
+        prompt = f"{frontend_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
         if self.interactive:
             final_response = self.interact(response)
@@ -103,8 +127,60 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_test_backlog(self, analyst_report):
-        instructions = "Com base no relatório do Analista acima, gere o backlog de atividades de testes abordando tudo o que há pra ser desenvolvido no módulo de Testes: listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto. Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias. Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter. Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        prompt = f"{analyst_report}\n\n{instructions}"
+        tests_backlog_model = """
+            MODELO DE BACKLOG DE TESTES
+
+            **Criar Pastas**
+            1. ##pastas/unit-tests: pasta para armazenar os testes unitários do projeto.
+            2. ##pastas/integration-tests: pasta para armazenar os testes de integração do projeto.
+            3. ##pastas/e2e-tests: pasta para armazenar os testes de ponta a ponta do projeto.
+            4. ##pastas/mocks: pasta para armazenar mocks e stubs usados nos testes.
+            5. ##pastas/utils: pasta para armazenar utilitários e helpers para os testes.
+
+            **Criar Arquivos**
+            1. ##unit-tests/auth.service.test.js: arquivo para testar o serviço de autenticação do projeto.
+            2. ##unit-tests/user.service.test.js: arquivo para testar o serviço de usuário do projeto.
+            3. ##integration-tests/auth.integration.test.js: arquivo para testar a integração do serviço de autenticação com o banco de dados.
+            4. ##integration-tests/user.integration.test.js: arquivo para testar a integração do serviço de usuário com o banco de dados.
+            5. ##e2e-tests/login.e2e.test.js: arquivo para testar o fluxo completo de login do usuário.
+            6. ##e2e-tests/user-registration.e2e.test.js: arquivo para testar o fluxo completo de registro de usuário.
+            7. ##mocks/auth.mock.js: arquivo para armazenar mocks do serviço de autenticação.
+            8. ##mocks/user.mock.js: arquivo para armazenar mocks do serviço de usuário.
+            9. ##utils/test-helpers.js: arquivo para armazenar helpers e utilitários para os testes.
+
+            **Criar Classes e Funções**
+            1. ##unit-tests/auth.service.test.js:
+                * função loginTest(): para testar a autenticação do usuário.
+                * função logoutTest(): para testar o logout do usuário.
+            2. ##unit-tests/user.service.test.js:
+                * função createUserTest(): para testar a criação de um usuário.
+                * função getUserByIdTest(): para testar a obtenção de um usuário por ID.
+            3. ##integration-tests/auth.integration.test.js:
+                * função authDBConnectionTest(): para testar a conexão do serviço de autenticação com o banco de dados.
+            4. ##integration-tests/user.integration.test.js:
+                * função userDBConnectionTest(): para testar a conexão do serviço de usuário com o banco de dados.
+            5. ##e2e-tests/login.e2e.test.js:
+                * função userLoginFlowTest(): para testar o fluxo completo de login do usuário.
+            6. ##e2e-tests/user-registration.e2e.test.js:
+                * função userRegistrationFlowTest(): para testar o fluxo completo de registro de usuário.
+            7. ##mocks/auth.mock.js:
+                * função getAuthMock(): para retornar um mock do serviço de autenticação.
+            8. ##mocks/user.mock.js:
+                * função getUserMock(): para retornar um mock do serviço de usuário.
+            9. ##utils/test-helpers.js:
+                * função setupTestEnv(): para configurar o ambiente de testes.
+                * função tearDownTestEnv(): para desmontar o ambiente de testes.
+            """
+        instructions = (
+            "Com base no modelo e no relatório do Analista acima,"
+            "gere o backlog de atividades de testes abordando tudo o que há pra ser desenvolvido no módulo de Testes: "
+            "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
+            "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
+            "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
+            "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
+            "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+        )
+        prompt = f"{tests_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
         if self.interactive:
             final_response = self.interact(response)
