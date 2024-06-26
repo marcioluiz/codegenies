@@ -94,14 +94,14 @@ def start(project_name, analyst_properties):
         if report_content is not None:
             with open(os.path.join(project_base_path, "reports", report_file), 'w') as f:
                 f.write(str(report_content))
-    ## END 100% Working 
     
-    ## TO-DO solve problems with code
     # Criando os grafos das tarefas
     backend_task_graph = build_task_graph(backend_backlog)
     frontend_task_graph = build_task_graph(frontend_backlog)
     test_task_graph = build_task_graph(test_backlog)
 
+    ## END 100% Working 
+    ## TO-DO solve problems with code
     developers = [backend_developer, frontend_developer]
     for developer in developers:
         development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))

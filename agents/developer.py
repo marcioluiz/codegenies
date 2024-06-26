@@ -61,10 +61,9 @@ class Developer(BaseAgent):
 
         # Verifica se a tarefa é de criação de pasta, arquivo ou código
         if parent_category.lower().startswith("criar pastas"):
-            # Criar pasta
-            dir_name = task.replace('##', '').strip()
-            # Buscar padrão "##pastas/nome_da_pasta"
-            match = re.search(r'##pastas/([^\\/*?:"<>|]+)', dir_name)
+            # Criar pasta para a tarefa corrente
+            dir_name = task.replace('##pastas', '').strip()
+            match = re.search(r'([^\\/*?:"<>|]+)', dir_name)
             if match:
                 dir_name = match.group(1)  # Nome da pasta
             else:
@@ -75,8 +74,22 @@ class Developer(BaseAgent):
             os.makedirs(dir_path, exist_ok=True)
             print(f"Pasta criada: {dir_path}")
 
+            # Processar sub-nós e criar pastas para cada um
+            for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                subnode_dir_name = subnode.name.replace('##pastas', '').strip()
+                match = re.search(r'([^\\/*?:"<>|]+)', subnode_dir_name)
+                if match:
+                    subnode_dir_name = match.group(1)
+                else:
+                    print(f"Nome de sub-pasta inválido: {subnode_dir_name}. Usando nome padrão.")
+                    subnode_dir_name = "new_subfolder"
+                subnode_dir_name = self._sanitize_task_name(subnode_dir_name)
+                subnode_dir_path = os.path.join(dir_path, subnode_dir_name)
+                os.makedirs(subnode_dir_path, exist_ok=True)
+                print(f"Sub-pasta criada: {subnode_dir_path}")
+
         elif parent_category.lower().startswith("criar arquivos"):
-            # Criar arquivo
+            # Criar arquivo para a tarefa corrente
             file_name = task.replace('##', '').strip()
             # Buscar padrão "nomedoarquivo.ext"
             match = re.search(r'([^\\/*?:"<>|]+)\.([a-zA-Z]+)$', file_name)
@@ -89,6 +102,20 @@ class Developer(BaseAgent):
             file_path = os.path.join(development_dir, file_name)
             open(file_path, 'w').close()
             print(f"Arquivo criado: {file_path}")
+
+            # Processar sub-nós e criar arquivos para cada um
+            for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                subnode_file_name = subnode.name.replace('##', '').strip()
+                match = re.search(r'([^\\/*?:"<>|]+)\.([a-zA-Z]+)$', subnode_file_name)
+                if match:
+                    subnode_file_name = match.group(0)  # Nome do arquivo completo
+                else:
+                    print(f"Nome de sub-arquivo inválido: {subnode_file_name}. Usando nome padrão.")
+                    subnode_file_name = f"new_subfile.{extension}"
+                subnode_file_name = self._sanitize_task_name(subnode_file_name)
+                subnode_file_path = os.path.join(development_dir, subnode_file_name)
+                open(subnode_file_path, 'w').close()
+                print(f"Sub-arquivo criado: {subnode_file_path}")
 
         elif parent_category.lower().startswith("criar classes e funções") or \
                 parent_category.lower().startswith("criar") and \
