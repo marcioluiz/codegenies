@@ -97,6 +97,10 @@ class Developer(BaseAgent):
                 parent_category.lower().startswith("métodos") or \
                 parent_category.lower().startswith("rotas") or \
                 parent_category.lower().startswith("testes") or \
+                parent_category.lower().startswith("mocks") or \
+                parent_category.lower().startswith("helpers") or \
+                parent_category.lower().startswith("utilitários") or \
+                parent_category.lower().startswith("outras atividades") or \
                 task.startswith("##"):
             # Criar código dentro de um arquivo existente ou novo
             if task.startswith("##"):
