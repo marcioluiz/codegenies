@@ -93,7 +93,9 @@ def build_task_graph(backlog):
 def process_task_graph(developer, task_graph, development_dir, extension):
     def dfs(node, visited, stack):
         visited.add(node)
-        for subnode in node.subnodes:
+        # Ordenar os sub-nós em ordem alfabética antes de realizar a DFS
+        sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
+        for subnode in sorted_subnodes:
             if subnode not in visited:
                 dfs(subnode, visited, stack)
         stack.append(node)
@@ -101,8 +103,8 @@ def process_task_graph(developer, task_graph, development_dir, extension):
     visited = set()
     stack = []
 
-    # Realiza a DFS para todos os nós do grafo
-    for node in task_graph.nodes:
+    # Realiza a DFS para todos os nós do grafo, ordenando em ordem alfabética
+    for node in sorted(task_graph.nodes, key=lambda x: x.name):
         if node not in visited:
             dfs(node, visited, stack)
 
@@ -112,9 +114,10 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         node_development_dir = os.path.join(development_dir, node.name.replace(' ', '_'))
         os.makedirs(node_development_dir, exist_ok=True)
 
-        # Processa cada sub-nó com base na categoria do nó superior
+        # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
         if node.subnodes:
-            for subnode in node.subnodes:
+            sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
+            for subnode in sorted_subnodes:
                 subnode_development_dir = os.path.join(node_development_dir, subnode.name.replace(' ', '_'))
                 developer.process_task(subnode, subnode_development_dir, extension, node.name)
         else:
