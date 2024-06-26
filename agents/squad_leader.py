@@ -68,6 +68,7 @@ class SquadLeader(BaseAgent):
             "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
             "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
             "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+            "\nSiga o modelo co precisão."
         )
         prompt = f"{backend_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
@@ -117,6 +118,7 @@ class SquadLeader(BaseAgent):
             "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
             "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
             "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+            "\nSiga o modelo co precisão."
         )
         prompt = f"{frontend_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
@@ -179,6 +181,7 @@ class SquadLeader(BaseAgent):
             "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
             "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
             "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
+            "\nSiga o modelo co precisão."
         )
         prompt = f"{tests_backlog_model}\n\n{analyst_report}\n\n{instructions}"
         response = self.evaluate(prompt)
