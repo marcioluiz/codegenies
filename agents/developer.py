@@ -91,17 +91,17 @@ class Developer(BaseAgent):
             print(f"Arquivo criado: {file_path}")
 
         elif parent_category.lower().startswith("criar classes e funções") or \
-                parent_category.lower().startswith("funções") or \
-                parent_category.lower().startswith("serviços") or \
-                parent_category.lower().startswith("migrations") or \
-                parent_category.lower().startswith("métodos") or \
-                parent_category.lower().startswith("rotas") or \
-                parent_category.lower().startswith("testes") or \
-                parent_category.lower().startswith("mocks") or \
-                parent_category.lower().startswith("helpers") or \
-                parent_category.lower().startswith("utilitários") or \
-                parent_category.lower().startswith("outras atividades") or \
-                task.startswith("##"):
+                parent_category.lower().startswith("criar") and \
+                "funções" in parent_category.lower() or \
+                "migrations" in parent_category.lower() or \
+                "métodos" in parent_category.lower() or \
+                "rotas" in parent_category.lower() or \
+                "testes" in parent_category.lower() or \
+                "mocks" in parent_category.lower() or \
+                "helpers" in parent_category.lower() or \
+                "utilitários" in parent_category.lower() or \
+                "outras atividades" in parent_category.lower() or \
+                "##" in task :
 
             # Verifica se é um nó pai com ##
             if task.startswith("##"):
