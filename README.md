@@ -20,6 +20,8 @@ Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada
      - `codegemma:7b-instruct-v1.1-q4_K_M` (Developer)
      - `llama3:8b-instruct-q4_K_M` (Squad Leader)
 
+   - Caso deseje basta alterar estes nomes pelos modelos que preferir no arquivo `main.py`. Claro vc deverá baixar os modelos homônios na Biblioteca Ollama.
+
 3. **Inicie os Modelos:**
    - Certifique-se de que os modelos estão em execução e acessíveis para que os agentes possam se comunicar com eles. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
 
@@ -30,8 +32,8 @@ Para configurar este projeto, siga os passos abaixo:
 1. **Crie uma Pasta do Projeto:**
    - Crie uma pasta com o nome do seu projeto.
 
-2. **Crie o Arquivo `project.properties`:**
-   - Utilize um editor de texto para criar um arquivo chamado `project.properties` com o seguinte conteúdo:
+2. **Configure o Arquivo `project.properties`:**
+   - Utilize um editor de texto para editar o arquivo chamado `project.properties` com o seguinte conteúdo:
      ```
      # Título e Descrição do Projeto
      title=
@@ -43,11 +45,13 @@ Para configurar este projeto, siga os passos abaixo:
 
      # Tecnologias usadas nas camadas do projeto
      backend_technology=
+     backend_file_extension=
      frontend_technology=
+     frontend_file_extension=
      ```
 
 3. **Execute o Script Principal:**
-   - Execute o arquivo `main.py` passando como parâmetro o nome do seu projeto e a localização do arquivo `project.properties`.
+   - Execute o arquivo `main.py`.
    - Exemplo: `python main.py`
 
 4. **Configure os Agentes:**
@@ -79,6 +83,7 @@ Para executar o projeto, siga estas etapas:
 
 ## Estrutura de Pastas do Projeto
 
+```
 A estrutura de pastas do projeto será organizada da seguinte maneira:
 project_name/
 ├── agents/
@@ -100,6 +105,7 @@ project_name/
 │   └── README.md
 ├── project.properties
 └── main.py
+```
 
 ## Contribuição
 
