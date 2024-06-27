@@ -1,14 +1,40 @@
-# agents/squad_leader.py
+"""
+squad_leader.py
+
+Este arquivo define a classe para agentes Líderes de Equipe. 
+A classe herda da classe base definida em `base_agent.py` e 
+implementa métodos específicos para as suas tarefas.
+
+Classes:
+
+- Squad Leader: Classe do agente (Líder de Equipe).
+  - __init__(self, model, [name], interactive=False): Inicializa o agente.
+    - model (Ollama): Modelo de linguagem a ser utilizado pelo agente.
+    - name (str): Nome do agente (apenas para Developer).
+    - interactive (bool): Define se o processo será interativo.
+"""
 import os
 from .base_agent import BaseAgent
 import json
 
 class SquadLeader(BaseAgent):
+    """
+    Inicializa o agente SquadLeader.
+    Args:
+        - model (Ollama): Modelo de linguagem a ser utilizado pelo líder de equipe.
+        - interactive (bool): Define se o processo será interativo.
+    """
     def __init__(self, llm, interactive=True):
         super().__init__("Líder de Equipe", llm)
         self.interactive = interactive
 
     def generate_general_report(self, analyst_report):
+        """
+        Gera o relatório geral do projeto.
+
+        Args:
+            - analyst_report (str): Relatório inicial gerado pelo analista.
+        """
         instructions = ("Seja um bom analista de requisitos e crie um relatório bem completo."
                         "Com base no relatório do analista acima, gere um relatório geral do projeto, "
                         "abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e "
@@ -23,6 +49,12 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_backend_backlog(self, analyst_report):
+        """
+        Gera o backlog de tarefas de backend.
+
+        Args:
+            - analyst_report (str): Relatório inicial gerado pelo analista.
+        """
         backend_backlog_model = """
             MODELO DE BACKLOG BACKEND
 
@@ -79,6 +111,12 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_frontend_backlog(self, analyst_report):
+        """
+        Gera o backlog de tarefas de frontend.
+
+        Args:
+            - analyst_report (str): Relatório inicial gerado pelo analista.
+        """
         frontend_backlog_model = """
             MODELO DE BACKLOG FRONTEND
             
@@ -129,6 +167,12 @@ class SquadLeader(BaseAgent):
         return self._parse_response(final_response)
 
     def generate_test_backlog(self, analyst_report):
+        """
+        Gera o backlog de tarefas de testes.
+
+        Args:
+            - analyst_report (str): Relatório inicial gerado pelo analista.
+        """
         tests_backlog_model = """
             MODELO DE BACKLOG DE TESTES
 

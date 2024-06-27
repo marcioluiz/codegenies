@@ -1,4 +1,20 @@
 # graph.py
+"""
+graph.py
+
+Este arquivo contém funções para a construção e processamento de grafos de tarefas. Os grafos são utilizados para organizar e gerenciar as tarefas de desenvolvimento e teste do projeto.
+
+Funções:
+
+- build_task_graph(backlog): Constrói um grafo de tarefas a partir de um backlog.
+  - backlog (str): Backlog de tarefas em formato de string.
+
+- process_task_graph(agent, task_graph, output_dir, file_extension): Processa um grafo de tarefas e gera os arquivos de código correspondentes.
+  - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
+  - task_graph (Graph): Grafo de tarefas a ser processado.
+  - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
+  - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
+"""
 
 import re
 import os
@@ -37,6 +53,15 @@ class Graph:
         return f"Graph(nodes={len(self.nodes)}, edges={len(self.edges)})"
 
 def build_task_graph(backlog):
+    """
+    Constrói um grafo de tarefas a partir de um backlog.
+
+    Args:
+        - backlog (str): Backlog de tarefas em formato de string.
+
+    Returns:
+        - Graph: Grafo de tarefas construído a partir do backlog.
+    """
     graph = Graph()
     tasks = backlog.splitlines()
     nodes = {}
@@ -91,10 +116,21 @@ def build_task_graph(backlog):
     return graph
 
 def process_task_graph(developer, task_graph, development_dir, extension):
+    """
+    Processa um grafo de tarefas e gera os arquivos de código correspondentes.
+
+    Args:
+        - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
+        - task_graph (Graph): Grafo de tarefas a ser processado.
+        - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
+        - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
+    """
     def dfs(node, visited, stack):
         visited.add(node)
         # Ordenar os sub-nós em ordem alfabética antes de realizar a DFS
         sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
+        for subnode in sorted_subnodes:
+            print(sorted_subnodes)
         for subnode in sorted_subnodes:
             if subnode not in visited:
                 dfs(subnode, visited, stack)
@@ -117,6 +153,8 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
         if node.subnodes:
             sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
+            for subnode in sorted_subnodes:
+                print(sorted_subnodes)
             for subnode in sorted_subnodes:
                 subnode_development_dir = os.path.join(node_development_dir, subnode.name.replace(' ', '_'))
                 developer.process_task(subnode, subnode_development_dir, extension, node.name)

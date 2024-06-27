@@ -1,9 +1,30 @@
-# agents/analyst.py
+"""
+analyst.py
+
+Este arquivo define a classe para o agente Analista. 
+A classe herda da classe base definida em `base_agent.py` e 
+implementa métodos específicos para as suas tarefas.
+
+Classes:
+
+- Analyst: Classe do agente (Analista).
+  - __init__(self, model, [name], interactive=False): Inicializa o agente.
+    - model (Ollama): Modelo de linguagem a ser utilizado pelo agente.
+    - name (str): Nome do agente (apenas para Developer).
+    - interactive (bool): Define se o processo será interativo.
+"""
 import os
 from .base_agent import BaseAgent
 import configparser
 
 class Analyst(BaseAgent):
+    """
+    Inicializa o agente Analyst.
+        Args:
+        - model (Ollama): Modelo de linguagem a ser utilizado pelo analista.
+        - properties_file (str): Caminho para o arquivo de propriedades do projeto.
+        - interactive (bool): Define se o processo será interativo.
+    """
     def __init__(self, llm, properties_file, interactive=True):
         super().__init__("Analista", llm)
         self.properties_file = properties_file
@@ -16,6 +37,12 @@ class Analyst(BaseAgent):
         return config
 
     def generate_report(self):
+        """
+        Gera o relatório inicial do projeto.
+            Args:
+            - model (Ollama): Modelo de linguagem a ser utilizado pelo líder de equipe.
+            - interactive (bool): Define se o processo será interativo.
+        """
         project_info = "\n".join([f"{section}:\n{', '.join([f'{key}: {value}' for key, value in section_data.items()])}" for section, section_data in self.project_data.items()])
         prompt = f"Gere um relatório de análise do projeto completo com base nas propriedades a seguir e leve cada uma delas em consideração no seu relatório:\n{project_info}\n\n Acresente após uma análise rápida de total de pastas de módulos e classes de código de no máximo 04 paragráfos ao final do relatório:\n[Insira aqui a análise rápida do projeto]"
         report = self.evaluate(prompt)

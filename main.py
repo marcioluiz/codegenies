@@ -1,5 +1,22 @@
-# main.py
+"""
+main.py
 
+Este arquivo é o ponto de entrada principal para a execução do projeto. Ele coordena a configuração inicial, a criação de agentes, a geração de relatórios e a estruturação do projeto.
+
+Funções:
+
+- clean_pycache(root_dir): Remove pastas __pycache__ do diretório especificado.
+  - root_dir (str): Caminho do diretório raiz onde a limpeza deve ser realizada.
+
+- create_directories(project_base_path): Cria as estruturas de pastas necessárias no projeto.
+  - project_base_path (str): Caminho da raiz do projeto onde as pastas serão criadas.
+
+- start(project_name, analyst_properties): Inicializa e executa o processo de configuração e execução do projeto.
+  - project_name (str): Nome do projeto.
+  - analyst_properties (str): Caminho para o arquivo de propriedades do analista.
+
+- if __name__ == "__main__": Ponto de entrada do script quando executado diretamente.
+"""
 import os
 import inspect
 import shutil
@@ -8,6 +25,12 @@ from graph import Graph, build_task_graph, process_task_graph
 from langchain_community.llms import Ollama
 
 def clean_pycache(root_dir):
+    """
+    Remove pastas __pycache__ do diretório especificado.
+
+    Args:
+    - root_dir (str): Caminho do diretório raiz onde a limpeza deve ser realizada.
+    """
     for root, dirs, files in os.walk(root_dir):
         for dir_name in dirs:
             if dir_name == "__pycache__":
@@ -16,12 +39,24 @@ def clean_pycache(root_dir):
                 print(f"Removida pasta __pycache__ em {pycache_dir}")
 
 def create_directories(project_base_path):
+    """
+    Cria as estruturas de pastas necessárias no projeto.
+
+    Args:
+    - project_base_path (str): Caminho da raiz do projeto onde as pastas serão criadas.
+    """
     base_dirs = ["agents", "reports", "dev"]
     for base_dir in base_dirs:
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
 
 def start(project_name, analyst_properties):
-    
+    """
+    Inicializa e executa o processo de configuração e execução do projeto.
+
+    Args:
+    - project_name (str): Nome do projeto.
+    - analyst_properties (str): Caminho para o arquivo de propriedades do analista.
+    """
     # Define um processo interativo
     interactive = input("Executar o processo interativo? (s/n): ").strip().lower() == 's'
     
