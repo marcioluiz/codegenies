@@ -4,7 +4,7 @@ graph.py
 
 Este arquivo contém funções para a construção e processamento de grafos de tarefas. Os grafos são utilizados para organizar e gerenciar as tarefas de desenvolvimento e teste do projeto.
 
-Funções:
+Principais Funções:
 
 - build_task_graph(backlog): Constrói um grafo de tarefas a partir de um backlog.
   - backlog (str): Backlog de tarefas em formato de string.
