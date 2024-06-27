@@ -84,7 +84,7 @@ class Developer(BaseAgent):
         # Verifica se a tarefa é de criação de pasta, arquivo ou código
         if parent_category.lower().startswith("criar pastas"):
             # Criar pasta para a tarefa corrente
-            match = re.search(r'##pastas/(\w+)', task)
+            match = re.search(r'##pastas\/(\w+)', task)
             if match:
                 dir_name = match.group(1)  # Nome da pasta
             else:
@@ -98,7 +98,7 @@ class Developer(BaseAgent):
             # Processar sub-nós e criar pastas para cada um
             for subnode in sorted(node.subnodes, key=lambda x: x.name):
                 subnode_task = subnode.name
-                match = re.search(r'##pastas/(\w+)', subnode_task)
+                match = re.search(r'##pastas\/(\w+)', subnode_task)
                 if match:
                     subnode_dir_name = match.group(1)
                 else:
@@ -112,7 +112,7 @@ class Developer(BaseAgent):
         elif parent_category.lower().startswith("criar arquivos"):
             # Criar arquivo para a tarefa corrente
             # Buscar padrão "nomedoarquivo.ext"
-            match = re.search(r'##arquivos/(\w+\.\w+)', task)
+            match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
             if match:
                 file_name = match.group(1)  # Nome do arquivo completo
             else:
@@ -133,7 +133,7 @@ class Developer(BaseAgent):
                 for subnode in sorted(node.subnodes, key=lambda x: x.name):
                     subnode_task = subnode.name
                     subnode_file_name = None
-                    match = re.search(r'##arquivos/(\w+\.\w+)', subnode_task)
+                    match = re.search(r'##(\w+)\/(\w+\.\w+)', subnode_task)
                     
                     if match:
                         subnode_file_name = match.group(1)  # Nome do arquivo completo
@@ -163,17 +163,16 @@ class Developer(BaseAgent):
                 "##" in task :
 
             # Verifica se é um nó pai com ##
-            if task.startswith("##"):
+            if "##" in task:
                 # Processar nó pai com ## como um arquivo
-                file_name = task.replace('##', '').strip()
-                match = re.search(r'([^\\/*?:"<>|]+)\.([a-zA-Z]+)$', file_name)
+                match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
                 if match:
                     file_name = match.group(0)
                 else:
-                    print(f"Nome de arquivo inválido: {file_name}. Usando nome padrão.")
+                    print(f"Nome de arquivo inválido: {task}. Usando nome padrão.")
                     file_name = f"new_file.{extension}"
-                file_name = self._sanitize_task_name(file_name)
-                file_path = os.path.join(development_dir, file_name)
+                file_name = self._sanitize_task_name(match)
+                file_path = os.path.join(development_dir, match)
                 open(file_path, 'w').close()
                 print(f"Arquivo criado: {file_path}")
 
