@@ -67,11 +67,15 @@ class Developer(BaseAgent):
             return response
         else:
             return {"Estrutura": response}
+    
+    def remove_pattern(self, text, pattern):
+        return re.sub(pattern, '', text)
 
     def _sanitize_task_name(self, task):
         """
-        Sanitizes the task name to create a valid filename.
+        Substituir caracteres não alfanuméricos e truncar até 30 caracteres.
         """
+        # Replace non-alphanumeric characters with underscores and truncate the task name to 30 characters
         return re.sub(r'[^a-zA-Z0-9]', '_', task[:30])
     
     def process_task(self, node, development_dir, extension, parent_category):
@@ -91,6 +95,7 @@ class Developer(BaseAgent):
                 print(f"Nome de pasta inválido: {dir_name}. Usando nome padrão.")
                 dir_name = "new_folder"
             dir_name = self._sanitize_task_name(dir_name)
+            dir_name = self.remove_pattern(dir_name, '##(\w+)\/')
             dir_path = os.path.join(development_dir, dir_name)
             os.makedirs(dir_path, exist_ok=True)
             print(f"Pasta criada: {dir_path}")
@@ -105,6 +110,7 @@ class Developer(BaseAgent):
                     print(f"Nome de sub-pasta inválido: {subnode_dir_name}. Usando nome padrão.")
                     subnode_dir_name = "new_subfolder"
                 subnode_dir_name = self._sanitize_task_name(subnode_dir_name)
+                dir_name = self.remove_pattern(dir_name, '##(\w+)\/')
                 subnode_dir_path = os.path.join(dir_path, subnode_dir_name)
                 os.makedirs(subnode_dir_path, exist_ok=True)
                 print(f"Sub-pasta criada: {subnode_dir_path}")
@@ -120,8 +126,10 @@ class Developer(BaseAgent):
                 file_name = f"new_file.{extension}"
 
             if file_name:
-                file_name = self._sanitize_task_name(file_name)
-                file_path = os.path.join(development_dir, file_name)
+                file_name = self.remove_pattern(file_name, '##(\w+)\/')
+                # Substitui sublinhado por hífens para nomenclatura de arquivos consistente
+                file_name_sanitized = file_name.replace('_', '-')
+                file_path = os.path.join(development_dir, file_name_sanitized)
 
                 # Garantir que os diretórios no caminho existam
                 os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -140,7 +148,7 @@ class Developer(BaseAgent):
                     else:
                         print(f"Nome de sub-arquivo inválido: {subnode_task}. Pulando criação do sub-arquivo.")
                     if subnode_file_name:
-                        subnode_file_name = self._sanitize_task_name(subnode_file_name)
+                        subnode_file_name = self.remove_pattern(subnode_file_name, '##(\w+)\/')
                         subnode_file_path = os.path.join(development_dir, subnode_file_name)
 
                         # Garantir que os diretórios no caminho existam
@@ -171,8 +179,8 @@ class Developer(BaseAgent):
                 else:
                     print(f"Nome de arquivo inválido: {task}. Usando nome padrão.")
                     file_name = f"new_file.{extension}"
-                file_name = self._sanitize_task_name(match)
-                file_path = os.path.join(development_dir, match)
+                file_name = self.remove_pattern(match, '##(\w+)\/')
+                file_path = os.path.join(development_dir, file_name)
                 open(file_path, 'w').close()
                 print(f"Arquivo criado: {file_path}")
 
@@ -196,6 +204,7 @@ class Developer(BaseAgent):
 
                 os.makedirs(development_dir, exist_ok=True)
                 task_name = self._sanitize_task_name(task_description)
+                task_name = self.remove_pattern(task_name, '##(\w+)\/')
                 structure_file_path = os.path.join(development_dir, f"estrutura_{task_name}.txt")
                 with open(structure_file_path, 'w') as f:
                     if isinstance(structure, dict):
@@ -212,10 +221,11 @@ class Developer(BaseAgent):
                     print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
                     return
 
-                # Geração de um nome de arquivo mais curto e significativo
-                sanitized_task_name = re.sub(r'[^a-zA-Z0-9]', '_', task_description)
-                filename = f"{sanitized_task_name}.{extension}"
-                code_file_path = os.path.join(development_dir, filename)
+                
+                # Substitua sublinhado por hífens para nomenclatura de arquivos consistente
+                file_name = self._sanitize_task_name(task_description)
+                file_name = self.remove_pattern(file_name, '##(\w+)\/')
+                code_file_path = os.path.join(development_dir, file_name)
 
                 with open(code_file_path, 'w') as f:
                     if isinstance(code, dict):
@@ -230,7 +240,7 @@ class Developer(BaseAgent):
                 if node.subnodes:
                     for subnode in sorted(node.subnodes, key=lambda x: x.name):
                         subnode_task_name = subnode.name
-                        subnode_development_dir = os.path.join(development_dir, task_name)
+                        subnode_development_dir = os.path.join(development_dir, subnode_task_name)
                         os.makedirs(subnode_development_dir, exist_ok=True)
                         self.process_task(subnode, subnode_development_dir, extension, task_description)
     

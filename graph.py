@@ -128,10 +128,9 @@ def process_task_graph(developer, task_graph, development_dir, extension):
     def dfs(node, visited, stack):
         visited.add(node)
         # Ordenar os sub-nós em ordem alfabética antes de realizar a DFS
-        sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
-        for subnode in sorted_subnodes:
-            print(sorted_subnodes)
-        for subnode in sorted_subnodes:
+        for subnode in node.subnodes:
+            print(node.subnodes)
+        for subnode in node.subnodes:
             if subnode not in visited:
                 dfs(subnode, visited, stack)
         stack.append(node)
@@ -147,16 +146,26 @@ def process_task_graph(developer, task_graph, development_dir, extension):
     # Processa os nós em ordem topológica
     while stack:
         node = stack.pop()
-        node_development_dir = os.path.join(development_dir, node.name.replace(' ', '_'))
+        
+        node_name = node.name.replace(' ', '_')
+        match = re.search(r'##pastas\/(\w+)', node_name)
+        if match:
+           node_name = match.group(1)
+        
+        node_development_dir = os.path.join(development_dir, node_name)
         os.makedirs(node_development_dir, exist_ok=True)
 
         # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
         if node.subnodes:
-            sorted_subnodes = sorted(node.subnodes, key=lambda x: x.name)
-            for subnode in sorted_subnodes:
-                print(sorted_subnodes)
-            for subnode in sorted_subnodes:
-                subnode_development_dir = os.path.join(node_development_dir, subnode.name.replace(' ', '_'))
+            for subnode in node.subnodes:
+                print(node.subnodes)
+            for subnode in node.subnodes:
+                
+                subnode_name = subnode.name.replace(' ', '_')
+                match = re.search(r'##pastas\/(\w+)', subnode_name)
+                if match:
+                    subnode_name = match.group(1)
+                subnode_development_dir = os.path.join(node_development_dir, subnode_name)
                 developer.process_task(subnode, subnode_development_dir, extension, node.name)
         else:
             developer.process_task(node, node_development_dir, extension, node.name)
