@@ -136,27 +136,11 @@ class Developer(BaseAgent):
         """
         task = node.name
 
-        # Processa pastas
-        if parent_category.lower().startswith("criar pastas"):
-            current_dir = self.process_create_folder(task, development_dir)
-            if current_dir:
-                for subnode in sorted(node.subnodes, key=lambda x: x.name):
-                    self.process_create_folder(subnode.name, current_dir)
-
-        # Processa arquivos
-        elif parent_category.lower().startswith("criar arquivos"):
-            current_file = self.process_create_file(task, development_dir)
-            if current_file:
-                self.generate_and_write_code(current_file, task)
-                for subnode in sorted(node.subnodes, key=lambda x: x.name):
-                    subnode_file = self.process_create_file(subnode.name, development_dir)
-                    if subnode_file:
-                        self.generate_and_write_code(subnode_file, subnode.name)
-
-        # Processa outras tarefas (classes, funções, etc.)
-        elif parent_category.lower().startswith("criar classes e funções") or \
-                parent_category.lower().startswith("criar") and \
-                ("funções" in parent_category.lower() or \
+        # Processa tarefas dos tipos previstos (classes, funções, etc.)
+        if parent_category.lower().startswith("**criar classes e funções") or \
+                parent_category.lower().startswith("**criar") and \
+                ("arquivos" in parent_category.lower() or \
+                 "funções" in parent_category.lower() or \
                  "migrations" in parent_category.lower() or \
                  "métodos" in parent_category.lower() or \
                  "rotas" in parent_category.lower() or \
@@ -166,7 +150,7 @@ class Developer(BaseAgent):
                  "utilitários" in parent_category.lower() or \
                  "outras atividades" in parent_category.lower()) or \
                 "##" in task:
-
+            
             if "##" in task:
                 match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
                 if match:

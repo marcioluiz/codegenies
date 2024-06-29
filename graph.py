@@ -154,7 +154,6 @@ def process_task_graph(developer, task_graph, development_dir, extension):
            node_name = match.group(1)
         node_name = unidecode.unidecode(node_name)
         node_development_dir = os.path.join(development_dir, node_name)
-        os.makedirs(node_development_dir, exist_ok=True)
 
         # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
         if node.subnodes:
