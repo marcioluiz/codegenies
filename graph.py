@@ -14,6 +14,23 @@ Principais Funções:
   - task_graph (Graph): Grafo de tarefas a ser processado.
   - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
   - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
+
+English version:
+
+This file contains functions for constructing and processing task graphs. Graphs are used to organize and manage project development and testing tasks.
+
+Main Functions:
+
+- build_task_graph(backlog): Builds a task graph from a backlog.
+  - backlog (str): Task backlog in string format.
+
+- process_task_graph(agent, task_graph, output_dir, file_extension): Processes a task graph and generates corresponding code files.
+  - agent (object): Agent responsible for processing tasks (Developer or Tester).
+  - task_graph (Graph): Task graph to be processed.
+  - output_dir (str): Output directory where generated files will be saved.
+  - file_extension (str): Extension of the files to be generated (e.g., 'py', 'js').
+     
+
 """
 
 import re
@@ -62,6 +79,16 @@ def build_task_graph(backlog):
 
     Returns:
         - Graph: Grafo de tarefas construído a partir do backlog.
+
+    English:
+    
+    Builds a task graph from a backlog.
+
+    Args:
+        - backlog (str): Task backlog in string format.
+
+    Returns:
+        - Graph: Task graph built from the backlog.
     """
     graph = Graph()
     tasks = backlog.splitlines()
@@ -77,6 +104,7 @@ def build_task_graph(backlog):
             continue
         if line.startswith("**") and line.endswith("**"):
             # Identificar uma nova categoria de tarefas
+            # Identify a new category of tasks
             group_name = line.strip("**").strip()
             current_group_node = Node(group_name)
             nodes[group_name] = current_group_node
@@ -84,6 +112,7 @@ def build_task_graph(backlog):
             current_task_node = None
         elif line.startswith("##"):
             # Identificar uma nova tarefa de criar pasta ou arquivo
+            # Identify a new task to create folder or file
             task_name = line.strip("##").strip()
             task_node = Node(task_name)
             if current_group_node:
@@ -94,6 +123,7 @@ def build_task_graph(backlog):
             current_task_node = task_node
         elif line.startswith("*"):
             # Identificar uma nova função a ser criada dentro de um arquivo
+            # Identify a new function to be created within a file
             function_name = line.strip("*").strip()
             function_node = Node(function_name)
             if current_task_node:
@@ -105,6 +135,7 @@ def build_task_graph(backlog):
             nodes[function_name] = function_node
         else:
             # Linha que não corresponde a nenhuma das categorias acima
+            # Line that doesn't match any of the above categories
             task_name = line
             task_node = Node(task_name)
             if current_group_node:
@@ -125,10 +156,21 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         - task_graph (Graph): Grafo de tarefas a ser processado.
         - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
         - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
+
+    English:
+        
+    Processes a task graph and generates corresponding code files.
+
+    Args:
+        - agent (object): Agent responsible for processing tasks (Developer or Tester).
+        - task_graph (Graph): Task graph to be processed.
+        - output_dir (str): Output directory where generated files will be saved.
+        - file_extension (str): Extension of the files to be generated (e.g., 'py', 'js').
     """
     def dfs(node, visited, stack):
         visited.add(node)
         # Ordenar os sub-nós em ordem alfabética antes de realizar a DFS
+        # Sort sub-nodes alphabetically before performing DFS
         for subnode in node.subnodes:
             print(node.subnodes)
         for subnode in node.subnodes:
@@ -140,11 +182,13 @@ def process_task_graph(developer, task_graph, development_dir, extension):
     stack = []
 
     # Realiza a DFS para todos os nós do grafo, ordenando em ordem alfabética
+    # Perform DFS for all nodes in the graph, sorting alphabetica
     for node in task_graph.nodes:
         if node not in visited:
             dfs(node, visited, stack)
 
     # Processa os nós em ordem topológica
+    # Process nodes in topological order
     while stack:
         node = stack.pop()
         
@@ -156,6 +200,7 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         node_development_dir = os.path.join(development_dir, node_name)
 
         # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
+        # Process each sub-node based on the category of the parent node, alphabetically
         if node.subnodes:
             for subnode in node.subnodes:
                 print(node.subnodes)

@@ -12,6 +12,20 @@ Classes:
     - model (Ollama): Modelo de linguagem a ser utilizado pelo agente.
     - name (str): Nome do agente (apenas para Developer).
     - interactive (bool): Define se o processo será interativo.
+
+English:
+
+This file defines the base class Developer and its subclasses (BackendDeveloper, FrontendDeveloper).
+
+Classes:
+
+- Developer: Base class for developers.
+  - __init__(self, llm, role): Initializes a developer with a language model and role.
+    - llm (Ollama): Language model to be used by the developer.
+    - role (str): Role of the developer (e.g., "Backend Developer", "Frontend Developer").
+
+- BackendDeveloper: Subclass of Developer for backend development tasks.
+- FrontendDeveloper: Subclass of Developer for frontend development tasks.
 """
 import os
 import re
@@ -26,6 +40,15 @@ class Developer(BaseAgent):
         - model (Ollama): Modelo de linguagem a ser utilizado pelo desenvolvedor.
         - name (str): Nome do desenvolvedor.
         - interactive (bool): Define se o processo será interativo.
+
+    English:
+
+    Initializes a developer with a language model and role.
+
+        Args:
+            - llm (Ollama): Language model to be used by the developer.
+            - name (str): Name of the developer (e.g., "Backend Developer", "Frontend Developer").
+            - interactive (bool): Defines if the process should run with interactions with the user.
     """
     def __init__(self, llm, name, interactive=True):
         super().__init__(name, llm)
@@ -75,11 +98,25 @@ class Developer(BaseAgent):
     def _sanitize_task_name(self, task):
         """
         Substituir caracteres não alfanuméricos e truncar até 30 caracteres.
+        Argumentos:
+            - tarefa (str): Descrição da tarefa.
+        Retorna:
+            - str: nome do arquivo higienizado.
+
+        English:
+        
+        Sanitizes the task name to create a valid filename.
+        Args:
+            - task (str): Task description.
+        Returns:
+            - str: Sanitized filename.
         """
+        # Substitua caracteres não alfanuméricos por sublinhados e trunque o nome da tarefa para 30 caracteres
         # Replace non-alphanumeric characters with underscores and truncate the task name to 30 characters
         return re.sub(r'[^a-zA-Z0-9]', '_', task[:30])
 
     # Função para processar criação de pastas
+    # Function to process folder creation
     def process_create_folder(self, task, base_dir):
         match = re.search(r'##pastas\/(\w+)', task)
         if match:
@@ -96,6 +133,7 @@ class Developer(BaseAgent):
             return base_dir
 
     # Função para processar criação de arquivos
+    # Function to process file creation
     def process_create_file(self, task, base_dir):
         match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
         if match:
@@ -111,6 +149,7 @@ class Developer(BaseAgent):
             return None
 
     # Função para gerar e escrever código em arquivos
+    # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
         code_prompt = f"Gere o código necessário para a tarefa: {task_description}"
         print(f"Processando código para a tarefa: {task_description}")
@@ -133,10 +172,16 @@ class Developer(BaseAgent):
         """
         Processa uma tarefa, gerando a estrutura e código necessários.
         Lida com sub-nós aninhados se fornecido.
+
+        English:
+
+        Processes a task, generating the necessary structure and code.
+        Handles nested subnodes if provided.
         """
         task = node.name
 
         # Processa tarefas dos tipos previstos (classes, funções, etc.)
+        # Process tasks of the expected types (classes, functions, etc.)
         if parent_category.lower().startswith("**criar classes e funções") or \
                 parent_category.lower().startswith("**criar") and \
                 ("arquivos" in parent_category.lower() or \
@@ -216,4 +261,8 @@ class Developer(BaseAgent):
                     self.process_task(subnode, subnode_development_dir, extension, task_description)
     
     def get_source_code(self):
+        # Obtém o código-fonte da classe base
+        # Se a resposta for uma string simples ela é retornada
+        # Get the source code of the base class
+        # If the response is a simple string it is returned
         return super().get_source_code()
