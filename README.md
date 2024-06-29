@@ -118,13 +118,18 @@ project_name/
 │   │   ├── desenvolvedor_frontend/
 │   │   └── tester/
 │   ├── reports/
-│   │   ├── relatório_geral_do_projeto.txt
+│   │   ├── relatorio_geral_do_projeto.txt
 │   │   ├── backlog_de_tarefas_de_backend.txt
 │   │   ├── backlog_de_tarefas_de_frontend.txt
 │   │   └── backlog_de_tarefas_de_testes.txt
 │   └── README.md
+├── graph.py
+├── LICENSE (GPL-3.0 License)
+├── main.py
 ├── project.properties
-└── main.py
+├── README.en_US.md
+├── README.md
+└── requirements.txt
 ```
 
 ## Informações do Licenciamento

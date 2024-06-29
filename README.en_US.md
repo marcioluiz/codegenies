@@ -131,9 +131,13 @@ project_name/
 │ │ ├── frontend_task_backlog.txt
 │ │ └── test_task_backlog.txt
 │ └── README.md
-├── project.properties
+├── graph.py
 ├── LICENSE (GPL-3.0 License)
-└── main.py
+├── main.py
+├── project.properties
+├── README.en_US.md
+├── README.md
+└── requirements.txt
 ```
 
 ## Licensing Information
