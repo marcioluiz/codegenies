@@ -140,7 +140,7 @@ class Developer(BaseAgent):
         if parent_category.lower().startswith("criar pastas"):
             current_dir = self.process_create_folder(task, development_dir)
             if current_dir:
-                for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                for subnode in node.subnodes:
                     self.process_create_folder(subnode.name, current_dir)
 
         # Processa arquivos
@@ -148,7 +148,7 @@ class Developer(BaseAgent):
             current_file = self.process_create_file(task, development_dir)
             if current_file:
                 self.generate_and_write_code(current_file, task)
-                for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                for subnode in node.subnodes:
                     subnode_file = self.process_create_file(subnode.name, development_dir)
                     if subnode_file:
                         self.generate_and_write_code(subnode_file, subnode.name)
@@ -177,7 +177,7 @@ class Developer(BaseAgent):
                     os.makedirs(os.path.dirname(file_path), exist_ok=True)
                     self.generate_and_write_code(file_path, task)
 
-                    for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                    for subnode in node.subnodes:
                         self.process_task(subnode, development_dir, extension, task)
 
             else:
@@ -225,7 +225,7 @@ class Developer(BaseAgent):
 
                 print(f"Código gerado e salvo em: {code_file_path}")
 
-                for subnode in sorted(node.subnodes, key=lambda x: x.name):
+                for subnode in node.subnodes:
                     subnode_task_name = subnode.name
                     subnode_development_dir = os.path.join(development_dir, subnode_task_name)
                     os.makedirs(subnode_development_dir, exist_ok=True)

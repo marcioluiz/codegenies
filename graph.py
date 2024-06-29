@@ -140,7 +140,7 @@ def process_task_graph(developer, task_graph, development_dir, extension):
     stack = []
 
     # Realiza a DFS para todos os nós do grafo, ordenando em ordem alfabética
-    for node in sorted(task_graph.nodes, key=lambda x: x.name):
+    for node in task_graph.nodes:
         if node not in visited:
             dfs(node, visited, stack)
 
