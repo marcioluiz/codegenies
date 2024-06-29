@@ -168,11 +168,6 @@ def start(project_name, analyst_properties):
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
         f.write(readme_content)
 
-    # Capturando e salvando a saída completa
-    actions_report = sys.stdout.getvalue()
-    with open(os.path.join(project_base_path, "relatorio_acoes.txt"), 'w') as f:
-        f.write(actions_report)
-
 def main():
     project_name = input("Nome do projeto: ")
     analyst_properties = os.path.join(os.path.dirname(__file__), "project.properties")
