@@ -1,136 +1,149 @@
-# CodeGenies: Equipe de SLMs para Desenvolvimento  de Software em Grafo de Tarefas
+# CodeGenies: Team of SLMs for Software Development in Task Graph
 
-Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada em linguagem natural que permita às equipes de desenvolvimento trabalharem de forma eficiente, integrando inteligência artificial para automatizar as atividades do desenho de arquitetura, desenvolvimento de código e testes. O projeto faz uso de modelos de linguagem pequenos (ou SLMs como na sigla em inglês).
+This is a project developed with the purpose of creating a natural language-based platform 
+that allows development teams to work efficiently, integrating artificial intelligence 
+to automate architectural design, code development and testing activities. 
+The project makes use of small language models (or SLMs).
 
-## Requisitos
 
-- Python 3.11 (Testado com Python 3.11.9)
-- Conda or Miniconda instalados
-- Agentes LLMs instalados localmente com Ollama (Codegemma, Mistral, Llama-3)
+## Requirements
 
-## Configuração do Projeto
+- Python 3.11 (Tested with Python 3.11.9)
+- Conda or Miniconda installed
+- LLM agents installed locally with Ollama (Codegemma, Mistral, Llama-3)
 
-### Instalação do Ollama
+## Project Configuration
 
-1. **Baixe e instale o Ollama:**
-   - Acesse o [site oficial do Ollama](https://ollama.ai) e siga as instruções para baixar e instalar o software.
+### Ollama Installation
 
-2. **Configure os Modelos:**
-   - Você precisará dos seguintes modelos instalados e configurados no Ollama:
+## Project Configuration
+
+### Ollama Installation
+
+1. **Download and install Ollama:**
+   - Visit the [Ollama official website](https://ollama.ai) and follow the instructions to download and install the software.
+
+2. **Configure the Models:**
+   - You will need the following templates installed and configured in Ollama:
      - [phi3:14b-medium-128k-instruct-q4_K_M](https://ollama.com/library/phi3:14b-medium-128k-instruct-q4_K_M) (Analyst)
      - [codegemma:7b-instruct-v1.1-q4_K_M](https://ollama.com/library/codegemma:7b-instruct-v1.1-q4_K_M) (Developer)
      - [llama3:8b-instruct-q4_K_M](https://ollama.com/library/llama3:8b-instruct-q4_K_M) (Squad Leader)
-   - Caso deseje basta alterar estes nomes pelos modelos que preferir no arquivo `main.py`. Claro vc deverá baixar os modelos homônios na [Biblioteca Ollama](https://ollama.com/library/).
+   - If you wish, simply change these names to the models you prefer in the `main.py` file. Of course, you should download the homologous models from the [Ollama Library](https://ollama.com/library/).
 
-3. **Inicie os Modelos:**
-   - Certifique-se de que os modelos estão em execução e acessíveis para que os agentes possam se comunicar com eles. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
+3. **Start the Templates:**
+   - Ensure templates are running and accessible so agents can communicate with them. Check the ports used and adjust your firewall or router as necessary.
 
-### Configuração do Projeto
+### Project Configuration
 
-Para configurar este projeto, siga os passos abaixo:
+To configure this project, follow the steps below:
 
-1. **Crie uma Pasta do Projeto:**
-   - Crie uma pasta com o nome do seu projeto.
+1. **Create a Project Folder:**
+   - Create a folder with the name of your project.
 
-2. **Crie um Ambiente Conda para o Projeto:**
-   - Crie um ambiente conda com o nome do seu projeto:
+2. **Create a Conda Environment for the Project:**
+   - Create a conda environment with the name of your project:
    ```
       conda create -n codegenies python=3.11
    ```
-   - Execute o ambiente e confira a execução:
+   - Run the environment and check the execution:
    ```
       conda activate codegenies
       conda info
    ```
 
-3. **Instale as dependências do projeto:**
-   - Crie um ambiente conda com o nome do seu projeto:
+3. **Install project dependencies:**
+   - Create a conda environment with the name of your project:
    ```
       pip install -r requirements.txt
    ```
 
-4. **Configure o Arquivo `project.properties`:**
-   - Utilize um editor de texto para editar o arquivo chamado `project.properties` com o seguinte conteúdo:
+4. **Configure the `project.properties` File:**
+   - Use a text editor to edit the file called `project.properties` with the following content:
      ```
-     # Título e Descrição do Projeto
+     # Project Title and Description
      title=
      description=
      author=
 
-     # Detalhamento técnico Completo do Projeto
+     # Complete technical details of the Project
      technical_details=
 
-     # Tecnologias usadas nas camadas do projeto
+     # Technologies used in project layers
      backend_technology=
      backend_file_extension=
      frontend_technology=
      frontend_file_extension=
      ```
 
-5. **Inicie os Serviços Externos:**
-   - Certifique-se de que os modelos instalados localmente [via Ollama Library](https://ollama.com/library/) ou em serviços externos (como [Hugging Face](https://huggingface.co/models?sort=downloads&search=gguf)) estão em execução e acessíveis para comunicar-se com o projeto. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
+5. **Start External Services:**
+   - Make sure models are installed locally [via Ollama Library](https://ollama.com/library/) or from external services (like [Hugging Face](https://huggingface.co/models?sort= downloads&search=gguf)) are running and accessible to communicate with the project. Check the ports used and adjust your firewall or router as necessary.
 
-6. **Execute o Script Principal:**
-   - Execute o arquivo `main.py`.
-   - Exemplo: `python main.py`
+6. **Run the Main Script:**
+   - Run the `main.py` file.
+   - Example: `python main.py`
 
-7. **Configure Novos Agentes:**
-   - Crie novos agentes na pasta `agents` conforme a necessidade do seu projeto para realizar tarefas diversificadas, como gerar arquivos de estrutura, pastas ou arquivos de código.
+7. **Configure New Agents:**
+   - Create new agents in the `agents` folder as needed by your project to perform different tasks, such as generating structure files, folders or code files.
 
-## Execução do Projeto
+## Project Execution
 
-Para executar o projeto, siga estas etapas:
+To run the project, follow these steps:
 
-1. **Inicie os Serviços Externos:**
-   - Certifique-se de que os modelos instalados localmente (via Ollama) ou em serviços externos (como Hugging Face) estão em execução.
+1. **Start External Services:**
+   - Make sure templates installed locally (via Ollama) or on external services (like Hugging Face) are running.
 
-2. **Execute o Script Principal:**
-   - Execute o arquivo `main.py` passando como parâmetro o nome do seu projeto e a localização do arquivo `project.properties`.
-   - O sistema começará a gerar os relatórios iniciais para cada um dos agentes e iniciará a criação da estrutura de pastas e códigos conforme as respectivas backlogs de atividades geradas pelo analista.
+2. **Run the Main Script:**
+   - Run the `main.py` file passing the name of your project and the location of the `project.properties` file as parameters.
+   - The system will begin generating initial reports for each of the agents and will begin creating the structure of folders and codes according to the respective activity backlogs generated by the analyst.
 
-3. **Trabalhe nos Códigos:**
-   - Os desenvolvedores trabalharão em suas pastas separadas no projeto, implementando seus códigos conforme os backlogs.
+3. **Work on Codes:**
+   - Developers will work in their separate folders in the project, implementing their codes according to the backlogs.
 
-4. **Teste o Código:**
-   - O tester deve realizar os testes e adicioná-los à sua pasta separada, também dentro do projeto.
-   - A equipe deve trabalhar em conjunto para realizar os testes no código produzido e corrigir os eventuais erros encontrados.
+4. **Test the Code:**
+   - The tester must perform the tests and add them to their separate folder, also within the project.
+   - The team must work together to carry out tests on the code produced and correct any errors found.
 
-5. **Gere Relatórios:**
-   - Quando estiver pronto, o sistema gera o relatório completo com as informações dos agentes e os resultados dos testes realizados pelo tester.
+5. **Generate Reports:**
+   - When ready, the system generates a complete report with agent information and the results of the tests carried out by the tester.
 
-6. **Atualize o Projeto:**
-   - É possível retornar ao início do projeto para atualizar as informações, backlogs e relatórios, gerando uma nova estrutura de arquivos conforme necessário.
+6. **Update the Project:**
+   - You can return to the beginning of the project to update information, backlogs and reports, generating a new file structure as needed.
 
-## Estrutura de Pastas do Projeto
+## Project Folder Structure
 
 ```
-A estrutura de pastas do projeto será organizada da seguinte maneira:
+The project folder structure will be organized as follows:
 project_name/
 ├── agents/
-│   ├── analyst.py
-│   ├── squad_leader.py
-│   ├── developer_backend.py
-│   ├── developer_frontend.py
-│   └── tester.py
+│ ├── analyst.py
+│ ├── squad_leader.py
+│ ├── developer_backend.py
+│ ├── developer_frontend.py
+│ └── tester.py
 ├── build/
-│   ├── dev/
-│   │   ├── desenvolvedor_backend/
-│   │   ├── desenvolvedor_frontend/
-│   │   └── tester/
-│   ├── reports/
-│   │   ├── relatório_geral_do_projeto.txt
-│   │   ├── backlog_de_tarefas_de_backend.txt
-│   │   ├── backlog_de_tarefas_de_frontend.txt
-│   │   └── backlog_de_tarefas_de_testes.txt
-│   └── README.md
+│ ├── dev/
+│ │ ├── developer_backend/
+│ │ ├── developer_frontend/
+│ │ └── tester/
+│ ├── reports/
+│ │ ├── project_general_report.txt
+│ │ ├── backend_task_backlog.txt
+│ │ ├── frontend_task_backlog.txt
+│ │ └── test_task_backlog.txt
+│ └── README.md
 ├── project.properties
+├── LICENSE (GPL-3.0 License)
 └── main.py
 ```
 
-## Contribuição
+## Licensing Information
 
-Sinta-se à vontade para contribuir com este projeto. Se você tiver alguma dúvida ou encontrar problemas, abra uma issue ou envie um pull request.
+This project is released under the GNU General Public License v3.0 (GPL-3.0). This means that you are free to use, modify and distribute this code as long as you respect the terms of the GPL license. The full license text can be found in the LICENSE file included with the project.
+
+## Contribution
+
+Feel free to contribute to this project. If you have any questions or encounter problems, please open an issue or submit a pull request.
 
 ---
 
-**Aproveite a integração de inteligência artificial em suas equipes de desenvolvimento com o CodeGenies!**
+**Enjoy the integration of artificial intelligence into your development teams with CodeGenies!**

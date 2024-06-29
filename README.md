@@ -126,6 +126,10 @@ project_name/
 └── main.py
 ```
 
+## Informações do Licenciamento
+
+Este projeto é piblicado sob a Licença Pública Geral GNU v3.0 (GPL-3.0). Isto significa que você é livre para usar, modificar e distribuir este código, desde que respeite os termos da licença GPL. O texto completo da licença pode ser encontrado no arquivo LICENSE incluído no projeto.
+
 ## Contribution
 
 Feel free to contribute to this project. If you have any questions or encounter issues, open an issue or send a pull request.

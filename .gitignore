@@ -3,3 +3,4 @@ build/*
 !/build/.gitkeep
 agents/__pycache__/
 old/
+bkp.project.properties
