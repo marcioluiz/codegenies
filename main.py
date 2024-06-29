@@ -69,7 +69,6 @@ def start(project_name, analyst_properties):
     llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")  # Modelo Codegemma para fazer o papel de Developer
     llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Lama-3 para fazer o papel de Squadleader
 
-    ## BEGIN 100% Working 
     # Inicializando o analista
     analyst = Analyst(llm_anl, analyst_properties, interactive=interactive)
     analyst.generate_report()
@@ -135,8 +134,7 @@ def start(project_name, analyst_properties):
     frontend_task_graph = build_task_graph(frontend_backlog)
     test_task_graph = build_task_graph(test_backlog)
 
-    ## END 100% Working 
-    ## TO-DO solve problems with code
+    ## Processamento dos Grafos de Tarefas
     developers = [backend_developer, frontend_developer]
     for developer in developers:
         development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))

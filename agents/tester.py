@@ -29,22 +29,6 @@ class Tester(Developer):
         super().__init__(llm, "Tester")
         self.interactive = interactive
 
-    def generate_structure(self, prompt):
-        structure = self.evaluate(prompt)
-        if self.interactive:
-            final_structure = self.interact(structure)
-        else:
-            final_structure = structure
-        return self._parse_structure_response(final_structure)
-    
-    def _parse_structure_response(self, response):
-        if isinstance(response, str):
-            return {"Estrutura": response}
-        elif isinstance(response, dict):
-            return response
-        else:
-            return {"Estrutura": response}
-
     def develop_tests(self, prompt):
         tests = self.evaluate(prompt)
         if self.interactive:
