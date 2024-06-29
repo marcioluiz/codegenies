@@ -6,7 +6,8 @@ Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada
 
 - Python 3.11 (Testado com Python 3.11.9)
 - Conda or Miniconda instalados
-- Agentes LLMs instalados localmente com Ollama (Codegemma, Mistral, Llama-3)
+- Agentes SLMs instalados localmente com Ollama (Codegemma, Mistral, Llama-3)
+- Framework [Langchain](https://github.com/langchain-ai/langchain) para executar os prompts nas SLMs ao percorrer o grafo de tarefas criado com a extensão [Langgraph](https://github.com/langchain-ai/langgraph)
 
 ## Configuração do Projeto
 

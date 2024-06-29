@@ -1,8 +1,6 @@
 # CodeGenies: Team of SLMs for Software Development in Task Graph
 
-This is a project developed with the purpose of creating a natural language-based platform 
-that allows development teams to work efficiently, integrating artificial intelligence 
-to automate architectural design, code development and testing activities. 
+This is a project developed with the purpose of creating a natural language-based platform that allows development teams to work efficiently, integrating artificial intelligence to automate architectural design, code development and testing activities. 
 The project makes use of small language models (or SLMs).
 
 
@@ -10,7 +8,8 @@ The project makes use of small language models (or SLMs).
 
 - Python 3.11 (Tested with Python 3.11.9)
 - Conda or Miniconda installed
-- LLM agents installed locally with Ollama (Codegemma, Mistral, Llama-3)
+- SLM agents installed locally with Ollama (Codegemma, Mistral, Llama-3)
+- Framework [Langchain](https://github.com/langchain-ai/langchain) to execute prompts on the SLMs when traversing the task graph created with the [Langgraph](https://github.com/langchain-) extension ai/langgraph)
 
 ## Project Configuration
 
@@ -86,7 +85,7 @@ To configure this project, follow the steps below:
 To run the project, follow these steps:
 
 1. **Start External Services:**
-   - Make sure templates installed locally (via Ollama) or on external services (like Hugging Face) are running.
+   - Make sure the models installed locally (via Ollama) or on external services (like Hugging Face) are running.
 
 2. **Run the Main Script:**
    - Run the `main.py` file passing the name of your project and the location of the `project.properties` file as parameters.
