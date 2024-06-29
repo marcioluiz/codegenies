@@ -18,6 +18,7 @@ Principais Funções:
 
 import re
 import os
+import unidecode
 
 class Node:
     def __init__(self, name):
@@ -151,7 +152,7 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         match = re.search(r'##pastas\/(\w+)', node_name)
         if match:
            node_name = match.group(1)
-        
+        node_name = unidecode.unidecode(node_name)
         node_development_dir = os.path.join(development_dir, node_name)
         os.makedirs(node_development_dir, exist_ok=True)
 
@@ -165,6 +166,7 @@ def process_task_graph(developer, task_graph, development_dir, extension):
                 match = re.search(r'##pastas\/(\w+)', subnode_name)
                 if match:
                     subnode_name = match.group(1)
+                subnode_name = unidecode.unidecode(subnode_name)
                 subnode_development_dir = os.path.join(node_development_dir, subnode_name)
                 developer.process_task(subnode, subnode_development_dir, extension, node.name)
         else:
