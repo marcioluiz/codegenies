@@ -16,10 +16,6 @@ The project makes use of small language models (or SLMs).
 
 ### Ollama Installation
 
-## Project Configuration
-
-### Ollama Installation
-
 1. **Download and install Ollama:**
    - Visit the [Ollama official website](https://ollama.ai) and follow the instructions to download and install the software.
 
