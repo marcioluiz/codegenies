@@ -67,16 +67,6 @@ class Tester(Developer):
             return response
         else:
             return {"Teste": response}
-        
-    def _sanitize_task_name(self, task):
-        """
-        Limpa o nome da tarefa para criar um nome de arquivo válido.
-        
-        English:
-
-        Sanitizes the task name to create a valid filename.
-        """
-        return re.sub(r'[^a-zA-Z0-9]', '_', task[:30])
     
     def get_source_code(self):
         # Obtém o código-fonte da classe base
