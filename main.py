@@ -176,13 +176,15 @@ def main():
     original_stdout = sys.stdout
     captured_stdout = StringIO()
     sys.stdout = MultiOutput(original_stdout, captured_stdout)
+    project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
 
     try:
         start(project_name, analyst_properties)
     finally:
         sys.stdout = original_stdout  # Restaura o stdout original
         actions_report = captured_stdout.getvalue()  # Obtém a saída capturada
-        print(actions_report)  # Imprime a saída capturada no terminal
+        with open(os.path.join(project_base_path, "relatorio_geral_execucao.txt"), 'w') as f:
+            f.write(actions_report)
 
 if __name__ == "__main__":
     main()
