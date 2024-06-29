@@ -5,6 +5,7 @@ Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada
 ## Requisitos
 
 - Python 3.11 (Testado com Python 3.11.9)
+- Conda or Miniconda instalados
 - Agentes LLMs instalados localmente com Ollama (Codegemma, Mistral, Llama-3)
 
 ## Configuração do Projeto
@@ -32,7 +33,24 @@ Para configurar este projeto, siga os passos abaixo:
 1. **Crie uma Pasta do Projeto:**
    - Crie uma pasta com o nome do seu projeto.
 
-2. **Configure o Arquivo `project.properties`:**
+2. **Crie um Ambiente Conda para o Projeto:**
+   - Crie um ambiente conda com o nome do seu projeto:
+   ```
+      conda create -n codegenies python=3.11
+   ```
+   - Execute o ambiente e confira a execução:
+   ```
+      conda activate codegenies
+      conda info
+   ```
+
+3. **Instale as dependências do projeto:**
+   - Crie um ambiente conda com o nome do seu projeto:
+   ```
+      pip install -r requirements.txt
+   ```
+
+4. **Configure o Arquivo `project.properties`:**
    - Utilize um editor de texto para editar o arquivo chamado `project.properties` com o seguinte conteúdo:
      ```
      # Título e Descrição do Projeto
@@ -50,14 +68,14 @@ Para configurar este projeto, siga os passos abaixo:
      frontend_file_extension=
      ```
 
-3. **Inicie os Serviços Externos:**
-   - Certifique-se de que os modelos instalados localmente (via Ollama) ou em serviços externos (como Hugging Face) estão em execução e acessíveis para comunicar-se com o projeto. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
+5. **Inicie os Serviços Externos:**
+   - Certifique-se de que os modelos instalados localmente [via Ollama Library](https://ollama.com/library/) ou em serviços externos (como [Hugging Face](https://huggingface.co/models?sort=downloads&search=gguf)) estão em execução e acessíveis para comunicar-se com o projeto. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
 
-3. **Execute o Script Principal:**
+6. **Execute o Script Principal:**
    - Execute o arquivo `main.py`.
    - Exemplo: `python main.py`
 
-4. **Configure Novos Agentes:**
+7. **Configure Novos Agentes:**
    - Crie novos agentes na pasta `agents` conforme a necessidade do seu projeto para realizar tarefas diversificadas, como gerar arquivos de estrutura, pastas ou arquivos de código.
 
 ## Execução do Projeto
