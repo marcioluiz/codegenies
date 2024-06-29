@@ -50,11 +50,14 @@ Para configurar este projeto, siga os passos abaixo:
      frontend_file_extension=
      ```
 
+3. **Inicie os Serviços Externos:**
+   - Certifique-se de que os modelos instalados localmente (via Ollama) ou em serviços externos (como Hugging Face) estão em execução e acessíveis para comunicar-se com o projeto. Verifique as portas utilizadas e ajuste seu firewall ou roteador conforme necessário.
+
 3. **Execute o Script Principal:**
    - Execute o arquivo `main.py`.
    - Exemplo: `python main.py`
 
-4. **Configure os Agentes:**
+4. **Configure Novos Agentes:**
    - Crie novos agentes na pasta `agents` conforme a necessidade do seu projeto para realizar tarefas diversificadas, como gerar arquivos de estrutura, pastas ou arquivos de código.
 
 ## Execução do Projeto
