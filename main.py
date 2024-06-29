@@ -20,6 +20,8 @@ Funções:
 import os
 import inspect
 import shutil
+import sys
+from io import StringIO
 from agents import Analyst, SquadLeader, Developer, Tester
 from graph import Graph, build_task_graph, process_task_graph
 from langchain_community.llms import Ollama
@@ -57,107 +59,115 @@ def start(project_name, analyst_properties):
     - project_name (str): Nome do projeto.
     - analyst_properties (str): Caminho para o arquivo de propriedades do analista.
     """
-    # Define um processo interativo
-    interactive = input("Executar o processo interativo? (s/n): ").strip().lower() == 's'
-    
 
-    # Limpar pastas __pycache__
-    clean_pycache(os.path.dirname(__file__))
+    # Redirecionando a saída padrão para capturar o log
+    original_stdout = sys.stdout
+    sys.stdout = StringIO()
 
-    # Inicializando o Ollama
-    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")  # Modelo Phi-3 para fazer o papel de Analyst
-    llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")  # Modelo Codegemma para fazer o papel de Developer
-    llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Lama-3 para fazer o papel de Squadleader
+    try: 
+        # Define um processo interativo
+        interactive = input("Executar o processo interativo? (s/n): ").strip().lower() == 's'
+        
 
-    # Inicializando o analista
-    analyst = Analyst(llm_anl, analyst_properties, interactive=interactive)
-    analyst.generate_report()
-    analyst_report = analyst.output
+        # Limpar pastas __pycache__
+        clean_pycache(os.path.dirname(__file__))
 
-    # Inicializando o líder de equipe
-    squad_leader = SquadLeader(llm_sq, interactive=interactive)
+        # Inicializando o Ollama
+        llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")  # Modelo Phi-3 para fazer o papel de Analyst
+        llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")  # Modelo Codegemma para fazer o papel de Developer
+        llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Lama-3 para fazer o papel de Squadleader
 
-    # Criando os agentes desenvolvedores e tester
-    backend_developer = Developer(llm_dev, "Desenvolvedor Backend", interactive=interactive)
-    frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend", interactive=interactive)
-    tester = Tester(llm_dev, interactive=interactive)
+        # Inicializando o analista
+        analyst = Analyst(llm_anl, analyst_properties, interactive=interactive)
+        analyst.generate_report()
+        analyst_report = analyst.output
 
-    # Criando o grafo
-    agents = {
-        "Analista": analyst,
-        "Líder de Equipe": squad_leader,
-        "Desenvolvedor Backend": backend_developer,
-        "Desenvolvedor Frontend": frontend_developer,
-        "Tester": tester
-    }
+        # Inicializando o líder de equipe
+        squad_leader = SquadLeader(llm_sq, interactive=interactive)
 
-    # Criando a estrutura de pastas na raiz do diretório de build
-    project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
-    create_directories(project_base_path)
+        # Criando os agentes desenvolvedores e tester
+        backend_developer = Developer(llm_dev, "Desenvolvedor Backend", interactive=interactive)
+        frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend", interactive=interactive)
+        tester = Tester(llm_dev, interactive=interactive)
 
-    # Salvando os arquivos na pasta agents
-    for agent_name, agent in agents.items():
-        agent_file = agent_name.lower().replace(' ', '_') + ".py"
-        agent_content = f"# {agent_name}\n\n{agent.__doc__}\n\n"
-        if inspect.isfunction(agent) or inspect.isclass(agent):
-            agent_content += inspect.getsource(agent)
-        else:
-            agent_content += str(agent)
-        agent_path = os.path.join(project_base_path, "agents", agent_file)
-        with open(agent_path, 'w') as f:
-            f.write(agent_content)
+        # Criando o grafo
+        agents = {
+            "Analista": analyst,
+            "Líder de Equipe": squad_leader,
+            "Desenvolvedor Backend": backend_developer,
+            "Desenvolvedor Frontend": frontend_developer,
+            "Tester": tester
+        }
 
-    squad_leader.generate_general_report(analyst_report)
-    general_report = squad_leader.output
-    squad_leader.generate_backend_backlog(analyst_report)
-    backend_backlog = squad_leader.output
-    squad_leader.generate_frontend_backlog(analyst_report)
-    frontend_backlog = squad_leader.output
-    squad_leader.generate_test_backlog(analyst_report)
-    test_backlog = squad_leader.output
+        # Criando a estrutura de pastas na raiz do diretório de build
+        project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
+        create_directories(project_base_path)
 
-    # Salvando os relatórios na pasta de relatórios
-    reports = {
-        "relatório_geral_do_projeto.txt": general_report,
-        "backlog_de_tarefas_de_backend.txt": backend_backlog,
-        "backlog_de_tarefas_de_frontend.txt": frontend_backlog,
-        "backlog_de_tarefas_de_testes.txt": test_backlog
-    }
-    
-    for report_file, report_content in reports.items():
-        if report_content is not None:
-            with open(os.path.join(project_base_path, "reports", report_file), 'w') as f:
-                f.write(str(report_content))
-    
-    # Criando os grafos das tarefas
-    backend_task_graph = build_task_graph(backend_backlog)
-    frontend_task_graph = build_task_graph(frontend_backlog)
-    test_task_graph = build_task_graph(test_backlog)
+        # Salvando os arquivos na pasta agents
+        for agent_name, agent in agents.items():
+            agent_file = agent_name.lower().replace(' ', '_') + ".py"
+            agent_content = f"# {agent_name}\n\n{agent.__doc__}\n\n"
+            if inspect.isfunction(agent) or inspect.isclass(agent):
+                agent_content += inspect.getsource(agent)
+            else:
+                agent_content += str(agent)
+            agent_path = os.path.join(project_base_path, "agents", agent_file)
+            with open(agent_path, 'w') as f:
+                f.write(agent_content)
 
-    ## Processamento dos Grafos de Tarefas
-    developers = [backend_developer, frontend_developer]
-    for developer in developers:
-        development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))
-        os.makedirs(development_dir, exist_ok=True)
+        squad_leader.generate_general_report(analyst_report)
+        general_report = squad_leader.output
+        squad_leader.generate_backend_backlog(analyst_report)
+        backend_backlog = squad_leader.output
+        squad_leader.generate_frontend_backlog(analyst_report)
+        frontend_backlog = squad_leader.output
+        squad_leader.generate_test_backlog(analyst_report)
+        test_backlog = squad_leader.output
 
-        if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            process_task_graph(backend_developer, backend_task_graph, development_dir, 'py')
-        elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            process_task_graph(frontend_developer, frontend_task_graph, development_dir, 'js')
+        # Salvando os relatórios na pasta de relatórios
+        reports = {
+            "relatório_geral_do_projeto.txt": general_report,
+            "backlog_de_tarefas_de_backend.txt": backend_backlog,
+            "backlog_de_tarefas_de_frontend.txt": frontend_backlog,
+            "backlog_de_tarefas_de_testes.txt": test_backlog
+        }
+        
+        for report_file, report_content in reports.items():
+            if report_content is not None:
+                with open(os.path.join(project_base_path, "reports", report_file), 'w') as f:
+                    f.write(str(report_content))
+        
+        # Criando os grafos das tarefas
+        backend_task_graph = build_task_graph(backend_backlog)
+        frontend_task_graph = build_task_graph(frontend_backlog)
+        test_task_graph = build_task_graph(test_backlog)
 
-    test_dir = os.path.join(project_base_path, "dev", "tester")
-    os.makedirs(test_dir, exist_ok=True)
-    process_task_graph(tester, test_task_graph, test_dir, 'py')
+        ## Processamento dos Grafos de Tarefas
+        developers = [backend_developer, frontend_developer]
+        for developer in developers:
+            development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))
+            os.makedirs(development_dir, exist_ok=True)
+            print("Processando Grafos de Tarefas para {}".format(developer.name))
+            if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
+                process_task_graph(backend_developer, backend_task_graph, development_dir, 'py')
+            elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
+                process_task_graph(frontend_developer, frontend_task_graph, development_dir, 'js')
 
-    # Criando o README do Projeto
-    readme_content = f"# {project_name}\n\n[Insira a descrição do projeto aqui]"
-    with open(os.path.join(project_base_path, "README.md"), 'w') as f:
-        f.write(readme_content)
+        test_dir = os.path.join(project_base_path, "dev", "tester")
+        os.makedirs(test_dir, exist_ok=True)
+        process_task_graph(tester, test_task_graph, test_dir, 'py')
 
-    # Criando o relatório de ações completo
-    actions_report = "[Insira o relatório de ações completo aqui]"
-    with open(os.path.join(project_base_path, "relatorio_acoes.txt"), 'w') as f:
-        f.write(actions_report)
+        # Criando o README do Projeto
+        readme_content = f"# {project_name}\n\n[Insira a descrição do projeto aqui]"
+        with open(os.path.join(project_base_path, "README.md"), 'w') as f:
+            f.write(readme_content)
+
+        # Capturando e salvando a saída completa
+        actions_report = sys.stdout.getvalue()
+        with open(os.path.join(project_base_path, "relatorio_acoes.txt"), 'w') as f:
+            f.write(actions_report)
+    finally: 
+        sys.stdout = original_stdout  # Restaura o stdout original
 
 if __name__ == "__main__":
     project_name = input("Nome do projeto: ")
