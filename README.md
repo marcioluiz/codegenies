@@ -1,6 +1,6 @@
-# CodeGenies: Equipe de Desenvolvimento de Software em Grafo de LLMs
+# CodeGenies: Equipe de SLMs para Desenvolvimento  de Software em Grafo de Tarefas
 
-Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada em linguagem natural que permita às equipes de desenvolvimento trabalharem de forma eficiente, integrando inteligência artificial para automatizar as atividades do desenho de arquitetura, desenvolvimento de código e testes.
+Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada em linguagem natural que permita às equipes de desenvolvimento trabalharem de forma eficiente, integrando inteligência artificial para automatizar as atividades do desenho de arquitetura, desenvolvimento de código e testes. O projeto faz uso de modelos de linguagem pequenos (ou SLMs como na sigla em inglês).
 
 ## Requisitos
 
