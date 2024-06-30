@@ -65,9 +65,7 @@ To configure this project, follow the steps below:
 
      # Technologies used in project layers
      backend_technology=
-     backend_file_extension=
      frontend_technology=
-     frontend_file_extension=
      ```
 
 5. **Start External Services:**

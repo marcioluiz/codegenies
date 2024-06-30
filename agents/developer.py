@@ -168,7 +168,7 @@ class Developer(BaseAgent):
 
         print(f"Código gerado e salvo em: {file_path}")
 
-    def process_task(self, node, development_dir, extension, parent_category):
+    def process_task(self, node, development_dir, parent_category):
         """
         Processa uma tarefa, gerando a estrutura e código necessários.
         Lida com sub-nós aninhados se fornecido.
@@ -197,7 +197,13 @@ class Developer(BaseAgent):
                 "##" in task:
             
             if "##" in task:
-                match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
+                # Testa se encontra o padrão de nome de arquivo "nomedoarquivo.tipo.ext"
+                # Tests for the filename pattern "filename.type.ext"  
+                match = re.search(r'##(\w+)\/(\w+\.\w+\.\w+)', task)
+                if not match:
+                    # Testa se encontra o padrão de nome de arquivo "nomedoarquivo.ext"
+                    # Tests for the filename pattern "filename.ext" 
+                    match = re.search(r'##(\w+)\/(\w+\.\w+)', task)
                 if match:
                     file_name = match.group(2)
                     file_name = unidecode.unidecode(file_name)
@@ -207,7 +213,7 @@ class Developer(BaseAgent):
                     self.generate_and_write_code(file_path, task)
 
                     for subnode in node.subnodes:
-                        self.process_task(subnode, development_dir, extension, task)
+                        self.process_task(subnode, development_dir, task)
 
             else:
                 task_description = task.replace('*', '').strip()
@@ -258,7 +264,7 @@ class Developer(BaseAgent):
                     subnode_task_name = subnode.name
                     subnode_development_dir = os.path.join(development_dir, subnode_task_name)
                     os.makedirs(subnode_development_dir, exist_ok=True)
-                    self.process_task(subnode, subnode_development_dir, extension, task_description)
+                    self.process_task(subnode, subnode_development_dir, task_description)
     
     def get_source_code(self):
         # Obtém o código-fonte da classe base

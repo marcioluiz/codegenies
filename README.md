@@ -63,9 +63,7 @@ Para configurar este projeto, siga os passos abaixo:
 
      # Tecnologias usadas nas camadas do projeto
      backend_technology=
-     backend_file_extension=
      frontend_technology=
-     frontend_file_extension=
      ```
 
 5. **Inicie os Serviços Externos:**

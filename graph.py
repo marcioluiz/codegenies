@@ -9,11 +9,10 @@ Principais Funções:
 - build_task_graph(backlog): Constrói um grafo de tarefas a partir de um backlog.
   - backlog (str): Backlog de tarefas em formato de string.
 
-- process_task_graph(agent, task_graph, output_dir, file_extension): Processa um grafo de tarefas e gera os arquivos de código correspondentes.
+- process_task_graph(agent, task_graph, output_dir): Processa um grafo de tarefas e gera os arquivos de código correspondentes.
   - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
   - task_graph (Graph): Grafo de tarefas a ser processado.
   - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
-  - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
 
 English version:
 
@@ -24,11 +23,10 @@ Main Functions:
 - build_task_graph(backlog): Builds a task graph from a backlog.
   - backlog (str): Task backlog in string format.
 
-- process_task_graph(agent, task_graph, output_dir, file_extension): Processes a task graph and generates corresponding code files.
+- process_task_graph(agent, task_graph, output_dir): Processes a task graph and generates corresponding code files.
   - agent (object): Agent responsible for processing tasks (Developer or Tester).
   - task_graph (Graph): Task graph to be processed.
   - output_dir (str): Output directory where generated files will be saved.
-  - file_extension (str): Extension of the files to be generated (e.g., 'py', 'js').
      
 
 """
@@ -147,7 +145,7 @@ def build_task_graph(backlog):
 
     return graph
 
-def process_task_graph(developer, task_graph, development_dir, extension):
+def process_task_graph(developer, task_graph, development_dir):
     """
     Processa um grafo de tarefas e gera os arquivos de código correspondentes.
 
@@ -155,7 +153,6 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
         - task_graph (Graph): Grafo de tarefas a ser processado.
         - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
-        - file_extension (str): Extensão dos arquivos a serem gerados (e.g., 'py', 'js').
 
     English:
         
@@ -165,7 +162,6 @@ def process_task_graph(developer, task_graph, development_dir, extension):
         - agent (object): Agent responsible for processing tasks (Developer or Tester).
         - task_graph (Graph): Task graph to be processed.
         - output_dir (str): Output directory where generated files will be saved.
-        - file_extension (str): Extension of the files to be generated (e.g., 'py', 'js').
     """
     def dfs(node, visited, stack):
         visited.add(node)
@@ -211,6 +207,6 @@ def process_task_graph(developer, task_graph, development_dir, extension):
                     subnode_name = match.group(1)
                 subnode_name = unidecode.unidecode(subnode_name)
                 subnode_development_dir = os.path.join(node_development_dir, subnode_name)
-                developer.process_task(subnode, subnode_development_dir, extension, node.name)
+                developer.process_task(subnode, subnode_development_dir, node.name)
         else:
-            developer.process_task(node, node_development_dir, extension, node.name)
+            developer.process_task(node, node_development_dir, node.name)

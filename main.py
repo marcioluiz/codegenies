@@ -205,13 +205,13 @@ def start(project_name, analyst_properties):
         os.makedirs(development_dir, exist_ok=True)
         print("Processando Grafos de Tarefas para {}".format(developer.name))
         if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            process_task_graph(backend_developer, backend_task_graph, development_dir, 'py')
+            process_task_graph(backend_developer, backend_task_graph, development_dir)
         elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            process_task_graph(frontend_developer, frontend_task_graph, development_dir, 'js')
+            process_task_graph(frontend_developer, frontend_task_graph, development_dir)
 
     test_dir = os.path.join(project_base_path, "dev", "tester")
     os.makedirs(test_dir, exist_ok=True)
-    process_task_graph(tester, test_task_graph, test_dir, 'py')
+    process_task_graph(tester, test_task_graph, test_dir)
 
     # Criando o README do Projeto
     # Creating Project README
