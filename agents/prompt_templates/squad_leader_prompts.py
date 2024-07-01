@@ -130,7 +130,7 @@ class SquadLeaderPrompts:
         """
         MODELO DE BACKLOG DE TESTES
 
-        **Criar Classes e Funções**
+        **Criar Arquivos, Pastas, Classes e Funções**
         001. ##unit-tests/auth.service.test.js: arquivo para testar o serviço de autenticação do projeto.
             * função loginTest(): para testar a autenticação do usuário.
             * função logoutTest(): para testar o logout do usuário.
