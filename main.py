@@ -64,6 +64,16 @@ def clean_pycache(root_dir):
                 shutil.rmtree(pycache_dir)
                 print(f"Removida pasta __pycache__ em {pycache_dir}")
 
+        # Verifica se estamos na pasta agents ou na subpasta prompt_templates
+        if 'agents' in root and 'prompt_templates' in dirs:
+            prompt_templates_dir = os.path.join(root, 'prompt_templates')
+            for sub_root, sub_dirs, sub_files in os.walk(prompt_templates_dir):
+                for sub_dir_name in sub_dirs:
+                    if sub_dir_name == "__pycache__":
+                        sub_pycache_dir = os.path.join(sub_root, sub_dir_name)
+                        shutil.rmtree(sub_pycache_dir)
+                        print(f"Removida pasta __pycache__ em {sub_pycache_dir}")
+
 def create_directories(project_base_path):
     """
     Cria as estruturas de pastas necessárias no projeto.

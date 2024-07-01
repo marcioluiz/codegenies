@@ -26,9 +26,9 @@ Classes:
 - generate_backlog(self): Generates a backlog based on project analysis.
 - get_properties(self): Retrieves properties related to the project analysis.
 """
-import os
 from .base_agent import BaseAgent
 import configparser
+from .prompt_templates import AnalystPrompts as prompt_templates
 
 class Analyst(BaseAgent):
     """
@@ -76,7 +76,7 @@ class Analyst(BaseAgent):
             - interactive (bool): Defines whether the process will be interactive.
         """
         project_info = "\n".join([f"{section}:\n{', '.join([f'{key}: {value}' for key, value in section_data.items()])}" for section, section_data in self.project_data.items()])
-        prompt = f"Gere um relatório de análise do projeto completo com base nas propriedades a seguir e leve cada uma delas em consideração no seu relatório:\n{project_info}\n\n Acresente após uma análise rápida de total de pastas de módulos e classes de código de no máximo 04 paragráfos ao final do relatório:\n[Insira aqui a análise rápida do projeto]"
+        prompt = f"{prompt_templates.analyst_report_prompt_instructions}\n{project_info}\n\n{prompt_templates.analyst_report_refinement_instructions}"
         report = self.evaluate(prompt)
         if self.interactive:
             final_report = self.interact(report)

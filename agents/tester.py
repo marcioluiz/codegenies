@@ -27,8 +27,6 @@ Classes:
     - interactive (bool): Defines if the process will be interactive.
 
 """
-import os
-import re
 from agents import Developer
 
 class Tester(Developer):
