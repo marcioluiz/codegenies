@@ -2,7 +2,8 @@
 """
 graph.py
 
-Este arquivo contém funções para a construção e processamento de grafos de tarefas. Os grafos são utilizados para organizar e gerenciar as tarefas de desenvolvimento e teste do projeto.
+Este arquivo contém funções para a construção e processamento de grafos de tarefas. 
+Os grafos são utilizados para organizar e gerenciar as tarefas de desenvolvimento e teste do projeto.
 
 Principais Funções:
 
@@ -16,7 +17,8 @@ Principais Funções:
 
 English version:
 
-This file contains functions for constructing and processing task graphs. Graphs are used to organize and manage project development and testing tasks.
+This file contains functions for constructing and processing task graphs. 
+Graphs are used to organize and manage project development and testing tasks.
 
 Main Functions:
 

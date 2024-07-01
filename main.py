@@ -1,7 +1,9 @@
 """
 main.py
 
-Este arquivo é o ponto de entrada principal para a execução do projeto. Ele coordena a configuração inicial, a criação de agentes, a geração de relatórios e a estruturação do projeto.
+Este arquivo é o ponto de entrada principal para a execução do projeto. 
+Ele coordena a configuração inicial, a criação de agentes, 
+a geração de relatórios e a estruturação do projeto.
 
 Funções:
 
@@ -19,7 +21,9 @@ Funções:
 
 English version:
 
-This file is the main entry point for project execution. It coordinates initial setup, agent creation, report generation, and project structuring.
+This file is the main entry point for project execution. 
+It coordinates initial setup, agent creation, report generation, 
+and project structuring.
 
 Functions:
 

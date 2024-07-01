@@ -16,63 +16,43 @@ class SquadLeaderPrompts:
         """
         MODELO DE BACKLOG BACKEND
 
-        **Criar Pastas**
-        001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
-        002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
-        003. ##pastas/services: pasta para armazenar os serviços do projeto.
-        004. ##pastas/migrations: pasta para armazenar as migrações do banco de dados.
-        005. ##pastas/repositories: pasta para armazenar os repositórios do projeto.
-
-        **Criar Arquivos**
+        **Criar Arquivos, Pastas, Classes e Funções**
         001. ##models/user.model.py: arquivo para definir o modelo de dados do usuário.
-        002. ##models/video.model.py: arquivo para definir o modelo de dados dos videos.
-        002. ##models/comment.model.py: arquivo para definir o modelo de dados de comentários.
-        003. ##controllers/auth.controller.py: arquivo para controlar a autenticação do usuário.
-        004. ##controllers/video.controller.py: arquivo para controlar os videos.
-        005. ##controllers/videostream.controller.py: arquivo para controlar o stream de videos.
-        006. ##controllers/comment.controller.py: arquivo para controlar os comentários de vídeos.
-        007. ##services/auth.service.py: arquivo para os serviços de autenticação.
-        008. ##services/video.service.py: arquivo para os serviços do video.
-        009. ##services/videostream.service.py: arquivo para os serviços de stream de videos.
-        010. ##repositories/user.repository.py: arquivo para os repositórios de usuário.
-        011. ##repositories/video.repository.py: arquivo para os repositórios de videos.
-
-        **Criar Classes e Funções**
-        001. ##models/user.model.py:
             * classe User: para definir o modelo de dados do usuário.
             * função validateUser(): para validar os dados do usuário.
-        002. ##models/video.model.py:
+        002. ##models/video.model.py: arquivo para definir o modelo de dados dos videos.
             * classe Video: para definir o modelo de dados do video.
             * função validateVideo(): para validar os dados do video.
-        003. ##models/comment.model.py:
+        003. ##models/comment.model.py: arquivo para definir o modelo de dados de comentários.
             * classe Comment: para definir o modelo de dados dos comentários dos vídeos.
             * função validateComment(): para validar os dados dos comentários dos vídeos.
-        004. ##controllers/auth.controller.py:
+        004. ##controllers/auth.controller.py: arquivo para controlar a autenticação do usuário.
             * função login(): para realizar o login do usuário.
             * função logout(): para realizar o logout do usuário.
-        005. ##controllers/comment.controller.py:
+        005. ##controllers/videostream.controller.py: arquivo para controlar o stream de videos.
             * função createComment(): para criar um novo comentário.
             * função getCommments(): para obter todos os comentário.
-        006. ##controllers/video.controller.py:
+        006. ##controllers/comment.controller.py: arquivo para controlar os comentários de vídeos.
             * função createVideo(): para criar um novo vídeo.
             * função getVideos(): para obter todos os vídeos;
             * função getVideosbyUserID(): para obter todos os vídeos de um usuário pelon seu ID;
             * função getVideosbyTag(): para obter todos os vídeos de uma determinada Tag;
-        007. ##controllers/videostream.controller.py:
+        007. ##services/auth.service.py: arquivo para os serviços de autenticação.
             * função createVideoStream(): para criar uma nova transmissão de vídeo.
             * função getVideoStreams(): para obter todas as transmissões de vídeos.
             * função getVideoDetails(): para recuperar os detalhes de um vídeo.
             * função verifyVideoByID(): para verificar a existência de um vídeo por ID.
-        008. ##services/auth.service.py:
+        008. ##services/video.service.py: arquivo para os serviços do video.
             * função hashPassword(): para hashear a senha do usuário.
             * função verifyPassword(): para verificar a senha do usuário.
-        009. ##services/video.service.py:
+        009. ##services/videostream.service.py: arquivo para os serviços de stream de videos.
             * função getVideoByID(): para recuperar um vídeo pelo seu ID.
             * função getVideoByName(): para recuperar um vídeo pelo seu Nome.
             * função verifyIndexFromVideo(): para verificar a existência de um índex temporal em um vídeo.
-        010. ##services/videostream.service.py:
+        010. ##repositories/user.repository.py: arquivo para os repositórios de usuário.
             * função getVideoStreamByID(): para recuperar os uma transmissão de vídeo a partir do seu ID.
             * função getVideoStreamByIndex(): para recuperar os uma transmissão de vídeo a partir do seu ID e um índex temporal.
+        011. ##repositories/video.repository.py: arquivo para os repositórios de videos.
         """
     )
 
@@ -97,49 +77,35 @@ class SquadLeaderPrompts:
         """
         MODELO DE BACKLOG FRONTEND
                 
-         **Criar Pastas**
-        001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
-        002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
-        003. ##pastas/pages: pasta para armazenar as páginas do projeto.
-        004. ##pastas/services: pasta para armazenar os serviços do projeto.
-
-        **Criar Arquivos**
+        **Criar Arquivos, Pastas, Classes e Funções**
         001. ##models/user.model.js: arquivo para definir o modelo de dados do usuário.
-        002. ##models/video.model.js: arquivo para definir o modelo de dados dos videos.
-        003. ##models/comment.model.js: arquivo para definir o modelo de dados de comentários.
-        004. ##controllers/auth.controller.js: arquivo para controlar a autenticação do usuário.
-        005. ##controllers/video.controller.js: arquivo para controlar os videos.
-        006. ##controllers/videostream.controller.js: arquivo para controlar o stream de videos.
-        007. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
-        008. ##pages/usertimeline.repository.js: pagina de timeline de videos do usuário.
-        009. ##pages/videotimeline.repository.js: pagina de timeline de videos de todos os usuários.
-        010. ##services/auth.service.js: arquivo para os serviços de autenticação.
-        011. ##services/video.service.js: arquivo para os serviços do video.
-        012. ##services/comment.service.js: arquivo para os serviços de comentários.
-        013. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
-
-        **Criar Classes e Funções**
-        001. ##models/user.model.js:
             * classe User: para definir o modelo de dados do usuário.
             * função validateUser(): para validar os dados do usuário.
-        002. ##models/video.model.js:
+        002. ##models/video.model.js: arquivo para definir o modelo de dados dos videos.
             * classe Video: para definir o modelo de dados do video.
             * função validateVideo(): para validar os dados do video.
-        003. ##models/comment.model.js:
+        003. ##models/comment.model.js: arquivo para definir o modelo de dados de comentários.
             * classe Comment: para definir o modelo de dados dos comentários dos vídeos.
             * função validateComment(): para validar os dados dos comentários dos vídeos.
-        004. ##controllers/auth.controller.js:
+        004. ##controllers/auth.controller.js: arquivo para controlar a autenticação do usuário.
             * função login(): para realizar o login do usuário.
             * função logout(): para realizar o logout do usuário.
-        005. ##controllers/comment.controller.js:
+        005. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
             * função createComment(): para criar um novo comentário.
             * função getCommments(): para obter todos os comentário.
-        006. ##controllers/video.controller.js:
+        006. ##controllers/video.controller.js: arquivo para controlar os videos.
             * função createVideo(): para criar um novo vídeo.
             * função getVideos(): para obter todos os vídeos
-        007. ##services/auth.service.js:
+        007. ##pages/usertimeline.page.js: pagina de timeline de videos do usuário.
+        008. ##pages/videotimeline.page.js: pagina de timeline de videos de todos os usuários.
+        009. ##pages/homepage.page.js: pagina homepara todos os usuários, contem as abas: User Timeline e Videos Timeline.
+        010. ##pages/userprofile.page.js: pagina de perfil usuário.
+        011. ##services/auth.service.js: arquivo para os serviços de autenticação.
             * função hashPassword(): para hashear a senha do usuário.
             * função verifyPassword(): para verificar a senha do usuário.
+        012. ##services/video.service.js: arquivo para os serviços do video.
+        013. ##services/comment.service.js: arquivo para os serviços de comentários.
+        014. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
         """
     )
 
@@ -164,44 +130,26 @@ class SquadLeaderPrompts:
         """
         MODELO DE BACKLOG DE TESTES
 
-        **Criar Pastas**
-        001. ##pastas/unit-tests: pasta para armazenar os testes unitários do projeto.
-        002. ##pastas/integration-tests: pasta para armazenar os testes de integração do projeto.
-        003. ##pastas/e2e-tests: pasta para armazenar os testes de ponta a ponta do projeto.
-        004. ##pastas/mocks: pasta para armazenar mocks e stubs usados nos testes.
-        005. ##pastas/utils: pasta para armazenar utilitários e helpers para os testes.
-
-        **Criar Arquivos**
-        001. ##unit-tests/auth.service.test.js: arquivo para testar o serviço de autenticação do projeto.
-        002. ##unit-tests/user.service.test.js: arquivo para testar o serviço de usuário do projeto.
-        003. ##integration-tests/auth.integration.test.js: arquivo para testar a integração do serviço de autenticação com o banco de dados.
-        004. ##integration-tests/user.integration.test.js: arquivo para testar a integração do serviço de usuário com o banco de dados.
-        005. ##e2e-tests/login.e2e.test.js: arquivo para testar o fluxo completo de login do usuário.
-        006. ##e2e-tests/user-registration.e2e.test.js: arquivo para testar o fluxo completo de registro de usuário.
-        007. ##mocks/auth.mock.js: arquivo para armazenar mocks do serviço de autenticação.
-        008. ##mocks/user.mock.js: arquivo para armazenar mocks do serviço de usuário.
-        009. ##utils/test-helpers.js: arquivo para armazenar helpers e utilitários para os testes.
-
         **Criar Classes e Funções**
-        001. ##unit-tests/auth.service.test.js:
+        001. ##unit-tests/auth.service.test.js: arquivo para testar o serviço de autenticação do projeto.
             * função loginTest(): para testar a autenticação do usuário.
             * função logoutTest(): para testar o logout do usuário.
-        002. ##unit-tests/user.service.test.js:
+        002. ##unit-tests/user.service.test.js: arquivo para testar o serviço de usuário do projeto.
             * função createUserTest(): para testar a criação de um usuário.
             * função getUserByIdTest(): para testar a obtenção de um usuário por ID.
-        003. ##integration-tests/auth.integration.test.js:
+        003. ##integration-tests/auth.integration.test.js: arquivo para testar a integração do serviço de autenticação com o banco de dados.
             * função authDBConnectionTest(): para testar a conexão do serviço de autenticação com o banco de dados.
-        004. ##integration-tests/user.integration.test.js:
+        004. ##integration-tests/user.integration.test.js: arquivo para testar a integração do serviço de usuário com o banco de dados.
             * função userDBConnectionTest(): para testar a conexão do serviço de usuário com o banco de dados.
-        005. ##e2e-tests/login.e2e.test.js:
+        005. ##e2e-tests/login.e2e.test.js: arquivo para testar o fluxo completo de login do usuário.
             * função userLoginFlowTest(): para testar o fluxo completo de login do usuário.
-        006. ##e2e-tests/user-registration.e2e.test.js:
+        006. ##e2e-tests/user-registration.e2e.test.js: arquivo para testar o fluxo completo de registro de usuário.
             * função userRegistrationFlowTest(): para testar o fluxo completo de registro de usuário.
-        007. ##mocks/auth.mock.js:
+        007. ##mocks/auth.mock.js: arquivo para armazenar mocks do serviço de autenticação.
             * função getAuthMock(): para retornar um mock do serviço de autenticação.
-        008. ##mocks/user.mock.js:
+        008. ##mocks/user.mock.js: arquivo para armazenar mocks do serviço de usuário.
             * função getUserMock(): para retornar um mock do serviço de usuário.
-        009. ##utils/test-helpers.js:
+        009. ##utils/test-helpers.js: arquivo para armazenar helpers e utilitários para os testes.
             * função setupTestEnv(): para configurar o ambiente de testes.
             * função tearDownTestEnv(): para desmontar o ambiente de testes.
         """

@@ -15,7 +15,8 @@ Classes:
 
 English version:
 
-This file defines the Analyst class responsible for managing project analysis and backlog generation.
+This file defines the Analyst class responsible for managing project 
+analysis and backlog generation.
 
 Classes:
 
