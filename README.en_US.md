@@ -108,22 +108,26 @@ To run the project, follow these steps:
 The project folder structure will be organized as follows:
 project_name/
 ├── agents/
-│ ├── analyst.py
-│ ├── squad_leader.py
-│ ├── developer_backend.py
-│ ├── developer_frontend.py
-│ └── tester.py
+│   ├── analyst.py
+│   ├── squad_leader.py
+│   ├── developer_backend.py
+│   ├── developer_frontend.py
+│   ├── tester.py
+|   └── prompt_templates/
+|        ├── analyst_prompts.py
+│        ├── squad_leader_prompts.py
+│        └── developer_prompts.py
 ├── build/
-│ ├── dev/
-│ │ ├── developer_backend/
-│ │ ├── developer_frontend/
-│ │ └── tester/
-│ ├── reports/
-│ │ ├── project_general_report.txt
-│ │ ├── backend_task_backlog.txt
-│ │ ├── frontend_task_backlog.txt
-│ │ └── test_task_backlog.txt
-│ └── README.md
+│   ├── dev/
+│   │   ├── desenvolvedor_backend/
+│   │   ├── desenvolvedor_frontend/
+│   │   └── tester/
+│   ├── reports/
+│   │   ├── relatorio_geral_do_projeto.txt
+│   │   ├── backlog_de_tarefas_de_backend.txt
+│   │   ├── backlog_de_tarefas_de_frontend.txt
+│   │   └── backlog_de_tarefas_de_testes.txt
+│   └── README.md
 ├── graph.py
 ├── LICENSE (GPL-3.0 License)
 ├── main.py

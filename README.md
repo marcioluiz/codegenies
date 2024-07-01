@@ -110,7 +110,11 @@ project_name/
 │   ├── squad_leader.py
 │   ├── developer_backend.py
 │   ├── developer_frontend.py
-│   └── tester.py
+│   ├── tester.py
+|   └── prompt_templates/
+|        ├── analyst_prompts.py
+│        ├── squad_leader_prompts.py
+│        └── developer_prompts.py
 ├── build/
 │   ├── dev/
 │   │   ├── desenvolvedor_backend/
