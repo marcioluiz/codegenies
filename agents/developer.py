@@ -31,6 +31,12 @@ import os
 import re
 import unidecode
 from .base_agent import BaseAgent
+from prompt_templates.developer_templates import (
+    develop_code_instructions,
+    structure_prompt_instructions,
+    code_prompt_instruction,
+    code_structure_refinement_prompt
+)
 
 class Developer(BaseAgent):
     """
@@ -55,12 +61,7 @@ class Developer(BaseAgent):
         self.interactive = interactive
 
     def develop_code(self, prompt):
-        instructions = (
-            "Com base no backlog de atividades acima, gere gere todo o código dos arquivos "
-            "demandados nas instruções do backlog. Coloque todo o código sequencialmente marcando "
-            "início de arquivos com: ##arquivo.ext eo o fim de todo arquivo com: ##end-arquivo.ext ."
-        )
-        final_prompt = f"{prompt}\n\n{instructions}"
+        final_prompt = f"{prompt}\n\n{develop_code_instructions}"
         code = self.evaluate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
@@ -151,7 +152,7 @@ class Developer(BaseAgent):
     # Função para gerar e escrever código em arquivos
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
-        code_prompt = f"Gere o código necessário para a tarefa: {task_description}"
+        code_prompt = f"{code_prompt_instruction}{task_description}"
         print(f"Processando código para a tarefa: {task_description}")
         try:
             code = self.develop_code(code_prompt)
@@ -217,7 +218,7 @@ class Developer(BaseAgent):
 
             else:
                 task_description = task.replace('*', '').strip()
-                structure_prompt = f"Gere a estrutura de pastas e arquivos necessária para a tarefa: {task_description}"
+                structure_prompt = f"{structure_prompt_instructions}\n\n{task_description}"
                 print(f"Processando estrutura para a tarefa: {task_description}")
                 try:
                     structure = self.generate_structure(structure_prompt)
@@ -237,7 +238,7 @@ class Developer(BaseAgent):
                     else:
                         f.write(structure)
 
-                code_prompt = f"Gere o código necessário para a tarefa: {task_description} observando também a estrutura criada para a mesma: {structure}"
+                code_prompt = f"{code_prompt_instruction}{task_description}{code_structure_refinement_prompt}{structure}"
                 print(f"Processando código para a tarefa: {task_description}")
                 try:
                     code = self.develop_code(code_prompt)
