@@ -55,10 +55,24 @@ class SquadLeaderPrompts:
             * função getCommments(): para obter todos os comentário.
         006. ##controllers/video.controller.py:
             * função createVideo(): para criar um novo vídeo.
-            * função getVideos(): para obter todos os vídeos
-        007. ##services/auth.service.py:
+            * função getVideos(): para obter todos os vídeos;
+            * função getVideosbyUserID(): para obter todos os vídeos de um usuário pelon seu ID;
+            * função getVideosbyTag(): para obter todos os vídeos de uma determinada Tag;
+        007. ##controllers/videostream.controller.py:
+            * função createVideoStream(): para criar uma nova transmissão de vídeo.
+            * função getVideoStreams(): para obter todas as transmissões de vídeos.
+            * função getVideoDetails(): para recuperar os detalhes de um vídeo.
+            * função verifyVideoByID(): para verificar a existência de um vídeo por ID.
+        008. ##services/auth.service.py:
             * função hashPassword(): para hashear a senha do usuário.
             * função verifyPassword(): para verificar a senha do usuário.
+        009. ##services/video.service.py:
+            * função getVideoByID(): para recuperar um vídeo pelo seu ID.
+            * função getVideoByName(): para recuperar um vídeo pelo seu Nome.
+            * função verifyIndexFromVideo(): para verificar a existência de um índex temporal em um vídeo.
+        010. ##services/videostream.service.py:
+            * função getVideoStreamByID(): para recuperar os uma transmissão de vídeo a partir do seu ID.
+            * função getVideoStreamByIndex(): para recuperar os uma transmissão de vídeo a partir do seu ID e um índex temporal.
         """
     )
 
@@ -105,6 +119,7 @@ class SquadLeaderPrompts:
         006. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
         007. ##services/auth.service.js: arquivo para os serviços de autenticação.
         008. ##services/video.service.js: arquivo para os serviços do video.
+        008. ##services/comment.service.js: arquivo para os serviços de comentários.
         009. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
         010. ##pages/usertimeline.repository.js: pagina de timeline de videos do usuário.
         011. ##pages/videotimeline.repository.js: pagina de timeline de videos de todos os usuários.
