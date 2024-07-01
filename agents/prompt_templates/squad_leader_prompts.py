@@ -100,29 +100,23 @@ class SquadLeaderPrompts:
          **Criar Pastas**
         001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
         002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
-        003. ##pastas/services: pasta para armazenar os serviços do projeto.
-
-        **Criar Pastas**
-        001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
-        002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
-        003. ##pastas/services: pasta para armazenar os serviços do projeto.
-        004. ##pastas/migrations: pasta para armazenar as migrações do banco de dados.
-        005. ##pastas/repositories: pasta para armazenar os repositórios do projeto.
+        003. ##pastas/pages: pasta para armazenar as páginas do projeto.
+        004. ##pastas/services: pasta para armazenar os serviços do projeto.
 
         **Criar Arquivos**
         001. ##models/user.model.js: arquivo para definir o modelo de dados do usuário.
         002. ##models/video.model.js: arquivo para definir o modelo de dados dos videos.
-        002. ##models/comment.model.js: arquivo para definir o modelo de dados de comentários.
-        003. ##controllers/auth.controller.js: arquivo para controlar a autenticação do usuário.
-        004. ##controllers/video.controller.js: arquivo para controlar os videos.
-        005. ##controllers/videostream.controller.js: arquivo para controlar o stream de videos.
-        006. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
-        007. ##services/auth.service.js: arquivo para os serviços de autenticação.
-        008. ##services/video.service.js: arquivo para os serviços do video.
-        008. ##services/comment.service.js: arquivo para os serviços de comentários.
-        009. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
-        010. ##pages/usertimeline.repository.js: pagina de timeline de videos do usuário.
-        011. ##pages/videotimeline.repository.js: pagina de timeline de videos de todos os usuários.
+        003. ##models/comment.model.js: arquivo para definir o modelo de dados de comentários.
+        004. ##controllers/auth.controller.js: arquivo para controlar a autenticação do usuário.
+        005. ##controllers/video.controller.js: arquivo para controlar os videos.
+        006. ##controllers/videostream.controller.js: arquivo para controlar o stream de videos.
+        007. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
+        008. ##pages/usertimeline.repository.js: pagina de timeline de videos do usuário.
+        009. ##pages/videotimeline.repository.js: pagina de timeline de videos de todos os usuários.
+        010. ##services/auth.service.js: arquivo para os serviços de autenticação.
+        011. ##services/video.service.js: arquivo para os serviços do video.
+        012. ##services/comment.service.js: arquivo para os serviços de comentários.
+        013. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
 
         **Criar Classes e Funções**
         001. ##models/user.model.js:
