@@ -1,5 +1,5 @@
 # prompt_templates/__init__.py
 
-from .analyst_templates import AnalystTemplates
-from .developer_templates import DeveloperTemplates
-from .squad_leader_templates import SquadLeaderTemplates
+from .analyst_prompts import AnalystPrompts
+from .developer_prompts import DeveloperPrompts
+from .squad_leader_prompts import SquadLeaderPrompts

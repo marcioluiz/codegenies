@@ -31,12 +31,7 @@ import os
 import re
 import unidecode
 from .base_agent import BaseAgent
-from prompt_templates.developer_templates import (
-    develop_code_instructions,
-    structure_prompt_instructions,
-    code_prompt_instruction,
-    code_structure_refinement_prompt
-)
+from .prompt_templates import DeveloperPrompts as prompt_templates
 
 class Developer(BaseAgent):
     """
@@ -61,7 +56,7 @@ class Developer(BaseAgent):
         self.interactive = interactive
 
     def develop_code(self, prompt):
-        final_prompt = f"{prompt}\n\n{develop_code_instructions}"
+        final_prompt = f"{prompt}\n\n{prompt_templates.develop_code_instructions}"
         code = self.evaluate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
@@ -152,7 +147,7 @@ class Developer(BaseAgent):
     # Função para gerar e escrever código em arquivos
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
-        code_prompt = f"{code_prompt_instruction}{task_description}"
+        code_prompt = f"{prompt_templates.code_prompt_instruction}{task_description}"
         print(f"Processando código para a tarefa: {task_description}")
         try:
             code = self.develop_code(code_prompt)
@@ -218,7 +213,7 @@ class Developer(BaseAgent):
 
             else:
                 task_description = task.replace('*', '').strip()
-                structure_prompt = f"{structure_prompt_instructions}\n\n{task_description}"
+                structure_prompt = f"{prompt_templates.structure_prompt_instructions}\n\n{task_description}"
                 print(f"Processando estrutura para a tarefa: {task_description}")
                 try:
                     structure = self.generate_structure(structure_prompt)
@@ -238,7 +233,7 @@ class Developer(BaseAgent):
                     else:
                         f.write(structure)
 
-                code_prompt = f"{code_prompt_instruction}{task_description}{code_structure_refinement_prompt}{structure}"
+                code_prompt = f"{prompt_templates.code_prompt_instruction}{task_description}{prompt_templates.code_structure_refinement_prompt}{structure}"
                 print(f"Processando código para a tarefa: {task_description}")
                 try:
                     code = self.develop_code(code_prompt)
