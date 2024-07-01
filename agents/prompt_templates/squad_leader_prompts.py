@@ -25,28 +25,38 @@ class SquadLeaderPrompts:
 
         **Criar Arquivos**
         001. ##models/user.model.py: arquivo para definir o modelo de dados do usuário.
-        002. ##models/post.model.py: arquivo para definir o modelo de dados da publicação.
+        002. ##models/video.model.py: arquivo para definir o modelo de dados dos videos.
+        002. ##models/comment.model.py: arquivo para definir o modelo de dados de comentários.
         003. ##controllers/auth.controller.py: arquivo para controlar a autenticação do usuário.
-        004. ##controllers/post.controller.py: arquivo para controlar as publicações.
-        005. ##services/auth.service.py: arquivo para os serviços de autenticação.
-        006. ##services/post.service.py: arquivo para os serviços de publicações.
-        007. ##repositories/user.repository.py: arquivo para os repositórios de usuário.
-        008. ##repositories/post.repository.py: arquivo para os repositórios de publicações.
+        004. ##controllers/video.controller.py: arquivo para controlar os videos.
+        005. ##controllers/videostream.controller.py: arquivo para controlar o stream de videos.
+        006. ##controllers/comment.controller.py: arquivo para controlar os comentários de vídeos.
+        007. ##services/auth.service.py: arquivo para os serviços de autenticação.
+        008. ##services/video.service.py: arquivo para os serviços do video.
+        009. ##services/videostream.service.py: arquivo para os serviços de stream de videos.
+        010. ##repositories/user.repository.py: arquivo para os repositórios de usuário.
+        011. ##repositories/video.repository.py: arquivo para os repositórios de videos.
 
         **Criar Classes e Funções**
         001. ##models/user.model.py:
             * classe User: para definir o modelo de dados do usuário.
             * função validateUser(): para validar os dados do usuário.
-        002. ##models/post.model.py:
-            * classe Post: para definir o modelo de dados da publicação.
-            * função validatePost(): para validar os dados da publicação.
-        003. ##controllers/auth.controller.py:
+        002. ##models/video.model.py:
+            * classe Video: para definir o modelo de dados do video.
+            * função validateVideo(): para validar os dados do video.
+        003. ##models/comment.model.py:
+            * classe Comment: para definir o modelo de dados dos comentários dos vídeos.
+            * função validateComment(): para validar os dados dos comentários dos vídeos.
+        004. ##controllers/auth.controller.py:
             * função login(): para realizar o login do usuário.
             * função logout(): para realizar o logout do usuário.
-        004. ##controllers/post.controller.py:
-            * função createPost(): para criar uma nova publicação.
-            * função getPosts(): para obter todas as publicações.
-        005. ##services/auth.service.py:
+        005. ##controllers/comment.controller.py:
+            * função createComment(): para criar um novo comentário.
+            * função getCommments(): para obter todos os comentário.
+        006. ##controllers/video.controller.py:
+            * função createVideo(): para criar um novo vídeo.
+            * função getVideos(): para obter todos os vídeos
+        007. ##services/auth.service.py:
             * função hashPassword(): para hashear a senha do usuário.
             * função verifyPassword(): para verificar a senha do usuário.
         """
@@ -73,33 +83,54 @@ class SquadLeaderPrompts:
         """
         MODELO DE BACKLOG FRONTEND
                 
+         **Criar Pastas**
+        001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
+        002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
+        003. ##pastas/services: pasta para armazenar os serviços do projeto.
+
         **Criar Pastas**
-        001. ##pastas/testes: pasta para armazenar todos os arquivos relacionados a testes.
-        002. ##pastas/feature-tests: pasta para armazenar os testes de funcionalidade do projeto.
-        003. ##pastas/unit-tests: pasta para armazenar os testes unitários do projeto.
+        001. ##pastas/models: pasta para armazenar todos os modelos de dados do projeto.
+        002. ##pastas/controllers: pasta para armazenar os controladores do projeto.
+        003. ##pastas/services: pasta para armazenar os serviços do projeto.
+        004. ##pastas/migrations: pasta para armazenar as migrações do banco de dados.
+        005. ##pastas/repositories: pasta para armazenar os repositórios do projeto.
 
         **Criar Arquivos**
-        001. ##testes/config.js: arquivo para configurar os testes do projeto.
-        002. ##feature-test/user-create.spec.js: arquivo para testar a criação de um usuário.
-        003. ##feature-test/post-create.spec.js: arquivo para testar a criação de uma publicação.
-        004. ##unit-test/auth.service.test.js: arquivo para testar o serviço de autenticação do projeto.
-        005. ##unit-test/db.service.test.js: arquivo para testar o serviço de banco de dados do projeto.
+        001. ##models/user.model.js: arquivo para definir o modelo de dados do usuário.
+        002. ##models/video.model.js: arquivo para definir o modelo de dados dos videos.
+        002. ##models/comment.model.js: arquivo para definir o modelo de dados de comentários.
+        003. ##controllers/auth.controller.js: arquivo para controlar a autenticação do usuário.
+        004. ##controllers/video.controller.js: arquivo para controlar os videos.
+        005. ##controllers/videostream.controller.js: arquivo para controlar o stream de videos.
+        006. ##controllers/comment.controller.js: arquivo para controlar os comentários de vídeos.
+        007. ##services/auth.service.js: arquivo para os serviços de autenticação.
+        008. ##services/video.service.js: arquivo para os serviços do video.
+        009. ##services/videostream.service.js: arquivo para os serviços de stream de videos.
+        010. ##pages/usertimeline.repository.js: pagina de timeline de videos do usuário.
+        011. ##pages/videotimeline.repository.js: pagina de timeline de videos de todos os usuários.
 
         **Criar Classes e Funções**
-        001. ##testes/config.js:
-            * funcao configTest(): para configurar os testes do projeto.
-        002. ##feature-test/user-create.spec.js:
-            * função createUserTest(): para testar a criação de um usuário.
-            * função getUserByIdTest(): para testar a obtenção de um usuário por ID.
-        003. ##feature-test/post-create.spec.js:
-            * função createPostTest(): para testar a criação de uma publicação.
-            * função getPostsByUserTest(): para testar a obtenção de postagens por usuário.
-        004. ##unit-test/auth.service.test.js:
-            * função loginTest(): para testar a autenticação do usuário.
-            * função logoutTest(): para testar o logout do usuário.
-        005. ##unit-test/db.service.test.js:
-            * função connectToDBTest(): para testar a conexão com o banco de dados.
-            * função disconnectFromDBTest(): para testar o desligamento da conexão com o banco de dados.
+        001. ##models/user.model.js:
+            * classe User: para definir o modelo de dados do usuário.
+            * função validateUser(): para validar os dados do usuário.
+        002. ##models/video.model.js:
+            * classe Video: para definir o modelo de dados do video.
+            * função validateVideo(): para validar os dados do video.
+        003. ##models/comment.model.js:
+            * classe Comment: para definir o modelo de dados dos comentários dos vídeos.
+            * função validateComment(): para validar os dados dos comentários dos vídeos.
+        004. ##controllers/auth.controller.js:
+            * função login(): para realizar o login do usuário.
+            * função logout(): para realizar o logout do usuário.
+        005. ##controllers/comment.controller.js:
+            * função createComment(): para criar um novo comentário.
+            * função getCommments(): para obter todos os comentário.
+        006. ##controllers/video.controller.js:
+            * função createVideo(): para criar um novo vídeo.
+            * função getVideos(): para obter todos os vídeos
+        007. ##services/auth.service.js:
+            * função hashPassword(): para hashear a senha do usuário.
+            * função verifyPassword(): para verificar a senha do usuário.
         """
     )
 
