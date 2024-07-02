@@ -156,11 +156,17 @@ def process_task_graph(developer, task_graph, development_dir):
     for node in task_graph.nodes[0].subnodes:
         if "##" in node.name:
             node_name = node.name.replace(' ', '_')
-            # Testa se encontra o padrão de nome de arquivo "nomedoarquivo.tipo.ext"
-            # Tests for the filename pattern "filename.type.ext" 
+            # Testa se encontra o padrão "##pasta/nomedoarquivo e demais instruções"
+            # Tests if the pattern "##folder/filename and other instructions" is found
             match = re.search(r'##(\w+)\/(\w+)', node_name)
             if match:
                 node_name = match.group(1)
+            elif not match:
+                # Testa se encontra o padrão "##pasta-nome/nomedoarquivo e demais instruções"
+                # Tests if the pattern "##folder-name/filename and other instructions" is found
+                match = re.search(r'##(\w+)-(\w+)\/(\w+)', node_name)
+            if match:
+                node_name = f"{match.group(1)}-{match.group(2)}"
             node_name = unidecode.unidecode(node_name)
             node_development_dir = os.path.join(development_dir, node_name)
 
