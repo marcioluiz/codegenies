@@ -58,6 +58,7 @@ class Graph:
     def __repr__(self):
         return f"Graph(nodes={len(self.nodes)})"
 
+
 def build_task_graph(backlog):
     """
     Constrói um grafo de tarefas a partir de um backlog.
@@ -78,38 +79,58 @@ def build_task_graph(backlog):
     """
     graph = Graph()
     current_group_node = None
+    current_task_node = None
     nodes = {}
 
     for line in backlog.splitlines():
         line = line.strip()
         if not line:
             continue
-
+        
         if line.startswith("**") and line.endswith("**"):
-            # Identificar uma nova categoria de tarefas
-            # Identify a new category of tasks
+            # Nova categoria de tarefas
             group_name = line.strip("**").strip()
             current_group_node = nodes.setdefault(group_name, Node(group_name))
             graph.add_node(current_group_node)
-        elif line.startswith("##") or line.startswith("*"):
-            # Identificar uma nova tarefa e suas subtarefas
-            # Identify a new task and its subtasks
-            task_node = nodes.setdefault(task_name, Node(task_name))
-            if current_group_node:
-                current_group_node.add_subnode(task_node)
-            else:
-                graph.add_node(task_node)
-        else:
-            # Linha que não corresponde a nenhuma das categorias acima
-            # Line that doesn't match any of the above categories
+            current_task_node = None
+            
+        elif "##" in line:
+            # Nova tarefa para criar pasta ou arquivo
             task_name = line
             task_node = nodes.setdefault(task_name, Node(task_name))
             if current_group_node:
                 current_group_node.add_subnode(task_node)
             else:
                 graph.add_node(task_node)
+            current_task_node = task_node
+    
+        elif line.startswith("*") or line.startswith("+"):
+            # Nova função a ser criada dentro de um arquivo
+            if current_task_node:
+                function_name = line
+                function_node = nodes.setdefault(function_name, Node(function_name))
+                current_task_node.add_subnode(function_node)
+            else:
+                # Tratar como tarefa se não houver nó de tarefa atual
+                task_name = line
+                task_node = nodes.setdefault(task_name, Node(task_name))
+                if current_group_node:
+                    current_group_node.add_subnode(task_node)
+                else:
+                    graph.add_node(task_node)
+        
+        else:
+            # Linha que não corresponde a nenhuma das categorias acima
+            task_name = line
+            task_node = nodes.setdefault(task_name, Node(task_name))
+            if current_group_node:
+                current_group_node.add_subnode(task_node)
+            else:
+                graph.add_node(task_node)
+            current_task_node = task_node
 
     return graph
+    
 
 def process_task_graph(developer, task_graph, development_dir):
     """
