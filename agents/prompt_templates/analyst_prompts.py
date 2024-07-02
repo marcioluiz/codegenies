@@ -10,8 +10,8 @@ class AnalystPrompts:
 
     analyst_report_refinement_instructions = (
     """
-    Acresente após uma análise rápida de total de pastas de módulos e 
-    classes de código de no máximo 04 paragráfos ao final do relatório:
+    Acresente após o relatório uma análise rápida do total de pastas, módulos e 
+    classes de código com no máximo 04 paragráfos ao final do relatório:
     \n[Insira aqui a análise rápida do projeto]
     """
     )
