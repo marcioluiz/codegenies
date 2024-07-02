@@ -107,7 +107,7 @@ class Developer(BaseAgent):
 
         print(f"Código gerado e salvo em: {file_path}")
 
-    def process_task(self, node, development_dir, parent_name):
+    def process_task(self, node, development_dir):
         """
         Processa uma tarefa, gerando a estrutura e código necessários.
         Lida com sub-nós aninhados se fornecido.
@@ -122,43 +122,32 @@ class Developer(BaseAgent):
         if "##" in task:
             file_name = ''
             
-            # Testa se encontra os padrões:
-            # 1. "##nomedoarquivo.ext e demais instruções"
-            # Test if the patterns are met:
-            # 1. "##filename.ext and other instructions"
-            match = re.search(r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', task)
-            if match:
-                file_name = match.group(1)
-            elif not match:
-                # Testa se encontra os padrões:
-                # 1. "##nomedapasta/nomedoarquivo.ext e demais instruções"
-                # 2. "##nomeda-pasta/nomedoarquivo.ext e demais instruções"
-                # Test if the patterns are met:
-                # 1. "##foldername/filename.ext and other instructions"
-                # 2. "##folder-name/filename.ext and other instructions"
-                match = re.search(r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', task)
+            # Lista de padrões a serem testados juntamente com o índice do grupo a ser extraído
+            # Patterns list to be tested along with the right group indexes to be extracted
+            patterns = [
+                # 1. "##nomedoarquivo.ext"
+                #    "##filename.ext"
+                (r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1),
+                # 2. "##nomedapasta/nomearquivo.ext ou ##nomeda-pasta/nomearquivo.ext" 
+                #    "##foldername/filename.ext" or "##folder-name/filename.ext" 
+                (r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+                # 3. "##pasta/arquivo.ext" ou "##nome-pasta/arquivo.ext" e final "nome-arquivo.ext" ou "nome.arquivo.ext"
+                #    "##folder/file.ext" or "##folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
+                (r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+                # 4. "##pasta1/pasta2/nomedoarquivo.ext" ou "##pasta1/pasta2-nome/nomedoarquivo.ext" e final "nomedo-arquivo.ext" ou "nomedo.arquivo.ext"
+                #    "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
+                (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
+            ]
+
+            # Itera sobre os padrões para encontrar um match
+            # Iterate over the patterns to find a match
+            for pattern, group_index in patterns:
+                match = re.search(pattern, task)
                 if match:
-                    file_name = match.group(3)
-            elif not match:
-                # Testa se encontra os padrões:
-                # 1. "##nomedapasta/nomedoarquivo.ext ou nomedo-arquivo.ext nomedo.arquivo.ext e demais instruções"
-                # 2. "##nomeda-pasta/nomedoarquivo.ext ou nomedo-arquivo.ext nomedo.arquivo.ext e demais instruções"
-                # Test if the patterns are met:
-                # 1. "##foldername/filename.ext or file-name.ext or file.name.ext and other instructions"
-                # 2. "##folder-name/filename.ext or file-name.ext or file.name.ext and other instructions"
-                match = re.search(r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', task)
-                if match:
-                    file_name = match.group(3)
-            elif not match:
-                # Testa se encontra os padrões:
-                # 1. "##pasta1/pasta2/nomedoarquivo.ext ou nomedo-arquivo.ext nomedo.arquivo.ext e demais instruções"
-                # 2. "##pasta1/pasta2-nome/nomedoarquivo.ext ou nomedo-arquivo.ext nomedo.arquivo.ext e demais instruções"
-                # Test if the patterns are met:
-                # 1. "##folder1/folder2/filename.ext or file-name.ext or file.name.ext and other instructions"
-                # 2. "##folder1/dolder2-name/filename.ext or file-name.ext or file.name.ext and other instructions"
-                match = re.search(r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', task)
-                if match:
-                    file_name = match.group(9)
+                    # Pega o grupo correto que deu match
+                    # Get the correct group that matched
+                    file_name = match.group(group_index)  
+                    break
 
             if file_name != '':
                 file_name = self.sanitize_file_name(file_name)

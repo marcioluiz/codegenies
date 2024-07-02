@@ -183,4 +183,4 @@ def process_task_graph(developer, task_graph, development_dir):
             node_name = unidecode.unidecode(node_name)
             node_development_dir = os.path.join(development_dir, node_name)
 
-            developer.process_task(node, node_development_dir, task_graph.nodes[0].name)
+            developer.process_task(node, node_development_dir)
