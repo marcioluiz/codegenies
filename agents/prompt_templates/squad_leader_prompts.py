@@ -70,8 +70,8 @@ class SquadLeaderPrompts:
         1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
         Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
         \nSiga o modelo com precisão. Tem que haver apenas um item superior começando com "**Criar Arquivos, Pastas, Classes e Funções**" e 
-        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos e 
-        hierarquicamente abaixo dos arquivos, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo.
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pasta/arquivo.ext : explicação do arquivo"  em apenas uma linha
+        e por fim hierarquicamente abaixo, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo uma instrução por linha.
         """
     )
 
@@ -125,8 +125,8 @@ class SquadLeaderPrompts:
         1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
         Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
         \nSiga o modelo com precisão. Tem que haver apenas um item superior começando com "**Criar Arquivos, Pastas, Classes e Funções**" e 
-        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos e 
-        hierarquicamente abaixo dos arquivos, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo.
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pasta/arquivo.ext : explicação do arquivo"  em apenas uma linha
+        e por fim hierarquicamente abaixo, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo uma instrução por linha.
         """
     )
 
@@ -173,7 +173,7 @@ class SquadLeaderPrompts:
         1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
         Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
         \nSiga o modelo com precisão. Tem que haver apenas um item superior começando com "**Criar Arquivos, Pastas, Classes e Funções**" e 
-        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos e 
-        hierarquicamente abaixo dos arquivos, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo.
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pasta/arquivo.ext : explicação do arquivo"  em apenas uma linha
+        e por fim hierarquicamente abaixo, iniciado por "*" as funções, estruturas de dados e algoritmos de cada arquivo uma instrução por linha.
         """
     )
