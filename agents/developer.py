@@ -123,14 +123,22 @@ class Developer(BaseAgent):
             file_name = ''
             
             # Testa se encontra os padrões:
-            # 1. "##nomedapasta/nomedoarquivo.ext e demais instruções"
-            # 2. "##nomeda-pasta/nomedoarquivo.ext e demais instruções"
+            # 1. "##nomedoarquivo.ext e demais instruções"
             # Test if the patterns are met:
-            # 1. "##foldername/filename.ext and other instructions"
-            # 2. "##folder-name/filename.ext and other instructions"
-            match = re.search(r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', task)
+            # 1. "##filename.ext and other instructions"
+            match = re.search(r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', task)
             if match:
-                file_name = match.group(3)
+                file_name = match.group(1)
+            elif not match:
+                # Testa se encontra os padrões:
+                # 1. "##nomedapasta/nomedoarquivo.ext e demais instruções"
+                # 2. "##nomeda-pasta/nomedoarquivo.ext e demais instruções"
+                # Test if the patterns are met:
+                # 1. "##foldername/filename.ext and other instructions"
+                # 2. "##folder-name/filename.ext and other instructions"
+                match = re.search(r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', task)
+                if match:
+                    file_name = match.group(3)
             elif not match:
                 # Testa se encontra os padrões:
                 # 1. "##nomedapasta/nomedoarquivo.ext ou nomedo-arquivo.ext nomedo.arquivo.ext e demais instruções"
@@ -138,7 +146,7 @@ class Developer(BaseAgent):
                 # Test if the patterns are met:
                 # 1. "##foldername/filename.ext or file-name.ext or file.name.ext and other instructions"
                 # 2. "##folder-name/filename.ext or file-name.ext or file.name.ext and other instructions"
-                match = re.search(r'##((\w+\D\w+))\/((\w+)(\.|\-)(\w+)(\.)([a-z]{2}|[a-z]{3})\b)', task)
+                match = re.search(r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', task)
                 if match:
                     file_name = match.group(3)
             elif not match:
