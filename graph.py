@@ -47,28 +47,16 @@ class Node:
 
     def __repr__(self):
         return f"Node({self.name}, subnodes={len(self.subnodes)})"
-
-class Edge:
-    def __init__(self, from_node, to_node):
-        self.from_node = from_node
-        self.to_node = to_node
-
-    def __repr__(self):
-        return f"Edge(from={self.from_node.name}, to={self.to_node.name})"
     
 class Graph:
     def __init__(self):
         self.nodes = []
-        self.edges = []
 
     def add_node(self, node):
         self.nodes.append(node)
 
-    def add_edge(self, edge):
-        self.edges.append(edge)
-
     def __repr__(self):
-        return f"Graph(nodes={len(self.nodes)}, edges={len(self.edges)})"
+        return f"Graph(nodes={len(self.nodes)})"
 
 def build_task_graph(backlog):
     """
@@ -165,50 +153,15 @@ def process_task_graph(developer, task_graph, development_dir):
         - task_graph (Graph): Task graph to be processed.
         - output_dir (str): Output directory where generated files will be saved.
     """
-    def dfs(node, visited, stack):
-        visited.add(node)
-        # Ordenar os sub-nós em ordem alfabética antes de realizar a DFS
-        # Sort sub-nodes alphabetically before performing DFS
-        for subnode in node.subnodes:
-            print(node.subnodes)
-        for subnode in node.subnodes:
-            if subnode not in visited:
-                dfs(subnode, visited, stack)
-        stack.append(node)
+    for node in task_graph.nodes[0].subnodes:
+        if "##" in node.name:
+            node_name = node.name.replace(' ', '_')
+            # Testa se encontra o padrão de nome de arquivo "nomedoarquivo.tipo.ext"
+            # Tests for the filename pattern "filename.type.ext" 
+            match = re.search(r'##(\w+)\/(\w+)', node_name)
+            if match:
+                node_name = match.group(1)
+            node_name = unidecode.unidecode(node_name)
+            node_development_dir = os.path.join(development_dir, node_name)
 
-    visited = set()
-    stack = []
-
-    # Realiza a DFS para todos os nós do grafo, ordenando em ordem alfabética
-    # Perform DFS for all nodes in the graph, sorting alphabetica
-    for node in task_graph.nodes:
-        if node not in visited:
-            dfs(node, visited, stack)
-
-    # Processa os nós em ordem topológica
-    # Process nodes in topological order
-    while stack:
-        node = stack.pop()
-        
-        node_name = node.name.replace(' ', '_')
-        match = re.search(r'##pastas\/(\w+)', node_name)
-        if match:
-           node_name = match.group(1)
-        node_name = unidecode.unidecode(node_name)
-        node_development_dir = os.path.join(development_dir, node_name)
-
-        # Processa cada sub-nó com base na categoria do nó superior, em ordem alfabética
-        # Process each sub-node based on the category of the parent node, alphabetically
-        if node.subnodes:
-            for subnode in node.subnodes:
-                print(node.subnodes)
-            for subnode in node.subnodes:
-                subnode_name = subnode.name.replace(' ', '_')
-                match = re.search(r'##pastas\/(\w+)', subnode_name)
-                if match:
-                    subnode_name = match.group(1)
-                subnode_name = unidecode.unidecode(subnode_name)
-                subnode_development_dir = os.path.join(node_development_dir, subnode_name)
-                developer.process_task(subnode, subnode_development_dir, node.name)
-        else:
-            developer.process_task(node, node_development_dir, node.name)
+            developer.process_task(node, node_development_dir, task_graph.nodes[0].name)
