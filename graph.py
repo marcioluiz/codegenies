@@ -64,7 +64,6 @@ def build_task_graph(backlog):
 
     Args:
         - backlog (str): Backlog de tarefas em formato de string.
-
     Returns:
         - Graph: Grafo de tarefas construído a partir do backlog.
 
@@ -74,7 +73,6 @@ def build_task_graph(backlog):
 
     Args:
         - backlog (str): Task backlog in string format.
-
     Returns:
         - Graph: Task graph built from the backlog.
     """
@@ -82,9 +80,6 @@ def build_task_graph(backlog):
     tasks = backlog.splitlines()
     nodes = {}
     current_group_node = None
-
-    def is_new_task_line(line):
-        return bool(re.match(r'^[A-Za-z0-9]+\.', line.strip()))
 
     for line in tasks:
         line = line.strip()
@@ -153,34 +148,50 @@ def process_task_graph(developer, task_graph, development_dir):
         - task_graph (Graph): Task graph to be processed.
         - output_dir (str): Output directory where generated files will be saved.
     """
+
+    # Lista de padrões de nomes de pstas a serem testados
+    # List of folder name patterns to test
+    patterns = [
+        # 1. "##pasta/nomedoarquivo"
+        #    "##folder/filename"
+        (r'##(\w+)\/(\w+)', 0),
+        # 2. "##pasta-nome/nomedoarquivo"
+        #    "##folder-name/filename"
+        (r'##(\w+)-(\w+)\/(\w+)', 1),
+        # 3. "##pasta1/pasta2/nomedoarquivo"
+        #    "##folder1/folder2/filename"
+        (r'##(\w+)\/(\w+)\/(\w+)', 2),
+        # 4. "##pasta1/pasta2-nome/nomedoarquivo"
+        #    "##folder1/folder2-name/filename"
+        (r'##(\w+)\/(\w+)-(\w+)\/(\w+)', 3)
+    ]
+
     for node in task_graph.nodes[0].subnodes:
         if "##" in node.name:
             node_name = node.name.replace(' ', '_')
-            # Testa se encontra o padrão "##pasta/nomedoarquivo e demais instruções"
-            # Tests if the pattern "##folder/filename and other instructions" is found
-            match = re.search(r'##(\w+)\/(\w+)', node_name)
-            if match:
-                node_name = match.group(1)
-            elif not match:
-                # Testa se encontra o padrão "##pasta-nome/nomedoarquivo e demais instruções"
-                # Tests if the pattern "##folder-name/filename and other instructions" is found
-                match = re.search(r'##(\w+)-(\w+)\/(\w+)', node_name)
+            found_match = False
+
+            # Identifica qual o padrão de nome de pastas da tarefa
+            # Identifies the task's folder name pattern
+            for pattern, index in patterns:
+                match = re.search(pattern, node_name)
                 if match:
-                    node_name = f"{match.group(1)}-{match.group(2)}"
-            elif not match:
-                # Testa se encontra o padrão "##pasta1/pasta2/nomedoarquivo e demais instruções"
-                # Tests if the pattern "##folder1/folder2/filename and other instructions" is found
-                match = re.search(r'##(\w+)\/(\w+)\/(\w+)', node_name)
-                if match:
-                    node_name = f"{match.group(1)}/{match.group(2)}"
-            elif not match:
-                # Testa se encontra o padrão "##pasta1/pasta2-nome/nomedoarquivo e demais instruções"
-                # Tests if the pattern "##folder1/folder2-name/filename and other instructions" is found
-                match = re.search(r'##(\w+)\/(\w+)-(\w+)\/(\w+)', node_name)
-                if match:
-                    node_name = f"{match.group(1)}/{match.group(2)}-{match.group(3)}"
+                    if index == 0:
+                        node_name = match.group(1)
+                    elif index == 1:
+                        node_name = f"{match.group(1)}-{match.group(2)}"
+                    elif index == 2:
+                        node_name = f"{match.group(1)}/{match.group(2)}"
+                    elif index == 3:
+                        node_name = f"{match.group(1)}/{match.group(2)}-{match.group(3)}"
+                    found_match = True
+                    break
+            
+            if not found_match:
+                continue
 
             node_name = unidecode.unidecode(node_name)
             node_development_dir = os.path.join(development_dir, node_name)
-
+            # Processa Tarefa
+            # Process Task
             developer.process_task(node, node_development_dir)
