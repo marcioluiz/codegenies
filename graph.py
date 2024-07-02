@@ -161,12 +161,18 @@ def process_task_graph(developer, task_graph, development_dir):
             match = re.search(r'##(\w+)\/(\w+)', node_name)
             if match:
                 node_name = match.group(1)
-            elif not match:
+            if not match:
                 # Testa se encontra o padrão "##pasta-nome/nomedoarquivo e demais instruções"
                 # Tests if the pattern "##folder-name/filename and other instructions" is found
                 match = re.search(r'##(\w+)-(\w+)\/(\w+)', node_name)
-            if match:
-                node_name = f"{match.group(1)}-{match.group(2)}"
+                if match:
+                    node_name = f"{match.group(1)}-{match.group(2)}"
+            elif not match:
+                # Testa se encontra o padrão "##pasta1/pasta2/nomedoarquivo e demais instruções"
+                # Tests if the pattern "##folder1/folder2/filename and other instructions" is found
+                match = re.search(r'##(\w+)\/(\w+)\/(\w+)', node_name)
+                if match:
+                    node_name = f"{match.group(1)}/{match.group(2)}"
             node_name = unidecode.unidecode(node_name)
             node_development_dir = os.path.join(development_dir, node_name)
 
