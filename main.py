@@ -227,6 +227,7 @@ def start(project_name, analyst_properties):
     os.makedirs(test_dir, exist_ok=True)
     process_task_graph(tester, test_task_graph, test_dir)
 
+    # TO-DO - create prompt logic to create project README
     # Criando o README do Projeto
     # Creating Project README
     readme_content = f"# {project_name}\n\n[Insira a descrição do projeto aqui]"
