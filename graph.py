@@ -77,56 +77,37 @@ def build_task_graph(backlog):
         - Graph: Task graph built from the backlog.
     """
     graph = Graph()
-    tasks = backlog.splitlines()
-    nodes = {}
     current_group_node = None
+    nodes = {}
 
-    for line in tasks:
+    for line in backlog.splitlines():
         line = line.strip()
         if not line:
             continue
+
         if line.startswith("**") and line.endswith("**"):
             # Identificar uma nova categoria de tarefas
             # Identify a new category of tasks
             group_name = line.strip("**").strip()
-            current_group_node = Node(group_name)
-            nodes[group_name] = current_group_node
+            current_group_node = nodes.setdefault(group_name, Node(group_name))
             graph.add_node(current_group_node)
-            current_task_node = None
-        elif line.startswith("##"):
-            # Identificar uma nova tarefa de criar pasta ou arquivo
-            # Identify a new task to create folder or file
-            task_name = line.strip("##").strip()
-            task_node = Node(task_name)
+        elif line.startswith("##") or line.startswith("*"):
+            # Identificar uma nova tarefa e suas subtarefas
+            # Identify a new task and its subtasks
+            task_node = nodes.setdefault(task_name, Node(task_name))
             if current_group_node:
                 current_group_node.add_subnode(task_node)
             else:
                 graph.add_node(task_node)
-            nodes[task_name] = task_node
-            current_task_node = task_node
-        elif line.startswith("*"):
-            # Identificar uma nova função a ser criada dentro de um arquivo
-            # Identify a new function to be created within a file
-            function_name = line.strip("*").strip()
-            function_node = Node(function_name)
-            if current_task_node:
-                current_task_node.add_subnode(function_node)
-            elif current_group_node:
-                current_group_node.add_subnode(function_node)
-            else:
-                graph.add_node(function_node)
-            nodes[function_name] = function_node
         else:
             # Linha que não corresponde a nenhuma das categorias acima
             # Line that doesn't match any of the above categories
             task_name = line
-            task_node = Node(task_name)
+            task_node = nodes.setdefault(task_name, Node(task_name))
             if current_group_node:
                 current_group_node.add_subnode(task_node)
             else:
                 graph.add_node(task_node)
-            nodes[task_name] = task_node
-            current_task_node = task_node
 
     return graph
 
