@@ -4,10 +4,12 @@ class SquadLeaderPrompts:
     # Instruções de criação do backlog de atividades do backend
     # Instructions for creating the backend activity backlog
     general_report_instructions = (
-        "Seja um bom analista de requisitos e crie um relatório bem completo."
-        "Com base no relatório do analista acima, gere um relatório geral do projeto, "
-        "abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e "
-        "uso geral do framework escolhido conforme relatório acima, bem como todas as tarefas associadas."
+        """
+        Seja um bom analista de requisitos e crie um relatório bem completo.
+        Com base no relatório do analista acima, gere um relatório geral do projeto, 
+        abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e 
+        uso geral do framework escolhido conforme relatório acima, bem como todas as tarefas associadas.
+        """
     )
 
     # Modelo de backlog backend
@@ -60,14 +62,15 @@ class SquadLeaderPrompts:
     # Instructions for creating the backend activity backlog
     backend_instructions = (
         """
-        "Com base no modelo e no relatório do Analista acima,"
-        "gere o backlog de atividades de backend abordando tudo o que há pra ser desenvolvido no módulo de Backend: "
-        "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
-        "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
-        "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
-        "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
-        "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        "\nSiga o modelo com precisão."
+        Com base no modelo e no relatório do Analista acima,
+        gere o backlog de atividades de backend abordando tudo o que há pra ser desenvolvido no módulo de Backend: 
+        listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto.
+        Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias.
+        Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 
+        1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
+        Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
+        \nSiga o modelo com precisão.Tem que haver pelo menos um item superior começando com "**criar" e
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos.
         """
     )
 
@@ -113,14 +116,15 @@ class SquadLeaderPrompts:
     # Instructions for creating the frontend activity backlog
     frontend_instructions = (
         """
-        "Com base no modelo e no relatório do Analista acima,"
-        "gere o backlog de atividades de frontend abordando tudo o que há pra ser desenvolvido no módulo de Frontend: "
-        "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
-        "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
-        "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
-        "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
-        "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        "\nSiga o modelo com precisão."
+        Com base no modelo e no relatório do Analista acima,
+        gere o backlog de atividades de frontend abordando tudo o que há pra ser desenvolvido no módulo de Frontend: 
+        listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto.
+        Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias.
+        Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 
+        1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
+        Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
+        \nSiga o modelo com precisão. Tem que haver pelo menos um item superior começando com "**criar" e 
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos
         """
     )
 
@@ -159,13 +163,14 @@ class SquadLeaderPrompts:
     # Instructions for creating the testes activity backlog
     tests_instructions = (
         """
-        "Com base no modelo e no relatório do Analista acima,"
-        "gere o backlog de atividades de testes abordando tudo o que há pra ser desenvolvido no módulo de Testes: "
-        "listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto."
-        "Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias."
-        "Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: "
-        "1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter."
-        "Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext"
-        "\nSiga o modelo com precisão."
+        Com base no modelo e no relatório do Analista acima,
+        gere o backlog de atividades de testes abordando tudo o que há pra ser desenvolvido no módulo de Testes: 
+        listar todos os arquivos e todas as classes e funções necessárias para o funcionamento completo do projeto.
+        Seja bem específico e completo nesta geração, incluindo todas as pastas, arquivos, classes e funções necessárias.
+        Gere um arquivo final de instruções contendo uma instrução por linha, podendo esta instrução ser de um dos dois tipos a seguir: 
+        1o tipo: do tipo criar pasta e o nome da pasta na frente ou 2o tipo: do tipo criar arquivo, contendo o nome do arquivo e o detalhamento das funções que deve conter.
+        Favor marcar o nome de cada arquivo com uma tag: ##nomde do arquivo: nome-do-arquivo.ext
+        \nSiga o modelo com precisão.Tem que haver pelo menos um item superior começando com "**criar" e
+        hierarquicamente abaixo instruções que contem os nomes das pastas e arquivos na forma: "##pastas/arquivos.
         """
     )
