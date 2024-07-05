@@ -18,48 +18,17 @@ Functions:
 
 - if __name__ == "__main__": Script entry point when executed directly.
 """
-import inspect, json, os, shutil, sys
+import inspect, os, shutil, sys
 from io import StringIO
 from agents import Analyst, SquadLeader, Developer, Tester
 from graph import build_task_graph, process_task_graph
 from langchain_community.llms import Ollama
+from utils.translation_utils import translate_string
 
 # Global variable for language selection
 LANGUAGE = None
 
-def load_translations(module_name, lang):
-    """
-    Translate the given string key based on the selected language.
-
-    Args:
-    - module_name (str): Name of the module or file to load translations for.
-    - lang (str): Language code ("pt-br" or "en-us").
-
-    Returns:
-    - dict: Translations dictionary for the specified module and language.
-    """
-    translations_file = os.path.join(os.path.dirname(__file__), "l18n", module_name + ".json")
-    with open(translations_file, "r", encoding="utf-8") as f:
-        translations = json.load(f)
-    # Return translations for the specified language, default to empty dictionary if not found
-    return translations.get(lang, {})  
-
-def translate_string(module_name, key, lang):
-    """
-    Translate the given string key based on the selected language.
-    
-    Args:
-    - key (str): Key to translate.
-    - language (str): Language code ("pt-br" or "en-us").
-    
-    Returns:
-    - str: Translated string if available, otherwise returns the original key.
-    """
-    translations = load_translations(module_name, lang)
-    # Return the translation if found, otherwise return the original key
-    return translations.get(key, key)
-
-def select_language(self):
+def select_language():
     """
     Prompt the user to select a language for the project.
     
@@ -69,8 +38,7 @@ def select_language(self):
     while True:
         lang_input = input("Select language / Selecione o idioma (pt-br / en-us): ").strip().lower()
         if lang_input in ["pt-br", "en-us"]:
-            self.LANGUAGE = lang_input
-            break
+            return lang_input
         else:
             print("Invalid selection / Seleção inválida. Please select 'pt-br' or 'en-us'.")
             continue
@@ -87,7 +55,7 @@ class MultiOutput:
         for output in self.outputs:
             output.flush()
 
-def clean_pycache(self, root_dir):
+def clean_pycache(root_dir, language):
     """
     Removes __pycache__ folders from the specified directory.
 
@@ -96,13 +64,13 @@ def clean_pycache(self, root_dir):
     """
     
     # Get pycache message key translation
-    pycache_message_key = "pycache_message_key"
+    pycache_removed = "pycache_removed"
     for root, dirs, files in os.walk(root_dir):
         for dir_name in dirs:
             if dir_name == "__pycache__":
                 pycache_dir = os.path.join(root, dir_name)
                 shutil.rmtree(pycache_dir)
-                print(self.translate_string("main", pycache_message_key, LANGUAGE).format(pycache_dir))
+                print(translate_string('main', pycache_removed, language),{pycache_dir})
 
         # Verifica se estamos na pasta agents ou na subpasta prompt_templates
         if 'agents' in root and 'prompt_templates' in dirs:
@@ -112,7 +80,7 @@ def clean_pycache(self, root_dir):
                     if sub_dir_name == "__pycache__":
                         sub_pycache_dir = os.path.join(sub_root, sub_dir_name)
                         shutil.rmtree(sub_pycache_dir)
-                        print(self.translate_string("main", pycache_message_key, LANGUAGE).format(sub_pycache_dir))
+                        print(translate_string('main', pycache_removed, language),{sub_pycache_dir})
 
 def create_directories(project_base_path):
     """   
@@ -125,7 +93,7 @@ def create_directories(project_base_path):
     for base_dir in base_dirs:
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
 
-def start(project_name, analyst_properties):
+def start(project_name, analyst_properties, language):
     """
     Initializes and executes the project setup and execution process.
     Args:
@@ -134,8 +102,7 @@ def start(project_name, analyst_properties):
     """
 
     # Define an interactive process
-    interactive_key = "execute_interactive_prompt"
-    interactive = input(translate_string("main", interactive_key, LANGUAGE)).strip().lower() == 's'
+    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() == 's'
     
     # variables that control the execution of developer agent blocks
     generate_backend = False
@@ -151,24 +118,21 @@ def start(project_name, analyst_properties):
     test_backlog = None
 
     # Define which agents should execute their routines
-    generate_backend_key = "generate_all_prompt"
-    generate_all = input(translate_string("main", generate_backend_key, LANGUAGE)).strip().lower() == 's'
+    generate_backend_key = "generate_all_message"
+    generate_all = input(translate_string('main', generate_backend_key, language)).strip().lower() == 's'
     if generate_all:
         generate_backend = True
         generate_frontend = True
         generate_tests = True
     else:
-        generate_backend_key = "generate_backend_prompt"
-        generate_backend = generate_all or input(translate_string("main", generate_backend_key, LANGUAGE)).strip().lower() == 's'
+        generate_backend_key = "generate_backend_message"
+        generate_backend = generate_all or input(translate_string('main', generate_backend_key, language)).strip().lower() == 's'
         
-        generate_frontend_key = "generate_frontend_prompt"
-        generate_frontend = generate_all or input(translate_string("main", generate_frontend_key, LANGUAGE)).strip().lower() == 's'
+        generate_frontend_key = "generate_frontend_message"
+        generate_frontend = generate_all or input(translate_string('main', generate_frontend_key, language)).strip().lower() == 's'
 
-        generate_tests_key = "generate_tests_prompt"
-        generate_tests = generate_all or input(translate_string("main", generate_tests_key, LANGUAGE)).strip().lower() == 's'
-
-    # Clean __pycache__ folders
-    clean_pycache(os.path.dirname(__file__))
+        generate_tests_key = "generate_tests_message"
+        generate_tests = generate_all or input(translate_string('main', generate_tests_key, language)).strip().lower() == 's'
 
     # Phi-3 model to play the role of Analyst
     llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
@@ -178,31 +142,31 @@ def start(project_name, analyst_properties):
     llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")
 
     # Initializing Analyst
-    analyst = Analyst(llm_anl, translate_string("main", "analyst_name", LANGUAGE), analyst_properties, LANGUAGE, interactive=interactive)
+    analyst = Analyst(translate_string('main', 'analyst_name', language), llm_anl, analyst_properties, language, interactive=interactive)
     analyst.generate_report()
     analyst_report = analyst.output
 
     # Initializing Squad Leader
-    squad_leader = SquadLeader(llm_sq, interactive=interactive)
+    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, language, interactive=interactive)
 
     # Agents array
     agents = {
-        translate_string("main", "analyst_name", LANGUAGE): analyst,
-        translate_string("main", "squad_leader_name", LANGUAGE): squad_leader
+        translate_string('main', 'analyst_name', language): analyst,
+        translate_string('main', 'squad_leader_name', language): squad_leader
     }
 
     # Creating developer agents and tester
     if generate_backend:
-        backend_developer = Developer(llm_dev, translate_string("main", "backend_developer_name", LANGUAGE), interactive=interactive)
-        agents[translate_string("main", "backend_developer_name", LANGUAGE)] = backend_developer
+        backend_developer = Developer(translate_string('main', 'backend_developer_name', language), llm_dev, language, interactive=interactive)
+        agents[translate_string('main', 'backend_developer_name', language)] = backend_developer
 
     if generate_frontend:
-        frontend_developer = Developer(llm_dev, translate_string("main", "frontend_developer_name", LANGUAGE), interactive=interactive)
-        agents[translate_string("main", "frontend_developer_name", LANGUAGE)] = frontend_developer
+        frontend_developer = Developer(translate_string('main', 'frontend_developer_name', language), llm_dev, language, interactive=interactive)
+        agents[translate_string('main', 'frontend_developer_name', language)] = frontend_developer
 
     if generate_tests:
-        tester = Tester(llm_dev, interactive=interactive)
-        agents[translate_string("main", "tester_name", LANGUAGE)] = tester
+        tester = Tester(translate_string('main', 'frontend_developer_name', language), llm_dev, language, interactive=interactive)
+        agents[translate_string('main', 'tester_name', language)] = tester
 
     # Creating folder structure in the build
     project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
@@ -237,15 +201,15 @@ def start(project_name, analyst_properties):
 
     # Saving reports in the reports folder
     reports = {
-        translate_string("main", "project_report_file", LANGUAGE): general_report
+        translate_string('main', 'project_report_file', language): general_report
     }
 
     if generate_backend:
-        reports[translate_string("main", "backend_report_file", LANGUAGE)] = backend_backlog
+        reports[translate_string('main', 'backend_report_file', language)] = backend_backlog
     if generate_frontend:
-        reports[translate_string("main", "frontend_report_file", LANGUAGE)] = frontend_backlog
+        reports[translate_string('main', 'frontend_report_file', language)] = frontend_backlog
     if generate_tests:
-        reports[translate_string("main", "test_report_file", LANGUAGE)] = test_backlog
+        reports[translate_string('main', 'test_report_file', language)] = test_backlog
     
     for report_file, report_content in reports.items():
         if report_content is not None:
@@ -261,13 +225,13 @@ def start(project_name, analyst_properties):
     if generate_backend:
         development_dir = os.path.join(project_base_path, "dev", backend_developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
-        print(translate_string("main", "processing_task_graph", LANGUAGE).format(backend_developer.name))
+        print(translate_string('main', 'processing_task_graph', language).format(backend_developer.name))
         process_task_graph(backend_developer, backend_task_graph, development_dir)
     
     if generate_frontend:
         development_dir = os.path.join(project_base_path, "dev", frontend_developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
-        print(translate_string("main", "processing_task_graph", LANGUAGE).format(frontend_developer.name))
+        print(translate_string('main', 'processing_task_graph', language).format(frontend_developer.name))
         process_task_graph(frontend_developer, frontend_task_graph, development_dir)
 
     if generate_tests:
@@ -283,10 +247,13 @@ def start(project_name, analyst_properties):
 
 def main():
     # Ask the user which language they want to use
-    select_language()
+    LANGUAGE = select_language()
 
-    project_name_key = "project_name_prompt"
-    project_name = input(translate_string("main", project_name_key, LANGUAGE) + ": ")
+    # Clean __pycache__ folders
+    clean_pycache(os.path.dirname(__file__), LANGUAGE)
+
+    project_name_key = "project_folder_name_message"
+    project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")
     
     analyst_properties = os.path.join(os.path.dirname(__file__), "project.properties")
 
@@ -297,13 +264,13 @@ def main():
     project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
 
     try:
-        start(project_name, analyst_properties)
+        start(project_name, analyst_properties, LANGUAGE)
     finally:
         # Restore the original stdout
         sys.stdout = original_stdout
         # Get the captured output
         actions_report = captured_stdout.getvalue()
-        actions_report_file = translate_string("main", "execution_report_file", LANGUAGE)
+        actions_report_file = translate_string('main', 'execution_report_file', LANGUAGE)
         with open(os.path.join(project_base_path, actions_report_file), 'w') as f:
             f.write(actions_report)
 

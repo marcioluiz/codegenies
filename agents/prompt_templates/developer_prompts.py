@@ -1,6 +1,6 @@
 # prompt_templates/developer_templates.py
 
-from main import translate_string
+from utils.translation_utils import translate_string
 
 class DeveloperPrompts:
     """
@@ -9,18 +9,14 @@ class DeveloperPrompts:
     def __init__(self, language):
         self.language = language
 
-    @staticmethod
-    def develop_code_instructions():
+    def develop_code_instructions(self):
         return translate_string("developer_prompts", "develop_code_instructions", self.language)
 
-    @staticmethod
-    def structure_prompt_instructions():
+    def structure_prompt_instructions(self):
         return translate_string("developer_prompts", "structure_prompt_instructions", self.language)
 
-    @staticmethod
-    def code_prompt_instruction():
+    def code_prompt_instruction(self):
         return translate_string("developer_prompts", "code_prompt_instruction", self.language)
 
-    @staticmethod
-    def code_structure_refinement_prompt():
+    def code_structure_refinement_prompt(self):
         return translate_string("developer_prompts", "code_structure_refinement_prompt", self.language)

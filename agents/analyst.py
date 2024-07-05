@@ -16,7 +16,7 @@ Classes:
 from .base_agent import BaseAgent
 import configparser
 from .prompt_templates.analyst_prompts import AnalystPrompts
-from main import translate_string
+from utils.translation_utils import translate_string
 
 class Analyst(BaseAgent):
     """
@@ -35,6 +35,7 @@ class Analyst(BaseAgent):
         super().__init__(name, llm, language, interactive)
         self.properties_file = properties_file
         self.project_data = self.read_properties()
+        self.prompts = AnalystPrompts(self.language)
 
     def read_properties(self):
         """
@@ -51,9 +52,8 @@ class Analyst(BaseAgent):
             - model (Ollama): Language model to be used by the team leader.
             - interactive (bool): Defines whether the process will be interactive.
         """
-        prompts = AnalystPrompts(self.language)
         project_info = "\n".join([f"{section}:\n{', '.join([f'{key}: {value}' for key, value in section_data.items()])}" for section, section_data in self.project_data.items()])
-        prompt = f"{prompts.get_report_prompt()}\n{project_info}\n\n{prompts.get_refinement_instructions()}"
+        prompt = f"{self.prompts.get_report_prompt()}\n{project_info}\n\n{self.prompts.get_refinement_instructions()}"
         report = self.evaluate(prompt)
         if self.interactive:
             final_report = self.interact(report)

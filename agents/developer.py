@@ -19,7 +19,7 @@ import re
 import unidecode
 from .base_agent import BaseAgent
 from .prompt_templates.developer_prompts import DeveloperPrompts
-from main import translate_string
+from utils.translation_utils import translate_string
 
 class Developer(BaseAgent):
     """
@@ -32,10 +32,10 @@ class Developer(BaseAgent):
     """
     def __init__(self, name, llm, language, interactive):
         super().__init__(name, llm, language, interactive)
+        self.prompts = DeveloperPrompts(self.language)
 
     def develop_code(self, prompt):
-        prompt_templates = DeveloperPrompts(self.language)
-        final_prompt = f"{prompt}\n\n{prompt_templates.develop_code_instructions()}"
+        final_prompt = f"{prompt}\n\n{self.prompts.develop_code_instructions()}"
         code = self.evaluate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
@@ -71,7 +71,7 @@ class Developer(BaseAgent):
         file_name = re.sub('##(\w+)\/', '', file_name)
         return file_name.lower()
     
-    def detect_language_by_first_line(self, line, language_extensions):
+    def detect_language_by_first_line(self, line):
         """
         Detects the programming language based on the first line of code.
 
@@ -82,11 +82,17 @@ class Developer(BaseAgent):
         Returns:
         - str: The name of the language corresponding to the first line of code, or None if not found.
         """
-        for language, extensions in language_extensions.items():
-            for extension in extensions:
-                pattern = r'^.*?(?<!\\)\.' + re.escape(extension) + r'\b'
-                if re.search(pattern, line.strip(), re.IGNORECASE):
-                    return language
+        language_extensions = [
+            'apl', 'asm', 'awk', 'bas', 'bat', 'c', 'clj', 'coffee', 'cpp', 'cr', 'd', 'dart',
+            'ex', 'f77', 'f95', 'forth', 'fsharp', 'go', 'groovy', 'hs', 'html', 'java', 'jl',
+            'js', 'kt', 'lisp', 'lua', 'm', 'ml', 'php', 'pl', 'pro', 'ps1', 'py', 'rb', 'r',
+            'scala', 'scm', 'sh', 'sql', 'st', 'swift', 'ts', 'vb', 'v', 'vbs', 'vim', 'vhd',
+            'xml'
+        ]
+        for extension in language_extensions:
+            pattern = r'^.*?(?<!\\)\.' + re.escape(extension) + r'\b'
+            if re.search(pattern, line.strip(), re.IGNORECASE):
+                return extension
         return None
 
     def get_comment_prefix(self, language_extension):
@@ -170,7 +176,7 @@ class Developer(BaseAgent):
 
             # Identify the first line to determine the language
             if not block_language:
-                language_extension = self.detect_language_by_first_line(line.strip(), language_extensions)
+                language_extension = self.detect_language_by_first_line(line.strip())
                 if language_extension:
                     block_language = language_extension
 
@@ -193,8 +199,7 @@ class Developer(BaseAgent):
         - Removes markup from the generated code using the `remove_markup_from_code()` method.
         - Writes the cleaned code to the specified file path.
         """
-        prompt_templates = DeveloperPrompts(self.language)
-        code_prompt = f"{prompt_templates.code_prompt_instruction()}{task_description}"
+        code_prompt = f"{self.prompts.code_prompt_instruction()}{task_description}"
         code_processing_message = translate_string("developer", "code_processing_message", self.language)
         print(f"{code_processing_message}: {task_description}")
         try:

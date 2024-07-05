@@ -1,18 +1,12 @@
 # prompt_templates/squad_leader_templates.py
 
-from main import translate_string
+from utils.translation_utils import translate_string
 
 class SquadLeaderPrompts:
-    """
-    Class containing prompts for the Squad Leader agent.
-    """
-    def __init__(self, language):
-        self.language = language
 
     # Instructions for creating the project general report
-    @staticmethod
-    def get_general_report_instructions():
-        return translate_string("squad_leader_prompts", "squad_leader_general_report_instructions")
+    def get_general_report_instructions(self, language):
+        return translate_string("squad_leader_prompts", "squad_leader_general_report_instructions", language)
 
     # Backend backlog template
     backend_backlog_model = (

@@ -44,7 +44,7 @@ Classes:
                     • interactive (bool): Defines whether the process will be interactive.
 """
 import inspect
-from main import translate_string
+from utils.translation_utils import translate_string
 
 class BaseAgent:
     def __init__(self, name, llm, language, interactive):
@@ -56,13 +56,13 @@ class BaseAgent:
 
     def evaluate(self, prompt):
         try:
-            print(f"\n{translate_string("base_agent", "base_agent_evaluating_prompt", self.language).format(name=self.name, prompt=prompt)}")
+            print(f"\n{translate_string('base_agent', 'base_agent_evaluating_prompt', self.language).format(name=self.name, prompt=prompt)}")
             output = self.llm.invoke(prompt)
-            print(f"{translate_string("base_agent", "base_agent_model_response", self.language).format(output=output)}")
+            print(f"{translate_string('base_agent', 'base_agent_model_response', self.language).format(output=output)}")
             self.output = output
             return output
         except Exception as e:
-            print(f"{translate_string("base_agent", "base_agent_error_evaluating_prompt", self.language).format(error=e)}")
+            print(f"{translate_string('base_agent', 'base_agent_error_evaluating_prompt', self.language).format(error=e)}")
             return None
 
     def interact(self, prompt):
@@ -74,15 +74,15 @@ class BaseAgent:
             str: The refined answer.
         """
         response = prompt
-        print(f"\n{translate_string("base_agent", "base_agent_interacting_with_user", self.language).format(name=self.name)}")
-        interact = input(f"\n{translate_string("base_agent", "base_agent_prompt_alter_response", self.language)}")
+        print(f"\n{translate_string('base_agent', 'base_agent_interacting_with_user', self.language).format(name=self.name)}")
+        interact = input(f"\n{translate_string('base_agent', 'base_agent_prompt_alter_response', self.language)}")
         if interact.lower() == 's':
             response = ''
-            user_input = input(f"\n{translate_string("base_agent", "base_agent_human_action_needed", self.language)}")
+            user_input = input(f"\n{translate_string('base_agent', 'base_agent_human_action_needed', self.language)}")
             refined_prompt = user_input + "\n"  + prompt
             response = self.evaluate(refined_prompt)
         else:
-            print(f"\n{translate_string("base_agent", "base_agent_interaction_ended", self.language)}")
+            print(f"\n{translate_string('base_agent', 'base_agent_interaction_ended', self.language)}")
             user_input = None
             response = prompt
             
