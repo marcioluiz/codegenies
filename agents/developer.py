@@ -86,6 +86,18 @@ class Developer(BaseAgent):
         file_name = unidecode.unidecode(file_name)
         file_name = re.sub('##(\w+)\/', '', file_name)
         return file_name.lower()
+    
+    def remove_markup_from_code(code):
+        # Remove a palavra "Código"
+        # Remove the word "Code"
+        code = code.replace('Código:', '')
+
+        # Remove padrões "```linguagem" e "```"
+        # Remove patterns "```language" and "```"
+        code = re.sub(r'\`\`\`.*?\n', '', code)
+        code = re.sub('\`\`\`', '', code)
+
+        return code
 
     # Função para gerar e escrever código em arquivos
     # Function to generate and write code to files
@@ -97,6 +109,13 @@ class Developer(BaseAgent):
         except Exception as e:
             print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
             return
+
+        # Remove markup do código gerado
+        if isinstance(code, dict):
+            for key, value in code.items():
+                code[key] = self.remove_markup_from_code(value)
+        else:
+            code = self.remove_markup_from_code(code)
 
         with open(file_path, 'w') as f:
             if isinstance(code, dict):
