@@ -128,15 +128,46 @@ def start(project_name, analyst_properties):
     # Define an interactive process
     interactive = input("Executar o processo interativo? (s/n): ").strip().lower() == 's'
     
+    # variávies que controlam a execução dos blocos dos agentes desenvolvedores
+    # variables that control the execution of developer agent blocks
+    generate_backend = False
+    generate_frontend = False
+    generate_tests = False
+    
+    backend_developer = None
+    frontend_developer = None
+    tester = None
+    
+    backend_backlog = None
+    frontend_backlog = None
+    test_backlog = None
+
+    # Define quais agentes devem executar suas rotinas
+    generate_all = input("Deseja gerar backend, frontend e testes? (s/n): ").strip().lower() == 's'
+    if generate_all:
+        generate_backend = True
+        generate_frontend = True
+        generate_tests = True
+    else:
+        generate_backend = input("Gerar backend? (s/n): ").strip().lower() == 's'
+        generate_frontend = input("Gerar frontend? (s/n): ").strip().lower() == 's'
+        generate_tests = input("Gerar testes? (s/n): ").strip().lower() == 's'
+
     # Limpar pastas __pycache__
-   # Clean __pycache__ folders
+    # Clean __pycache__ folders
     clean_pycache(os.path.dirname(__file__))
 
     # Inicializando o Ollama
     # Initializing Ollama
-    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")  # Modelo Phi-3 para fazer o papel de Analyst
-    llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")  # Modelo Codegemma para fazer o papel de Developer
-    llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")  # Modelo Lama-3 para fazer o papel de Squadleader
+    # Modelo Phi-3 para fazer o papel de Analista
+    # Phi-3 model to play the role of Analyst
+    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
+    # Modelo Codegemma para fazer o papel de Desenvolvedor
+    # Codegemma model to play the role of Developer
+    llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")
+    # Modelo Lama-3 para fazer o papel de Líder de Equipe
+    # Lama-3 model to play the role of Squadleader
+    llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")
 
     # Inicializando o analista
     # Initializing Analyst
@@ -148,21 +179,26 @@ def start(project_name, analyst_properties):
     # Initializing Squad Leader
     squad_leader = SquadLeader(llm_sq, interactive=interactive)
 
-    # Criando os agentes desenvolvedores e tester
-    # Creating developer agents and tester
-    backend_developer = Developer(llm_dev, "Desenvolvedor Backend", interactive=interactive)
-    frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend", interactive=interactive)
-    tester = Tester(llm_dev, interactive=interactive)
-
-    # Ovjeto de agentes
-    # Agents object
+    # Array de agentes
+    # Agents array
     agents = {
         "Analista": analyst,
-        "Líder de Equipe": squad_leader,
-        "Desenvolvedor Backend": backend_developer,
-        "Desenvolvedor Frontend": frontend_developer,
-        "Tester": tester
+        "Líder de Equipe": squad_leader
     }
+
+    # Criando os agentes desenvolvedores e tester
+    # Creating developer agents and tester
+    if generate_backend:
+        backend_developer = Developer(llm_dev, "Desenvolvedor Backend", interactive=interactive)
+        agents["Desenvolvedor Backend"] = backend_developer
+
+    if generate_frontend:
+        frontend_developer = Developer(llm_dev, "Desenvolvedor Frontend", interactive=interactive)
+        agents["Desenvolvedor Frontend"] = frontend_developer
+
+    if generate_tests:
+        tester = Tester(llm_dev, interactive=interactive)
+        agents["Tester"] = tester
 
     # Criando a estrutura de pastas na raiz do diretório de build
     # Creating folder structure in the build
@@ -182,23 +218,35 @@ def start(project_name, analyst_properties):
         with open(agent_path, 'w') as f:
             f.write(agent_content)
 
+    # Gera o relatório geral do projeto
+    # Generate the project general report
     squad_leader.generate_general_report(analyst_report)
     general_report = squad_leader.output
-    squad_leader.generate_backend_backlog(analyst_report)
-    backend_backlog = squad_leader.output
-    squad_leader.generate_frontend_backlog(analyst_report)
-    frontend_backlog = squad_leader.output
-    squad_leader.generate_test_backlog(analyst_report)
-    test_backlog = squad_leader.output
+
+    # Gera os relatórios dos desenvolvedores e tester
+    # Generate developer and tester reports
+    if generate_backend:
+        squad_leader.generate_backend_backlog(analyst_report)
+        backend_backlog = squad_leader.output
+    if generate_frontend:
+        squad_leader.generate_frontend_backlog(analyst_report)
+        frontend_backlog = squad_leader.output
+    if generate_tests:
+        squad_leader.generate_test_backlog(analyst_report)
+        test_backlog = squad_leader.output
 
     # Salvando os relatórios na pasta de relatórios
     # Saving reports in the reports folder
     reports = {
-        "relatório_geral_do_projeto.txt": general_report,
-        "backlog_de_tarefas_de_backend.txt": backend_backlog,
-        "backlog_de_tarefas_de_frontend.txt": frontend_backlog,
-        "backlog_de_tarefas_de_testes.txt": test_backlog
+        "relatório_geral_do_projeto.txt": general_report
     }
+
+    if generate_backend:
+        reports["backlog_de_tarefas_de_backend.txt"] = backend_backlog
+    if generate_frontend:
+        reports["backlog_de_tarefas_de_frontend.txt"] = frontend_backlog
+    if generate_tests:
+        reports["backlog_de_tarefas_de_testes.txt"] = test_backlog
     
     for report_file, report_content in reports.items():
         if report_content is not None:
@@ -207,25 +255,28 @@ def start(project_name, analyst_properties):
     
     # Criando os grafos das tarefas
     # Creating task graphs
-    backend_task_graph = build_task_graph(backend_backlog)
-    frontend_task_graph = build_task_graph(frontend_backlog)
-    test_task_graph = build_task_graph(test_backlog)
+    backend_task_graph = build_task_graph(backend_backlog) if generate_backend else None
+    frontend_task_graph = build_task_graph(frontend_backlog) if generate_frontend else None
+    test_task_graph = build_task_graph(test_backlog) if generate_tests else None
 
     ## Processamento dos Grafos de Tarefas
     ## Processing Task Graphs
-    developers = [backend_developer, frontend_developer]
-    for developer in developers:
-        development_dir = os.path.join(project_base_path, "dev", developer.name.lower().replace(' ', '_'))
+    if generate_backend:
+        development_dir = os.path.join(project_base_path, "dev", backend_developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
-        print("Processando Grafos de Tarefas para {}".format(developer.name))
-        if developer.name.lower().replace(' ', '_') == 'desenvolvedor_backend':
-            process_task_graph(backend_developer, backend_task_graph, development_dir)
-        elif developer.name.lower().replace(' ', '_') == 'desenvolvedor_frontend':
-            process_task_graph(frontend_developer, frontend_task_graph, development_dir)
+        print("Processando Grafos de Tarefas para {}".format(backend_developer.name))
+        process_task_graph(backend_developer, backend_task_graph, development_dir)
+    
+    if generate_frontend:
+        development_dir = os.path.join(project_base_path, "dev", frontend_developer.name.lower().replace(' ', '_'))
+        os.makedirs(development_dir, exist_ok=True)
+        print("Processando Grafos de Tarefas para {}".format(frontend_developer.name))
+        process_task_graph(frontend_developer, frontend_task_graph, development_dir)
 
-    test_dir = os.path.join(project_base_path, "dev", "tester")
-    os.makedirs(test_dir, exist_ok=True)
-    process_task_graph(tester, test_task_graph, test_dir)
+    if generate_tests:
+        test_dir = os.path.join(project_base_path, "dev", "tester")
+        os.makedirs(test_dir, exist_ok=True)
+        process_task_graph(tester, test_task_graph, test_dir)
 
     # TO-DO - create prompt logic to create project README
     # Criando o README do Projeto
@@ -234,7 +285,7 @@ def start(project_name, analyst_properties):
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
         f.write(readme_content)
 
-def main():
+def main():# Define which agents should execute their routines
     project_name = input("Nome do projeto: ")
     analyst_properties = os.path.join(os.path.dirname(__file__), "project.properties")
     

@@ -86,7 +86,142 @@ class Developer(BaseAgent):
         file_name = unidecode.unidecode(file_name)
         file_name = re.sub('##(\w+)\/', '', file_name)
         return file_name.lower()
+    
+    def detect_language_by_first_line(self, line, language_extensions):
+        """
+        Detecta a linguagem de programação com base na primeira linha do código.
+        Argumentos:
+        - line (str): A primeira linha do código.
+        - language_extensions (dict): Dicionário de extensões de linguagens suportadas.
+        Retorna:
+        - str: O nome da linguagem correspondente à primeira linha do código, ou None se não encontrada.
 
+        English:
+        
+        Detects the programming language based on the first line of code.
+        Arguments:
+        - line (str): The first line of code.
+        - language_extensions (dict): Dictionary of supported language extensions.
+        Returns:
+        - str: The name of the language corresponding to the first line of code, or None if not found.
+        """
+        for language, extensions in language_extensions.items():
+            for extension in extensions:
+                pattern = r'^.*?(?<!\\)\.' + re.escape(extension) + r'\b'
+                if re.search(pattern, line.strip(), re.IGNORECASE):
+                    return language
+        return None
+
+    def get_comment_prefix(self, language_extension):
+        """
+        Obtém o prefixo de comentário para a extensão de arquivo especificada.
+        Argumentos:
+        - language_extension (str): A extensão de arquivo da linguagem de programação.
+        Retorna:
+        - str: O prefixo de comentário apropriado para a extensão de arquivo.
+
+        English:
+
+        Gets the comment prefix for the specified file extension.
+        Arguments:
+        - language_extension (str): The file extension of the programming language.
+        Returns:
+        -str: The appropriate comment prefix for the file extension.
+        """
+        comment_prefixes = {
+            '/*': ['css', 'html', 'xml'],
+            '//': ['c', 'cpp', 'cr', 'dart', 'd', 'fsharp', 'go', 
+                   'groovy', 'java', 'js', 'kt', 'nim', 'php', 'scala', 
+                   'swift', 'ts', 'v'],
+            '"': ['st', 'vim'],
+            '#': ['awk', 'coffee', 'ex', 'jl', 'pl', 'ps1', 'py', 
+                  'rb', 'r', 'sh', 'vbs'],
+            '%': ['m', 'pro'],
+            '(': ['ml'],
+            ';': ['asm'],
+            ';;': ['clj', 'lisp', 'scm'],
+            '\\': ['forth'],
+            '!': ['f77', 'f95'],
+            'REM': ['bat'],
+            '⍝': ['apl'],
+            '--': ['hs', 'lua', 'sql', 'vhd'],
+            '\'': ['bas', 'vb']
+            # Adicione mais prefixos conforme necessário
+            # Add more prefixes as needed
+        }
+
+        for prefix, extensions in comment_prefixes.items():
+            if language_extension.lower() in extensions:
+                return prefix
+
+        return ''
+
+    def remove_markup_from_code(self, code):
+        """
+        Remova a marcação do código gerado.
+        Argumentos:
+        - code (str): O código gerado com marcação.
+        Retorna:
+        - str: O código limpo sem marcação.
+
+        English:
+
+        Remove markup from the generated code.
+        Args:
+        - code (str): The generated code with markup.
+        Returns:
+        - str: The clean code without markup.
+        """
+        # Remove padrões "```linguagem" e "```"
+        # Remove patterns "```language" and "```"
+        code = re.sub(r'\`\`\`.*?\n', '', code)
+        code = re.sub('\`\`\`', '', code)
+        
+        modified_code_lines = []
+        block_language = None
+
+        code_lines = code.split('\n')
+        for line in code_lines:
+            if line.strip().startswith('**'):
+                # Remove os asteriscos apenas se a linha começar com '**'
+                # Remove asterisks only if the line starts with '**'
+                modified_line = re.sub(r'^\*\*|\*\*$', '', line.strip()).strip()
+                if block_language:
+                    comment_prefix = self.get_comment_prefix(block_language)
+                    if block_language.lower() in ['css', 'html', 'xml']:
+                        modified_code_lines.append(f'{comment_prefix} {modified_line} */')
+                    else:
+                        modified_code_lines.append(f'{comment_prefix} {modified_line}')
+                else:
+                    modified_code_lines.append(modified_line)
+            elif line.strip().startswith('*'):
+                # Remove os asteriscos apenas se a linha começar com '*'
+                # Remove asterisks only if the line starts with '*'
+                modified_line = re.sub(r'^\*', '', line.strip()).strip()
+                if block_language:
+                    comment_prefix = self.get_comment_prefix(block_language)
+                    if block_language.lower() in ['css', 'html', 'xml']:
+                        modified_code_lines.append(f'{comment_prefix} {modified_line} */')
+                    else:
+                        modified_code_lines.append(f'{comment_prefix} {modified_line}')
+                else:
+                    modified_code_lines.append(modified_line)
+            else:
+                modified_code_lines.append(line)
+
+            # Identifica a primeira linha para determinar a linguagem
+            # Identify the first line to determine the language
+            if not block_language:
+                language_extension = self.detect_language_by_first_line(line.strip(), language_extensions)
+                if language_extension:
+                    block_language = language_extension
+
+        # Une as linhas modificadas de volta em um único código
+        # Merge the modified lines back into a single code
+        cleaned_code = '\n'.join(modified_code_lines)
+
+        return cleaned_code
+            
     # Função para gerar e escrever código em arquivos
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
@@ -98,10 +233,18 @@ class Developer(BaseAgent):
             print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
             return
 
+        # Remove markup do código gerado
+        # Remove markup from generated code
+        if isinstance(code, dict):
+            for key, value in code.items():
+                code[key] = self.remove_markup_from_code(value)
+        else:
+            code = self.remove_markup_from_code(code)
+
         with open(file_path, 'w') as f:
             if isinstance(code, dict):
                 for key, value in code.items():
-                    f.write(f"{key}: {value}\n")
+                    f.write(f"{value}\n")
             else:
                 f.write(code)
 
