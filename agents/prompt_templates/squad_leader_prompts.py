@@ -1,18 +1,19 @@
 # prompt_templates/squad_leader_templates.py
 
-class SquadLeaderPrompts:
-    # Instruções de criação do backlog de atividades do backend
-    # Instructions for creating the backend activity backlog
-    general_report_instructions = (
-    """
-    Seja um bom analista de requisitos e crie um relatório bem completo.
-    Com base no relatório do analista acima, gere um relatório geral do projeto, 
-    abordando todos os aspectos relevantes: Backend, Frontend e Testes: classes, funções e 
-    uso geral do framework escolhido conforme relatório acima, bem como todas as tarefas associadas.
-    """
-    )
+from main import translate_string
 
-    # Modelo de backlog backend
+class SquadLeaderPrompts:
+    """
+    Class containing prompts for the Squad Leader agent.
+    """
+    def __init__(self, language):
+        self.language = language
+
+    # Instructions for creating the project general report
+    @staticmethod
+    def get_general_report_instructions():
+        return translate_string("squad_leader_prompts", "squad_leader_general_report_instructions")
+
     # Backend backlog template
     backend_backlog_model = (
     """

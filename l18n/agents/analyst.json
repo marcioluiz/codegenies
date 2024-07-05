@@ -1,0 +1,12 @@
+{
+    "pt-br": {
+      "analyst_report_prompt_instructions": "Instruções do relatório do analista",
+      "analyst_report_refinement_instructions": "Instruções de refinamento do relatório do analista",
+      "project_analysis_report": "Relatório de Análise do Projeto"
+    },
+    "en-us": {
+      "analyst_report_prompt_instructions": "Analyst report instructions",
+      "analyst_report_refinement_instructions": "Analyst report refinement instructions",
+      "project_analysis_report": "Project Analysis Report"
+    }
+  }

@@ -1,0 +1,20 @@
+{
+    "pt-br": {
+        "base_agent_evaluating_prompt": "O agente {name} está avaliando o prompt: {prompt}",
+        "base_agent_model_response": "Resposta do modelo: {output}",
+        "base_agent_error_evaluating_prompt": "Erro ao avaliar o prompt: {error}",
+        "base_agent_interacting_with_user": "Interação com o agente: {name} para alterar a resposta do modelo de linguagem acima.",
+        "base_agent_prompt_alter_response": "Deseja alterar a resposta do modelo? (s/n): ",
+        "base_agent_human_action_needed": "Ação humana possivelmente necessária. \nPor favor, insira mais um prompt para refinar o resultado anterior: ",
+        "base_agent_interaction_ended": "Interação encerrada. Prossiga com a execução."
+    },
+    "en-us": {
+        "base_agent_evaluating_prompt": "The agent {name} is evaluating the prompt: {prompt}",
+        "base_agent_model_response": "Model response: {output}",
+        "base_agent_error_evaluating_prompt": "Error evaluating the prompt: {error}",
+        "base_agent_interacting_with_user": "Interacting with the agent: {name} to alter the language model's response above.",
+        "base_agent_prompt_alter_response": "Do you want to alter the model's response? (y/n): ",
+        "base_agent_human_action_needed": "Human action possibly needed. \nPlease input another prompt to refine the previous result: ",
+        "base_agent_interaction_ended": "Interaction ended. Proceeding with execution."
+    }
+}

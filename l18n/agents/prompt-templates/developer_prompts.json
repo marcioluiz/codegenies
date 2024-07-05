@@ -1,0 +1,14 @@
+{
+    "pt-br": {
+      "develop_code_instructions": "Com base no backlog de atividades acima, gere todo o código dos arquivos demandados nas instruções do backlog. Coloque todo o código sequencialmente marcando início de arquivos com: ##arquivo.ext e o fim de todo arquivo com: ##end-arquivo.ext.",
+      "structure_prompt_instructions": "Gere a estrutura de pastas e arquivos necessária para a tarefa:",
+      "code_prompt_instruction": "Gere o código necessário para a tarefa:",
+      "code_structure_refinement_prompt": "Observando também a estrutura criada para a mesma:"
+    },
+    "en-us": {
+      "develop_code_instructions": "Based on the above activity backlog, generate all code for the requested files according to the backlog instructions. Place all code sequentially marking the start of files with: ##file.ext and the end of each file with: ##end-file.ext.",
+      "structure_prompt_instructions": "Generate the necessary folder and file structure for the task:",
+      "code_prompt_instruction": "Generate the necessary code for the task:",
+      "code_structure_refinement_prompt": "Also observing the structure created for it:"
+    }
+  }

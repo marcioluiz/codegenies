@@ -1,28 +1,26 @@
 # prompt_templates/developer_templates.py
 
+from main import translate_string
+
 class DeveloperPrompts:
-    develop_code_instructions = (
     """
-    Com base no backlog de atividades acima, gere gere todo o código dos arquivos 
-    demandados nas instruções do backlog. Coloque todo o código sequencialmente marcando 
-    início de arquivos com: ##arquivo.ext eo o fim de todo arquivo com: ##end-arquivo.ext .
+    Class containing prompts for the Developer agent.
     """
-    )
+    def __init__(self, language):
+        self.language = language
 
-    structure_prompt_instructions = (
-    """
-    Gere a estrutura de pastas e arquivos necessária para a tarefa:
-    """
-    )
+    @staticmethod
+    def develop_code_instructions():
+        return translate_string("developer_prompts", "develop_code_instructions", self.language)
 
-    code_prompt_instruction = (
-    """
-    Gere o código necessário para a tarefa:
-    """
-    )
+    @staticmethod
+    def structure_prompt_instructions():
+        return translate_string("developer_prompts", "structure_prompt_instructions", self.language)
 
-    code_structure_refinement_prompt = (
-    """
-    observando também a estrutura criada para a mesma:
-    """
-    )    
+    @staticmethod
+    def code_prompt_instruction():
+        return translate_string("developer_prompts", "code_prompt_instruction", self.language)
+
+    @staticmethod
+    def code_structure_refinement_prompt():
+        return translate_string("developer_prompts", "code_structure_refinement_prompt", self.language)

@@ -1,20 +1,6 @@
 """
 developer.py
 
-Este arquivo define a classe para agentes Desenvolvedores. 
-A classe herda da classe base definida em `base_agent.py` e 
-implementa métodos específicos para as suas tarefas.
-
-Classes:
-
-- Developer: Classe do agente (Desenvolvedor).
-  - __init__(self, model, [name], interactive=False): Inicializa o agente.
-    - model (Ollama): Modelo de linguagem a ser utilizado pelo agente.
-    - name (str): Nome do agente (apenas para Developer).
-    - interactive (bool): Define se o processo será interativo.
-
-English:
-
 This file defines the base class Developer and its subclasses:
  (BackendDeveloper, FrontendDeveloper).
 
@@ -32,19 +18,11 @@ import os
 import re
 import unidecode
 from .base_agent import BaseAgent
-from .prompt_templates import DeveloperPrompts as prompt_templates
+from .prompt_templates.developer_prompts import DeveloperPrompts
+from main import translate_string
 
 class Developer(BaseAgent):
     """
-    Inicializa o agente Developer.
-    
-    Args:
-        - model (Ollama): Modelo de linguagem a ser utilizado pelo desenvolvedor.
-        - name (str): Nome do desenvolvedor.
-        - interactive (bool): Define se o processo será interativo.
-
-    English:
-
     Initializes a developer with a language model and role.
 
         Args:
@@ -52,12 +30,12 @@ class Developer(BaseAgent):
             - name (str): Name of the developer (e.g., "Backend Developer", "Frontend Developer").
             - interactive (bool): Defines if the process should run with interactions with the user.
     """
-    def __init__(self, llm, name, interactive=True):
-        super().__init__(name, llm)
-        self.interactive = interactive
+    def __init__(self, name, llm, language, interactive):
+        super().__init__(name, llm, language, interactive)
 
     def develop_code(self, prompt):
-        final_prompt = f"{prompt}\n\n{prompt_templates.develop_code_instructions}"
+        prompt_templates = DeveloperPrompts(self.language)
+        final_prompt = f"{prompt}\n\n{prompt_templates.develop_code_instructions()}"
         code = self.evaluate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
@@ -66,20 +44,26 @@ class Developer(BaseAgent):
         return self._parse_code_response(final_code)
 
     def _parse_code_response(self, response):
+        """
+        Parses the code response into a dictionary format.
+
+        Args:
+        - response (str or dict): Response from code generation.
+
+        Returns:
+        - dict: Parsed response with translated 'Code' key.
+        """
         if isinstance(response, str):
-            return {"Código": response}
+            translated_code_key = translate_string("developer", "translated_code_key", self.language) 
+            return {translated_code_key: response}
         elif isinstance(response, dict):
             return response
         else:
-            return {"Código": response}
+            translated_code_key = translate_string("developer", "translated_code_key", self.language)
+            return {translated_code_key: response}
     
     def sanitize_file_name(self, file_name):
         """
-        Sanitza um nome de arquivo usando a biblioteca unicode e
-        remove o padrão '##(\w+)\/' usando a função re.sub().
-
-        English:
-        
         Sanitizes a filename using unicode library and
         removes the pattern '##(\w+)\/' using the re.sub() function.
         """
@@ -89,19 +73,12 @@ class Developer(BaseAgent):
     
     def detect_language_by_first_line(self, line, language_extensions):
         """
-        Detecta a linguagem de programação com base na primeira linha do código.
-        Argumentos:
-        - line (str): A primeira linha do código.
-        - language_extensions (dict): Dicionário de extensões de linguagens suportadas.
-        Retorna:
-        - str: O nome da linguagem correspondente à primeira linha do código, ou None se não encontrada.
-
-        English:
-        
         Detects the programming language based on the first line of code.
+
         Arguments:
         - line (str): The first line of code.
         - language_extensions (dict): Dictionary of supported language extensions.
+
         Returns:
         - str: The name of the language corresponding to the first line of code, or None if not found.
         """
@@ -114,17 +91,11 @@ class Developer(BaseAgent):
 
     def get_comment_prefix(self, language_extension):
         """
-        Obtém o prefixo de comentário para a extensão de arquivo especificada.
-        Argumentos:
-        - language_extension (str): A extensão de arquivo da linguagem de programação.
-        Retorna:
-        - str: O prefixo de comentário apropriado para a extensão de arquivo.
-
-        English:
-
         Gets the comment prefix for the specified file extension.
+        
         Arguments:
         - language_extension (str): The file extension of the programming language.
+        
         Returns:
         -str: The appropriate comment prefix for the file extension.
         """
@@ -146,7 +117,6 @@ class Developer(BaseAgent):
             '⍝': ['apl'],
             '--': ['hs', 'lua', 'sql', 'vhd'],
             '\'': ['bas', 'vb']
-            # Adicione mais prefixos conforme necessário
             # Add more prefixes as needed
         }
 
@@ -158,21 +128,12 @@ class Developer(BaseAgent):
 
     def remove_markup_from_code(self, code):
         """
-        Remova a marcação do código gerado.
-        Argumentos:
-        - code (str): O código gerado com marcação.
-        Retorna:
-        - str: O código limpo sem marcação.
-
-        English:
-
         Remove markup from the generated code.
         Args:
         - code (str): The generated code with markup.
         Returns:
         - str: The clean code without markup.
         """
-        # Remove padrões "```linguagem" e "```"
         # Remove patterns "```language" and "```"
         code = re.sub(r'\`\`\`.*?\n', '', code)
         code = re.sub('\`\`\`', '', code)
@@ -183,7 +144,6 @@ class Developer(BaseAgent):
         code_lines = code.split('\n')
         for line in code_lines:
             if line.strip().startswith('**'):
-                # Remove os asteriscos apenas se a linha começar com '**'
                 # Remove asterisks only if the line starts with '**'
                 modified_line = re.sub(r'^\*\*|\*\*$', '', line.strip()).strip()
                 if block_language:
@@ -195,7 +155,6 @@ class Developer(BaseAgent):
                 else:
                     modified_code_lines.append(modified_line)
             elif line.strip().startswith('*'):
-                # Remove os asteriscos apenas se a linha começar com '*'
                 # Remove asterisks only if the line starts with '*'
                 modified_line = re.sub(r'^\*', '', line.strip()).strip()
                 if block_language:
@@ -209,31 +168,42 @@ class Developer(BaseAgent):
             else:
                 modified_code_lines.append(line)
 
-            # Identifica a primeira linha para determinar a linguagem
             # Identify the first line to determine the language
             if not block_language:
                 language_extension = self.detect_language_by_first_line(line.strip(), language_extensions)
                 if language_extension:
                     block_language = language_extension
 
-        # Une as linhas modificadas de volta em um único código
         # Merge the modified lines back into a single code
         cleaned_code = '\n'.join(modified_code_lines)
 
         return cleaned_code
             
-    # Função para gerar e escrever código em arquivos
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
-        code_prompt = f"{prompt_templates.code_prompt_instruction}{task_description}"
-        print(f"Processando código para a tarefa: {task_description}")
+        """
+        Generates and writes code to a file.
+
+        Args:
+        - file_path (str): Path to write the generated code.
+        - task_description (str): Description of the task.
+
+        Notes:
+        - Uses the `develop_code()` method to generate code based on the provided task description.
+        - Removes markup from the generated code using the `remove_markup_from_code()` method.
+        - Writes the cleaned code to the specified file path.
+        """
+        prompt_templates = DeveloperPrompts(self.language)
+        code_prompt = f"{prompt_templates.code_prompt_instruction()}{task_description}"
+        code_processing_message = translate_string("developer", "code_processing_message", self.language)
+        print(f"{code_processing_message}: {task_description}")
         try:
             code = self.develop_code(code_prompt)
         except Exception as e:
-            print(f"Erro ao gerar o código para a tarefa '{task_description}': {e}")
+            error_message = translate_string("developer", "generate_and_write_code_error", self.language)
+            print(f"{error_message}: {task_description}: {e}")
             return
 
-        # Remove markup do código gerado
         # Remove markup from generated code
         if isinstance(code, dict):
             for key, value in code.items():
@@ -248,15 +218,11 @@ class Developer(BaseAgent):
             else:
                 f.write(code)
 
-        print(f"Código gerado e salvo em: {file_path}")
+        generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
+        print(f"{generate_code_message}: {file_path}")
 
     def process_task(self, node, development_dir):
         """
-        Processa uma tarefa, gerando a estrutura e código necessários.
-        Lida com sub-nós aninhados se fornecido.
-
-        English:
-
         Processes a task, generating the necessary structure and code.
         Handles nested subnodes if provided.
         """
@@ -265,29 +231,22 @@ class Developer(BaseAgent):
         if "##" in task:
             file_name = ''
             
-            # Lista de padrões a serem testados juntamente com o índice do grupo a ser extraído
             # Patterns list to be tested along with the right group indexes to be extracted
             patterns = [
-                # 1. "##nomedoarquivo.ext"
-                #    "##filename.ext"
+                # 1. "##filename.ext"
                 (r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1),
-                # 2. "##nomedapasta/nomearquivo.ext ou ##nomeda-pasta/nomearquivo.ext" 
-                #    "##foldername/filename.ext" or "##folder-name/filename.ext" 
+                # 2. "##foldername/filename.ext" or "##folder-name/filename.ext" 
                 (r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-                # 3. "##pasta/arquivo.ext" ou "##nome-pasta/arquivo.ext" e final "nome-arquivo.ext" ou "nome.arquivo.ext"
-                #    "##folder/file.ext" or "##folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
+                # 3. "##folder/file.ext" or "##folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
                 (r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-                # 4. "##pasta1/pasta2/nomedoarquivo.ext" ou "##pasta1/pasta2-nome/nomedoarquivo.ext" e final "nomedo-arquivo.ext" ou "nomedo.arquivo.ext"
-                #    "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
+                # 4. "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
                 (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
             ]
 
-            # Itera sobre os padrões para encontrar um match
             # Iterate over the patterns to find a match
             for pattern, group_index in patterns:
                 match = re.search(pattern, task)
                 if match:
-                    # Pega o grupo correto que deu match
                     # Get the correct group that matched
                     file_name = match.group(group_index)  
                     break
@@ -304,8 +263,6 @@ class Developer(BaseAgent):
                     self.generate_and_write_code(file_path, complete_task_description)
            
     def get_source_code(self):
-        # Obtém o código-fonte da classe base
-        # Se a resposta for uma string simples ela é retornada
         # Get the source code of the base class
         # If the response is a simple string it is returned
         return super().get_source_code()
