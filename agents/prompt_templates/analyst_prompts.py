@@ -11,3 +11,6 @@ class AnalystPrompts:
     
     def get_refinement_instructions(self):
         return translate_string("analyst_prompts", "analyst_report_refinement_instructions", self.language)
+    
+    def get_readme_instructions(self):
+        return translate_string("analyst_prompts", "analyst_readme_instructions", self.language)

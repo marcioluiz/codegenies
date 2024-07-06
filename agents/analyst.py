@@ -72,6 +72,33 @@ class Analyst(BaseAgent):
         else:
             return {translate_string("analyst", "project_analysis_report", self.language): response}
     
+    def generate_readme(self, general_report, backend_report=None, frontend_report=None, test_report=None, language="en-us"):
+        """
+        Generates README content based on project reports.
+
+        Args:
+        - general_report (str): General project report.
+        - backend_report (str): Backend project report.
+        - frontend_report (str): Frontend project report.
+        - test_report (str): Test project report.
+        - language (str): Language code for translation (default is "en-us").
+
+        Returns:
+        - str: Generated README content.
+        """
+        readme_content = f"# {self.project_name}\n\n"
+        readme_content += f"## General Report\n\n{general_report}\n\n"
+
+        if backend_report:
+            readme_content += f"## Backend Report\n\n{backend_report}\n\n"
+        if frontend_report:
+            readme_content += f"## Frontend Report\n\n{frontend_report}\n\n"
+        if test_report:
+            readme_content += f"## Test Report\n\n{test_report}\n\n"
+
+        readme_content += self.prompts.get_readme_instructions(language)
+        return readme_content
+    
     def get_source_code(self):
         # Get the source code of the base class
         # If the response is a simple string it is returned
