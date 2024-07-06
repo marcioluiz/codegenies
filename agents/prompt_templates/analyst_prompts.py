@@ -17,10 +17,10 @@ class AnalystPrompts:
     
     def get_readme_prompt(self, project_name, general_report, backend_report, frontend_report, test_report):
         return (
-            f"{self.get_readme_instructions()}\n\n"
             f"Project Name: {project_name}\n\n"
             f"General Report:\n{general_report}\n\n"
             f"Backend Report:\n{backend_report}\n\n"
             f"Frontend Report:\n{frontend_report}\n\n"
             f"Test Report:\n{test_report}\n"
+            f"{self.get_readme_instructions()}\n\n"
         )
