@@ -2,13 +2,13 @@
   "pt-br": {
     "code_processing_message": "Processando código para a tarefa: ",
     "generate_and_write_code_error": "Erro ao gerar o código para a tarefa '{task_description}': {error}",
-    "generate_and_write_code_success": "Código gerado e salvo em: {file_path}",
+    "generate_and_write_code_success": "Código gerado e salvo em",
     "translated_code_key": "Código"
   },
   "en-us": {
     "code_processing_message": "Processing code for task: ",
     "generate_and_write_code_error": "Error generating code for task '{task_description}': {error}",
-    "generate_and_write_code_success": "Generated code saved at: {file_path}",
+    "generate_and_write_code_success": "Generated code saved at",
     "translated_code_key": "Code"
   }
 }
