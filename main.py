@@ -223,34 +223,34 @@ def start(project_name, analyst_properties, language):
     # Creating task graphs
     if generate_backend:
         backend_task_graph = build_task_graph(backend_backlog)
-        
     if generate_frontend:
         frontend_task_graph = build_task_graph(frontend_backlog)
-        
     if generate_tests:
         test_task_graph = build_task_graph(test_backlog)
         
-
     ## Processing Task Graphs
     if generate_backend:
         development_dir = os.path.join(project_base_path, "dev", backend_developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
-        print(translate_string('main', 'processing_task_graph', language).format(backend_developer.name))
+        processing_task_graph_message = translate_string('main', 'processing_task_graph', language)
+        print(f"{processing_task_graph_message} {backend_developer.name}")
         process_task_graph(backend_developer, backend_task_graph, development_dir)
     
     if generate_frontend:
         development_dir = os.path.join(project_base_path, "dev", frontend_developer.name.lower().replace(' ', '_'))
         os.makedirs(development_dir, exist_ok=True)
-        print(translate_string('main', 'processing_task_graph', language).format(frontend_developer.name))
+        processing_task_graph_message = translate_string('main', 'processing_task_graph', language)
+        print(f"{processing_task_graph_message} {frontend_developer.name}")
         process_task_graph(frontend_developer, frontend_task_graph, development_dir)
 
     if generate_tests:
         test_dir = os.path.join(project_base_path, "dev", "tester")
         os.makedirs(test_dir, exist_ok=True)
-        print(translate_string('main', 'processing_task_graph', language).format(tester.name))
+        processing_task_graph_message = translate_string('main', 'processing_task_graph', language)
+        print(f"{processing_task_graph_message} {tester.name}")
         process_task_graph(tester, test_task_graph, test_dir)
 
-    # TO-DO - create prompt logic to create project README
+    # TO-DO - improve README prompt engeneering
     # Creating Project README
     readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog)
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
