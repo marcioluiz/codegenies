@@ -62,7 +62,6 @@ def clean_pycache(root_dir, language):
     Args:
     - root_dir (str): Root directory path where cleaning should be performed.
     """
-    
     # Get pycache message key translation
     pycache_removed = "pycache_removed"
     for root, dirs, files in os.walk(root_dir):
@@ -241,7 +240,7 @@ def start(project_name, analyst_properties, language):
 
     # TO-DO - create prompt logic to create project README
     # Creating Project README
-    readme_content = analyst.generate_readme(general_report, backend_backlog, frontend_backlog, test_backlog, language)
+    readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog, language)
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
         f.write(readme_content)
 

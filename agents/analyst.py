@@ -72,7 +72,7 @@ class Analyst(BaseAgent):
         else:
             return {translate_string("analyst", "project_analysis_report", self.language): response}
     
-    def generate_readme(self, general_report, backend_report=None, frontend_report=None, test_report=None, language="en-us"):
+    def generate_readme(self, project_name, general_report, backend_report, frontend_report, test_report, language):
         """
         Generates README content based on project reports.
 
@@ -86,7 +86,7 @@ class Analyst(BaseAgent):
         Returns:
         - str: Generated README content.
         """
-        readme_content = f"# {self.project_name}\n\n"
+        readme_content = f"# {project_name}\n\n"
         readme_content += f"## General Report\n\n{general_report}\n\n"
 
         if backend_report:

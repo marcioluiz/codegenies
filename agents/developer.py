@@ -206,8 +206,8 @@ class Developer(BaseAgent):
                     if language_extension:
                         block_language = language_extension
 
-                comment_prefix = self.get_comment_prefix(block_language)
-                if comment_prefix:
+                if line.strip().startswith(self.get_comment_prefix(block_language)):
+                    comment_prefix = self.get_comment_prefix(block_language)
                     current_prefix = line.split()[0] if line.strip() else ''
                     if current_prefix != comment_prefix:
                         line = line.replace(current_prefix, comment_prefix, 1)
