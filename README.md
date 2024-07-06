@@ -104,7 +104,7 @@ Para executar o projeto, siga estas etapas:
 
 ```
 A estrutura de pastas do projeto será organizada da seguinte maneira:
-project_name/
+code_genies/
 ├── agents/
 │   ├── analyst.py
 │   ├── squad_leader.py
@@ -126,6 +126,18 @@ project_name/
 │   │   ├── backlog_de_tarefas_de_frontend.txt
 │   │   └── backlog_de_tarefas_de_testes.txt
 │   └── README.md
+├── l18n/
+│   ├── agents/
+│   │   ├── analyst.json
+│   │   ├── squad_leader.json
+│   │   ├── developer_backend.json
+│   │   ├── developer_frontend.json
+│   │   ├── tester.json
+│   |   └── prompt_templates/
+|   |       ├── analyst_prompts.json
+│   |       ├── squad_leader_prompts.json
+│   |       └── developer_prompts.json
+│   └── main.json
 ├── graph.py
 ├── LICENSE (GPL-3.0 License)
 ├── main.py
