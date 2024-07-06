@@ -105,6 +105,9 @@ class Developer(BaseAgent):
         Returns:
         -str: The appropriate comment prefix for the file extension.
         """
+        if not language_extension:
+            return ''
+            
         comment_prefixes = {
             '/*': ['css', 'html', 'xml'],
             '//': ['c', 'cpp', 'cr', 'dart', 'd', 'fsharp', 'go', 
@@ -195,12 +198,18 @@ class Developer(BaseAgent):
         Returns:
         - str: Code with corrected comment prefixes.
         """
+        if isinstance(code, dict):
+            modified_code = {}
+            for key, value in code.items():
+                modified_code[key] = self.fix_comments_prefix(value)
+            return modified_code
+
         lines = code.split('\n')
         modified_lines = []
         block_language = None
 
         for line in lines:
-            if line.strip().startswith(self.get_comment_prefix(block_language)):
+            if block_language and line.strip().startswith(self.get_comment_prefix(block_language)):
                 comment_prefix = self.get_comment_prefix(block_language)
                 current_prefix = line.split()[0] if line.strip() else ''
 
@@ -258,12 +267,17 @@ class Developer(BaseAgent):
         # Fix comment prefixes if necessary
         code = self.fix_comments_prefix(code)
 
-        with open(file_path, 'w') as f:
-            if isinstance(code, dict):
-                for key, value in code.items():
-                    f.write(f"{value}\n")
-            else:
-                f.write(code)
+        try:
+            with open(file_path, 'w') as f:
+                if isinstance(code, dict):
+                    for key, value in code.items():
+                        f.write(f"{value}\n")
+                else:
+                    f.write(code)
+        except Exception as e:
+            error_message = translate_string("developer", "code_written_fail", self.language)
+            print(f"{error_message}: {file_path}: {e}")
+            return
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
         print(f"{generate_code_message}: {file_path}")

@@ -133,6 +133,9 @@ def start(project_name, analyst_properties, language):
         generate_tests_message = "generate_tests_message"
         generate_tests = generate_all or input(translate_string('main', generate_tests_message, language)).strip().lower() in ['s', 'y']
 
+    # Clean __pycache__ folders
+    clean_pycache(os.path.dirname(__file__), language)
+
     # Phi-3 model to play the role of Analyst
     llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
     # Codegemma model to play the role of Developer
@@ -256,9 +259,6 @@ def start(project_name, analyst_properties, language):
 def main():
     # Ask the user which language they want to use
     LANGUAGE = select_language()
-
-    # Clean __pycache__ folders
-    clean_pycache(os.path.dirname(__file__), LANGUAGE)
 
     project_name_key = "project_folder_name_message"
     project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")
