@@ -14,7 +14,7 @@ Classes:
 
 """
 from agents import Developer
-from .prompt_templates.analyst_prompts import AnalystPrompts
+from .prompt_templates.developer_prompts import DeveloperPrompts
 from utils.translation_utils import translate_string
 
 class Tester(Developer):
@@ -23,7 +23,7 @@ class Tester(Developer):
         Initializes the Tester agent.            
         """
         super().__init__(name, llm, language, interactive)
-        self.prompts = AnalystPrompts(self.language)
+        self.prompts = DeveloperPrompts(self.language)
 
     def develop_tests(self, prompt):
         tests = self.evaluate(prompt)
