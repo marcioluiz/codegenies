@@ -101,7 +101,7 @@ def start(project_name, analyst_properties, language):
     """
 
     # Define an interactive process
-    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() == 's'
+    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() in ['s', 'y']
     
     # variables that control the execution of developer agent blocks
     generate_backend = False
@@ -118,20 +118,20 @@ def start(project_name, analyst_properties, language):
 
     # Define which agents should execute their routines
     generate_all_routines_message = "generate_all_message"
-    generate_all = input(translate_string('main', generate_all_routines_message, language)).strip().lower() == 's'
+    generate_all = input(translate_string('main', generate_all_routines_message, language)).strip().lower() in ['s', 'y']
     if generate_all:
         generate_backend = True
         generate_frontend = True
         generate_tests = True
     else:
         generate_backend_message = "generate_backend_message"
-        generate_backend = generate_all or input(translate_string('main', generate_backend_message, language)).strip().lower() == 's'
+        generate_backend = generate_all or input(translate_string('main', generate_backend_message, language)).strip().lower() in ['s', 'y']
         
         generate_frontend_message = "generate_frontend_message"
-        generate_frontend = generate_all or input(translate_string('main', generate_frontend_message, language)).strip().lower() == 's'
+        generate_frontend = generate_all or input(translate_string('main', generate_frontend_message, language)).strip().lower() in ['s', 'y']
 
         generate_tests_message = "generate_tests_message"
-        generate_tests = generate_all or input(translate_string('main', generate_tests_message, language)).strip().lower() == 's'
+        generate_tests = generate_all or input(translate_string('main', generate_tests_message, language)).strip().lower() in ['s', 'y']
 
     # Phi-3 model to play the role of Analyst
     llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")

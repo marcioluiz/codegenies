@@ -137,7 +137,8 @@ def process_task_graph(developer, task_graph, development_dir):
 
     if root_index is None:
         # Handle case where no root node with "**" markers is found
-        raise ValueError("No root node found starting and ending with '**'.")
+        print("No root node found starting and ending with '**'. unsing index 1 instead of 0.")
+        root_index = 1
 
     for node in task_graph.nodes[root_index].subnodes:
         if "##" in node.name:
