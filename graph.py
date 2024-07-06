@@ -131,7 +131,9 @@ def process_task_graph(developer, task_graph, development_dir):
     # Find the index of the root node starting and ending with "**"
     root_index = None
     for idx, node in enumerate(task_graph.nodes):
-        if node.name.startswith("**") and node.name.endswith("**"):
+        if node.name.startswith("**") and node.name.endswith("**") or \
+            ("Criar Arquivos, Pastas, Classes e Funções") in node.name or \
+            ("Create Files, Folders, Classes, and Functions") in node.name :
             root_index = idx
             break
 
