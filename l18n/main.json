@@ -22,9 +22,10 @@
       "backend_tasks_report": "Backlog de tarefas de backend",
       "frontend_tasks_report": "Backlog de tarefas de frontend",
       "test_tasks_report": "Backlog de tarefas de testes",
-      "backend_tasks_graph": "Gráfico de tarefas de backend",
-      "frontend_tasks_graph": "Gráfico de tarefas de frontend",
-      "test_tasks_graph": "Gráfico de tarefas de testes"
+      "backend_tasks_graph": "Grafo de tarefas do backend",
+      "frontend_tasks_graph": "Grafo de tarefas do frontend",
+      "test_tasks_graph": "Grafo de tarefas de testes",
+      "processing_task_graph": "Processando as tarefas do agente: "
   },
   "en-us": {
       "project_folder_name_message": "Project folder name",
@@ -51,6 +52,7 @@
       "test_tasks_report": "Test tasks backlog",
       "backend_tasks_graph": "Backend tasks graph",
       "frontend_tasks_graph": "Frontend tasks graph",
-      "test_tasks_graph": "Test tasks graph"
+      "test_tasks_graph": "Test tasks graph",
+      "processing_task_graph": "Processing tasks from the agent: "
   }
 }

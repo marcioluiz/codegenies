@@ -61,7 +61,9 @@ def build_task_graph(backlog):
         if not line:
             continue
         
-        if line.startswith("**") and line.endswith("**"):
+        if line.startswith("**") and line.endswith("**") or \
+            "Criar Arquivos, Pastas, Classes e Funções" in line or \
+            "Create Files, Folders, Classes, and Functions" in line:
             # New task category
             group_name = line.strip("**").strip()
             current_group_node = nodes.setdefault(group_name, Node(group_name))
@@ -132,8 +134,8 @@ def process_task_graph(developer, task_graph, development_dir):
     root_index = None
     for idx, node in enumerate(task_graph.nodes):
         if node.name.startswith("**") and node.name.endswith("**") or \
-            ("Criar Arquivos, Pastas, Classes e Funções") in node.name or \
-            ("Create Files, Folders, Classes, and Functions") in node.name :
+            "Criar Arquivos, Pastas, Classes e Funções" in node.name or \
+            "Create Files, Folders, Classes, and Functions" in node.name :
             root_index = idx
             break
 
