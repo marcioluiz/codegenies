@@ -184,6 +184,39 @@ class Developer(BaseAgent):
         cleaned_code = '\n'.join(modified_code_lines)
 
         return cleaned_code
+    
+    def fix_comments_prefix(self, code):
+        """
+        Fix comment prefixes in the code if necessary.
+
+        Args:
+        - code (str): Generated code to fix comment prefixes.
+
+        Returns:
+        - str: Code with corrected comment prefixes.
+        """
+        if isinstance(code, str):
+            lines = code.split('\n')
+            modified_lines = []
+            block_language = None
+
+            for line in lines:
+                if not block_language:
+                    language_extension = self.detect_language_by_first_line(line.strip())
+                    if language_extension:
+                        block_language = language_extension
+
+                comment_prefix = self.get_comment_prefix(block_language)
+                if comment_prefix:
+                    current_prefix = line.split()[0] if line.strip() else ''
+                    if current_prefix != comment_prefix:
+                        line = line.replace(current_prefix, comment_prefix, 1)
+
+                modified_lines.append(line)
+
+            code = '\n'.join(modified_lines)
+
+        return code
             
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
@@ -198,6 +231,7 @@ class Developer(BaseAgent):
         - Uses the `develop_code()` method to generate code based on the provided task description.
         - Removes markup from the generated code using the `remove_markup_from_code()` method.
         - Writes the cleaned code to the specified file path.
+        - Corrects comment prefixes using `fix_comments_prefix()` if necessary.
         """
         code_prompt = f"{self.prompts.code_prompt_instruction()}{task_description}"
         code_processing_message = translate_string("developer", "code_processing_message", self.language)
@@ -215,6 +249,9 @@ class Developer(BaseAgent):
                 code[key] = self.remove_markup_from_code(value)
         else:
             code = self.remove_markup_from_code(code)
+
+        # Fix comment prefixes if necessary
+        code = self.fix_comments_prefix(code)
 
         with open(file_path, 'w') as f:
             if isinstance(code, dict):
