@@ -105,6 +105,9 @@ class Developer(BaseAgent):
         Returns:
         -str: The appropriate comment prefix for the file extension.
         """
+        if not language_extension:
+            return ''
+            
         comment_prefixes = {
             '/*': ['css', 'html', 'xml'],
             '//': ['c', 'cpp', 'cr', 'dart', 'd', 'fsharp', 'go', 
@@ -195,28 +198,39 @@ class Developer(BaseAgent):
         Returns:
         - str: Code with corrected comment prefixes.
         """
-        if isinstance(code, str):
-            lines = code.split('\n')
-            modified_lines = []
-            block_language = None
+        if isinstance(code, dict):
+            modified_code = {}
+            for key, value in code.items():
+                modified_code[key] = self.fix_comments_prefix(value)
+            return modified_code
 
-            for line in lines:
-                if not block_language:
-                    language_extension = self.detect_language_by_first_line(line.strip())
-                    if language_extension:
-                        block_language = language_extension
+        lines = code.split('\n')
+        modified_lines = []
+        block_language = None
 
-                if line.strip().startswith(self.get_comment_prefix(block_language)):
-                    comment_prefix = self.get_comment_prefix(block_language)
-                    current_prefix = line.split()[0] if line.strip() else ''
-                    if current_prefix != comment_prefix:
-                        line = line.replace(current_prefix, comment_prefix, 1)
+        for line in lines:
+            if block_language and line.strip().startswith(self.get_comment_prefix(block_language)):
+                comment_prefix = self.get_comment_prefix(block_language)
+                current_prefix = line.split()[0] if line.strip() else ''
 
+                # Check if it's a CSS, HTML, or XML file
+                if block_language.lower() in ['css', 'html', 'xml']:
+                    modified_line = line.replace(current_prefix, f"{comment_prefix} {line.strip()} */", 1)
+                else:
+                    modified_line = line.replace(current_prefix, comment_prefix, 1)
+
+                modified_lines.append(modified_line)
+            else:
                 modified_lines.append(line)
 
-            code = '\n'.join(modified_lines)
+            # Identify the first line to determine the language
+            if not block_language:
+                language_extension = self.detect_language_by_first_line(line.strip())
+                if language_extension:
+                    block_language = language_extension
 
-        return code
+        modified_code = '\n'.join(modified_lines)
+        return modified_code
             
     # Function to generate and write code to files
     def generate_and_write_code(self, file_path, task_description):
@@ -253,12 +267,17 @@ class Developer(BaseAgent):
         # Fix comment prefixes if necessary
         code = self.fix_comments_prefix(code)
 
-        with open(file_path, 'w') as f:
-            if isinstance(code, dict):
-                for key, value in code.items():
-                    f.write(f"{value}\n")
-            else:
-                f.write(code)
+        try:
+            with open(file_path, 'w') as f:
+                if isinstance(code, dict):
+                    for key, value in code.items():
+                        f.write(f"{value}\n")
+                else:
+                    f.write(code)
+        except Exception as e:
+            error_message = translate_string("developer", "code_written_fail", self.language)
+            print(f"{error_message}: {file_path}: {e}")
+            return
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
         print(f"{generate_code_message}: {file_path}")

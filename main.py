@@ -101,7 +101,7 @@ def start(project_name, analyst_properties, language):
     """
 
     # Define an interactive process
-    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() == 's'
+    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() in ['s', 'y']
     
     # variables that control the execution of developer agent blocks
     generate_backend = False
@@ -117,21 +117,24 @@ def start(project_name, analyst_properties, language):
     test_backlog = None
 
     # Define which agents should execute their routines
-    generate_backend_key = "generate_all_message"
-    generate_all = input(translate_string('main', generate_backend_key, language)).strip().lower() == 's'
+    generate_all_routines_message = "generate_all_message"
+    generate_all = input(translate_string('main', generate_all_routines_message, language)).strip().lower() in ['s', 'y']
     if generate_all:
         generate_backend = True
         generate_frontend = True
         generate_tests = True
     else:
-        generate_backend_key = "generate_backend_message"
-        generate_backend = generate_all or input(translate_string('main', generate_backend_key, language)).strip().lower() == 's'
+        generate_backend_message = "generate_backend_message"
+        generate_backend = generate_all or input(translate_string('main', generate_backend_message, language)).strip().lower() in ['s', 'y']
         
-        generate_frontend_key = "generate_frontend_message"
-        generate_frontend = generate_all or input(translate_string('main', generate_frontend_key, language)).strip().lower() == 's'
+        generate_frontend_message = "generate_frontend_message"
+        generate_frontend = generate_all or input(translate_string('main', generate_frontend_message, language)).strip().lower() in ['s', 'y']
 
-        generate_tests_key = "generate_tests_message"
-        generate_tests = generate_all or input(translate_string('main', generate_tests_key, language)).strip().lower() == 's'
+        generate_tests_message = "generate_tests_message"
+        generate_tests = generate_all or input(translate_string('main', generate_tests_message, language)).strip().lower() in ['s', 'y']
+
+    # Clean __pycache__ folders
+    clean_pycache(os.path.dirname(__file__), language)
 
     # Phi-3 model to play the role of Analyst
     llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
@@ -191,9 +194,11 @@ def start(project_name, analyst_properties, language):
     if generate_backend:
         squad_leader.generate_backend_backlog(analyst_report)
         backend_backlog = squad_leader.output
+
     if generate_frontend:
         squad_leader.generate_frontend_backlog(analyst_report)
         frontend_backlog = squad_leader.output
+        
     if generate_tests:
         squad_leader.generate_test_backlog(analyst_report)
         test_backlog = squad_leader.output
@@ -216,9 +221,15 @@ def start(project_name, analyst_properties, language):
                 f.write(str(report_content))
     
     # Creating task graphs
-    backend_task_graph = build_task_graph(backend_backlog) if generate_backend else None
-    frontend_task_graph = build_task_graph(frontend_backlog) if generate_frontend else None
-    test_task_graph = build_task_graph(test_backlog) if generate_tests else None
+    if generate_backend:
+        backend_task_graph = build_task_graph(backend_backlog)
+        
+    if generate_frontend:
+        frontend_task_graph = build_task_graph(frontend_backlog)
+        
+    if generate_tests:
+        test_task_graph = build_task_graph(test_backlog)
+        
 
     ## Processing Task Graphs
     if generate_backend:
@@ -236,20 +247,18 @@ def start(project_name, analyst_properties, language):
     if generate_tests:
         test_dir = os.path.join(project_base_path, "dev", "tester")
         os.makedirs(test_dir, exist_ok=True)
+        print(translate_string('main', 'processing_task_graph', language).format(tester.name))
         process_task_graph(tester, test_task_graph, test_dir)
 
     # TO-DO - create prompt logic to create project README
     # Creating Project README
-    readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog, language)
+    readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog)
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
         f.write(readme_content)
 
 def main():
     # Ask the user which language they want to use
     LANGUAGE = select_language()
-
-    # Clean __pycache__ folders
-    clean_pycache(os.path.dirname(__file__), LANGUAGE)
 
     project_name_key = "project_folder_name_message"
     project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")

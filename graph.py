@@ -128,7 +128,21 @@ def process_task_graph(developer, task_graph, development_dir):
         (r'##(\w+)\/(\w+)-(\w+)\/(\w+)', 3)
     ]
 
-    for node in task_graph.nodes[0].subnodes:
+    # Find the index of the root node starting and ending with "**"
+    root_index = None
+    for idx, node in enumerate(task_graph.nodes):
+        if node.name.startswith("**") and node.name.endswith("**") or \
+            ("Criar Arquivos, Pastas, Classes e Funções") in node.name or \
+            ("Create Files, Folders, Classes, and Functions") in node.name :
+            root_index = idx
+            break
+
+    if root_index is None:
+        # Handle case where no root node with "**" markers is found
+        print("No root node found starting and ending with '**'. unsing index 1 instead of 0.")
+        root_index = 1
+
+    for node in task_graph.nodes[root_index].subnodes:
         if "##" in node.name:
             node_name = node.name.replace(' ', '_')
             found_match = False
