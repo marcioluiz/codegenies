@@ -1,0 +1,12 @@
+{
+    "pt-br": {
+      "analyst_report_prompt_instructions": "Gere um relatório de análise do projeto completo com base nas seguintes propriedades e leve cada uma delas em consideração no seu relatório:",
+      "analyst_report_refinement_instructions": "Acrescente ao relatório uma análise rápida do total de pastas, módulos e classes de código com no máximo 04 parágrafos ao final do relatório:\n[Insira aqui a análise rápida do projeto]",
+      "projetct_readme_instructions": "Com base no relatório geral do projeto e nos backlogs de trabalho de backend, dfrontend e testes acima, gere um arquivo README completo para o projeto contemplando, dependências, framework e biblioteca usados, execução e funcionamento do projeto."
+    },
+    "en-us": {
+      "analyst_report_prompt_instructions": "Generate a comprehensive project analysis report based on the following properties and consider each of them in your report:",
+      "analyst_report_refinement_instructions": "Add a brief analysis of the total number of folders, modules, and code classes with a maximum of 04 paragraphs at the end of the report:\n[Insert here the project's brief analysis]",
+      "projetct_readme_instructions": "Based on the overall project report and the backend, frontend and testing work backlogs above, generate a complete README file for the project covering dependencies, framework and library used, execution and operation of the project."
+    }
+  }

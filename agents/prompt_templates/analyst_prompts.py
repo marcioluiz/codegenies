@@ -1,17 +1,16 @@
 # prompt_templates/analyst_templates.py
 
-class AnalystPrompts:
-    analyst_report_prompt_instructions = (
-    """
-    Gere um relatório de análise do projeto completo com base nas propriedades a seguir e 
-    leve cada uma delas em consideração no seu relatório:
-    """
-    )
+from utils.translation_utils import translate_string
 
-    analyst_report_refinement_instructions = (
-    """
-    Acresente após o relatório uma análise rápida do total de pastas, módulos e 
-    classes de código com no máximo 04 paragráfos ao final do relatório:
-    \n[Insira aqui a análise rápida do projeto]
-    """
-    )
+class AnalystPrompts:
+    def __init__(self, language):
+        self.language = language
+
+    def get_report_prompt(self):
+        return translate_string("analyst_prompts", "analyst_report_prompt_instructions", self.language)
+    
+    def get_refinement_instructions(self):
+        return translate_string("analyst_prompts", "analyst_report_refinement_instructions", self.language)
+    
+    def get_readme_instructions(self):
+        return translate_string("analyst_prompts", "analyst_readme_instructions", self.language)

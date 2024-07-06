@@ -2,21 +2,6 @@
 """
 graph.py
 
-Este arquivo contém funções para a construção e processamento de grafos de tarefas. 
-Os grafos são utilizados para organizar e gerenciar as tarefas de desenvolvimento e teste do projeto.
-
-Principais Funções:
-
-- build_task_graph(backlog): Constrói um grafo de tarefas a partir de um backlog.
-  - backlog (str): Backlog de tarefas em formato de string.
-
-- process_task_graph(agent, task_graph, output_dir): Processa um grafo de tarefas e gera os arquivos de código correspondentes.
-  - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
-  - task_graph (Graph): Grafo de tarefas a ser processado.
-  - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
-
-English version:
-
 This file contains functions for constructing and processing task graphs. 
 Graphs are used to organize and manage project development and testing tasks.
 
@@ -29,8 +14,6 @@ Main Functions:
   - agent (object): Agent responsible for processing tasks (Developer or Tester).
   - task_graph (Graph): Task graph to be processed.
   - output_dir (str): Output directory where generated files will be saved.
-     
-
 """
 
 import re
@@ -61,15 +44,6 @@ class Graph:
 
 def build_task_graph(backlog):
     """
-    Constrói um grafo de tarefas a partir de um backlog.
-
-    Args:
-        - backlog (str): Backlog de tarefas em formato de string.
-    Returns:
-        - Graph: Grafo de tarefas construído a partir do backlog.
-
-    English:
-    
     Builds a task graph from a backlog.
 
     Args:
@@ -88,14 +62,14 @@ def build_task_graph(backlog):
             continue
         
         if line.startswith("**") and line.endswith("**"):
-            # Nova categoria de tarefas
+            # New task category
             group_name = line.strip("**").strip()
             current_group_node = nodes.setdefault(group_name, Node(group_name))
             graph.add_node(current_group_node)
             current_task_node = None
             
         elif "##" in line:
-            # Nova tarefa para criar pasta ou arquivo
+            # New task to create folder or file
             task_name = line
             task_node = nodes.setdefault(task_name, Node(task_name))
             if current_group_node:
@@ -105,13 +79,13 @@ def build_task_graph(backlog):
             current_task_node = task_node
     
         elif line.startswith("*") or line.startswith("+"):
-            # Nova função a ser criada dentro de um arquivo
+            # New function to be created inside a file
             if current_task_node:
                 function_name = line
                 function_node = nodes.setdefault(function_name, Node(function_name))
                 current_task_node.add_subnode(function_node)
             else:
-                # Tratar como tarefa se não houver nó de tarefa atual
+                # Treat as task if there is no current task node
                 task_name = line
                 task_node = nodes.setdefault(task_name, Node(task_name))
                 if current_group_node:
@@ -120,7 +94,7 @@ def build_task_graph(backlog):
                     graph.add_node(task_node)
         
         else:
-            # Linha que não corresponde a nenhuma das categorias acima
+            # Line that does not match any of the categories above
             task_name = line
             task_node = nodes.setdefault(task_name, Node(task_name))
             if current_group_node:
@@ -134,15 +108,6 @@ def build_task_graph(backlog):
 
 def process_task_graph(developer, task_graph, development_dir):
     """
-    Processa um grafo de tarefas e gera os arquivos de código correspondentes.
-
-    Args:
-        - agent (object): Agente responsável por processar as tarefas (Developer ou Tester).
-        - task_graph (Graph): Grafo de tarefas a ser processado.
-        - output_dir (str): Diretório de saída onde os arquivos gerados serão salvos.
-
-    English:
-        
     Processes a task graph and generates corresponding code files.
 
     Args:
@@ -151,20 +116,15 @@ def process_task_graph(developer, task_graph, development_dir):
         - output_dir (str): Output directory where generated files will be saved.
     """
 
-    # Lista de padrões de nomes de pstas a serem testados
     # List of folder name patterns to test
     patterns = [
-        # 1. "##pasta/nomedoarquivo"
-        #    "##folder/filename"
+        # 1. "##folder/filename"
         (r'##(\w+)\/(\w+)', 0),
-        # 2. "##pasta-nome/nomedoarquivo"
-        #    "##folder-name/filename"
+        # 2. "##folder-name/filename"
         (r'##(\w+)-(\w+)\/(\w+)', 1),
-        # 3. "##pasta1/pasta2/nomedoarquivo"
-        #    "##folder1/folder2/filename"
+        # 3. "##folder1/folder2/filename"
         (r'##(\w+)\/(\w+)\/(\w+)', 2),
-        # 4. "##pasta1/pasta2-nome/nomedoarquivo"
-        #    "##folder1/folder2-name/filename"
+        # 4. "##folder1/folder2-name/filename"
         (r'##(\w+)\/(\w+)-(\w+)\/(\w+)', 3)
     ]
 
@@ -173,7 +133,6 @@ def process_task_graph(developer, task_graph, development_dir):
             node_name = node.name.replace(' ', '_')
             found_match = False
 
-            # Identifica qual o padrão de nome de pastas da tarefa
             # Identifies the task's folder name pattern
             for pattern, index in patterns:
                 match = re.search(pattern, node_name)
@@ -194,6 +153,5 @@ def process_task_graph(developer, task_graph, development_dir):
 
             node_name = unidecode.unidecode(node_name)
             node_development_dir = os.path.join(development_dir, node_name)
-            # Processa Tarefa
             # Process Task
             developer.process_task(node, node_development_dir)
