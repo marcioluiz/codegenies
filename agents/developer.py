@@ -201,20 +201,28 @@ class Developer(BaseAgent):
             block_language = None
 
             for line in lines:
+                if line.strip().startswith(self.get_comment_prefix(block_language)):
+                    comment_prefix = self.get_comment_prefix(block_language)
+                    current_prefix = line.split()[0] if line.strip() else ''
+
+                    # Check if it's a CSS, HTML, or XML file
+                    if block_language.lower() in ['css', 'html', 'xml']:
+                        modified_line = line.replace(current_prefix, f"{comment_prefix} {line.strip()} */", 1)
+                    else:
+                        modified_line = line.replace(current_prefix, comment_prefix, 1)
+
+                    modified_lines.append(modified_line)
+                else:
+                    modified_lines.append(line)
+
+                # Identify the first line to determine the language
                 if not block_language:
                     language_extension = self.detect_language_by_first_line(line.strip())
                     if language_extension:
                         block_language = language_extension
 
-                if line.strip().startswith(self.get_comment_prefix(block_language)):
-                    comment_prefix = self.get_comment_prefix(block_language)
-                    current_prefix = line.split()[0] if line.strip() else ''
-                    if current_prefix != comment_prefix:
-                        line = line.replace(current_prefix, comment_prefix, 1)
-
-                modified_lines.append(line)
-
-            code = '\n'.join(modified_lines)
+            modified_code = '\n'.join(modified_lines)
+            return modified_code
 
         return code
             

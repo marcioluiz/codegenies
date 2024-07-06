@@ -240,7 +240,7 @@ def start(project_name, analyst_properties, language):
 
     # TO-DO - create prompt logic to create project README
     # Creating Project README
-    readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog, language)
+    readme_content = analyst.generate_readme(project_name, general_report, backend_backlog, frontend_backlog, test_backlog)
     with open(os.path.join(project_base_path, "README.md"), 'w') as f:
         f.write(readme_content)
 

@@ -72,7 +72,7 @@ class Analyst(BaseAgent):
         else:
             return {translate_string("analyst", "project_analysis_report", self.language): response}
     
-    def generate_readme(self, project_name, general_report, backend_report, frontend_report, test_report, language):
+    def generate_readme(self, project_name, general_report, backend_report, frontend_report, test_report):
         """
         Generates README content based on project reports.
 
@@ -86,17 +86,12 @@ class Analyst(BaseAgent):
         Returns:
         - str: Generated README content.
         """
-        readme_content = f"# {project_name}\n\n"
-        readme_content += f"## General Report\n\n{general_report}\n\n"
+        # Get the prompt for the README content
+        readme_prompt = self.prompts.get_readme_prompt(project_name, general_report, backend_report, frontend_report, test_report)
+        
+        # Evaluate the prompt to generate the README content
+        readme_content = self.evaluate(readme_prompt)
 
-        if backend_report:
-            readme_content += f"## Backend Report\n\n{backend_report}\n\n"
-        if frontend_report:
-            readme_content += f"## Frontend Report\n\n{frontend_report}\n\n"
-        if test_report:
-            readme_content += f"## Test Report\n\n{test_report}\n\n"
-
-        readme_content += self.prompts.get_readme_instructions(language)
         return readme_content
     
     def get_source_code(self):
