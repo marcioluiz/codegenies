@@ -20,9 +20,9 @@ The project makes use of small language models (or SLMs).
 
 2. **Configure the Models:**
    - You will need the following templates installed and configured in Ollama:
-     - [phi3:14b-medium-128k-instruct-q4_K_M](https://ollama.com/library/phi3:14b-medium-128k-instruct-q4_K_M) (Analyst)
-     - [codegemma:7b-instruct-v1.1-q4_K_M](https://ollama.com/library/codegemma:7b-instruct-v1.1-q4_K_M) (Developer)
-     - [llama3:8b-instruct-q4_K_M](https://ollama.com/library/llama3:8b-instruct-q4_K_M) (Squad Leader)
+     - [phi3.5:3.8b-mini-instruct-q4_K_M](https://ollama.com/library/phi3.5:3.8b-mini-instruct-q4_K_M) (Analyst)
+     - [codegemma:7b-instruct-q4_K_M](https://ollama.com/library/codegemma:7b-instruct-q4_K_M) (Developer)
+     - [llama3.1:8b-instruct-q4_K_M](https://ollama.com/library/llama3.1:8b-instruct-q4_K_M) (Squad Leader)
    - If you wish, simply change these names to the models you prefer in the `main.py` file. Of course, you should download the homologous models from the [Ollama Library](https://ollama.com/library/).
 
 3. **Start the Templates:**

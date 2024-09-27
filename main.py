@@ -137,11 +137,11 @@ def start(project_name, analyst_properties, language):
     clean_pycache(os.path.dirname(__file__), language)
 
     # Phi-3 model to play the role of Analyst
-    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
+    llm_anl = Ollama(model="phi3.5:3.8b-mini-instruct-q4_K_M")
     # Codegemma model to play the role of Developer
-    llm_dev = Ollama(model="codegemma:7b-instruct-v1.1-q4_K_M")
+    llm_dev = Ollama(model="codegemma:7b-instruct-q4_K_M")
     # Lama-3 model to play the role of Squadleader
-    llm_sq = Ollama(model="llama3:8b-instruct-q4_K_M")
+    llm_sq = Ollama(model="llama3.1:8b-instruct-q4_K_M")
 
     # Initializing Analyst
     analyst = Analyst(translate_string('main', 'analyst_name', language), llm_anl, analyst_properties, language, interactive=interactive)
