@@ -192,15 +192,15 @@ def start(project_name, analyst_properties, language):
 
     # Generate developer and tester reports
     if generate_backend:
-        squad_leader.generate_backend_backlog(analyst_report)
+        squad_leader.generate_backend_backlog(analyst_report, general_report)
         backend_backlog = squad_leader.output
 
     if generate_frontend:
-        squad_leader.generate_frontend_backlog(analyst_report)
+        squad_leader.generate_frontend_backlog(analyst_report, general_report)
         frontend_backlog = squad_leader.output
         
     if generate_tests:
-        squad_leader.generate_test_backlog(analyst_report)
+        squad_leader.generate_test_backlog(analyst_report, general_report)
         test_backlog = squad_leader.output
 
     # Saving reports in the reports folder
