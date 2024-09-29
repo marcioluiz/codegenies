@@ -149,7 +149,7 @@ def start(project_name, analyst_properties, language):
     analyst_report = analyst.output
 
     # Initializing Squad Leader
-    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, language, interactive=interactive)
+    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, analyst_properties, language, interactive=interactive)
 
     # Agents array
     agents = {
