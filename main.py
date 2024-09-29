@@ -137,9 +137,9 @@ def start(project_name, analyst_properties, language):
     clean_pycache(os.path.dirname(__file__), language)
 
     # Phi-3 model to play the role of Analyst
-    llm_anl = Ollama(model="phi3.5:3.8b-mini-instruct-q4_K_M")
-    # Codegemma model to play the role of Developer
-    llm_dev = Ollama(model="codegemma:7b-instruct-q4_K_M")
+    llm_anl = Ollama(model="phi3:14b-medium-128k-instruct-q4_K_M")
+    # DeepSeek Coder model to play the role of Developer | Old model -> codegemma:7b-instruct-q4_K_M
+    llm_dev = Ollama(model="deepseek-coder-v2:16b-lite-instruct-q4_K_M")
     # Lama-3 model to play the role of Squadleader
     llm_sq = Ollama(model="llama3.1:8b-instruct-q4_K_M")
 
@@ -149,7 +149,7 @@ def start(project_name, analyst_properties, language):
     analyst_report = analyst.output
 
     # Initializing Squad Leader
-    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, language, interactive=interactive)
+    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, analyst_properties, language, interactive=interactive)
 
     # Agents array
     agents = {
@@ -192,15 +192,15 @@ def start(project_name, analyst_properties, language):
 
     # Generate developer and tester reports
     if generate_backend:
-        squad_leader.generate_backend_backlog(analyst_report)
+        squad_leader.generate_backend_backlog(general_report)
         backend_backlog = squad_leader.output
 
     if generate_frontend:
-        squad_leader.generate_frontend_backlog(analyst_report)
+        squad_leader.generate_frontend_backlog(general_report)
         frontend_backlog = squad_leader.output
         
     if generate_tests:
-        squad_leader.generate_test_backlog(analyst_report)
+        squad_leader.generate_test_backlog(general_report)
         test_backlog = squad_leader.output
 
     # Saving reports in the reports folder

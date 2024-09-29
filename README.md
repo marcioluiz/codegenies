@@ -18,8 +18,8 @@ Este é um projeto desenvolvido com a finalidade de criar uma plataforma baseada
 
 2. **Configure os Modelos:**
    - Você precisará dos seguintes modelos instalados e configurados no Ollama:
-     - [phi3.5:3.8b-mini-instruct-q4_K_M](https://ollama.com/library/phi3.5:3.8b-mini-instruct-q4_K_M) (Analyst)
-     - [codegemma:7b-instruct-q4_K_M](https://ollama.com/library/codegemma:7b-instruct-q4_K_M) (Developer)
+     - [phi3:14b-medium-128k-instruct-q4_K_M](https://ollama.com/library/phi3:14b-medium-128k-instruct-q4_K_M) (Analyst)
+     - [deepseek-coder-v2:16b-lite-instruct-q4_K_M](https://ollama.com/library/deepseek-coder-v2:16b-lite-instruct-q4_K_M) (Developer)
      - [llama3.1:8b-instruct-q4_K_M](https://ollama.com/library/llama3.1:8b-instruct-q4_K_M) (Squad Leader)
    - Caso deseje basta alterar estes nomes pelos modelos que preferir no arquivo `main.py`. Claro vc deverá baixar os modelos homônios na [Biblioteca Ollama](https://ollama.com/library/).
 
