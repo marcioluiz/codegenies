@@ -28,6 +28,9 @@ from utils.translation_utils import translate_string
 # Global variable for language selection
 LANGUAGE = None
 
+# Global variable for development style selection
+DEVSTYLE = None
+
 def select_language():
     """
     Prompt the user to select a language for the project.
@@ -41,6 +44,21 @@ def select_language():
             return lang_input
         else:
             print("Invalid selection / Seleção inválida. Please select 'pt-br' or 'en-us'.")
+            continue
+
+def select_development_style():
+    """
+    Prompt the user to select the development style for the project.
+    
+    Returns:
+    - str: Language code ("normal", "tdd" or "code-correction").
+    """
+    while True:
+        dev_style_input = input("Select Development Style / Selecione o estilo de desenvolvimento (normal, tdd or code-correction): ").strip().lower()
+        if dev_style_input in ["normal", "tdd", "code-correction"]:
+            return dev_style_input
+        else:
+            print("Invalid selection / Seleção inválida. Please select 'normal', 'tdd' or 'code-correction'.")
             continue
 
 class MultiOutput:
@@ -92,7 +110,7 @@ def create_directories(project_base_path):
     for base_dir in base_dirs:
         os.makedirs(os.path.join(project_base_path, base_dir), exist_ok=True)
 
-def start(project_name, analyst_properties, language):
+def start(project_name, analyst_properties, development_style, language):
     """
     Initializes and executes the project setup and execution process.
     Args:
@@ -119,10 +137,14 @@ def start(project_name, analyst_properties, language):
     # Define which agents should execute their routines
     generate_all_routines_message = "generate_all_message"
     generate_all = input(translate_string('main', generate_all_routines_message, language)).strip().lower() in ['s', 'y']
-    if generate_all:
+    if (generate_all and development_style == "normal" ):
         generate_backend = True
         generate_frontend = True
         generate_tests = True
+    elif (generate_all and ( development_style == "tdd" or development_style == "code-correction")): 
+        generate_backend = True
+        generate_frontend = True
+        generate_tests = False
     else:
         generate_backend_message = "generate_backend_message"
         generate_backend = generate_all or input(translate_string('main', generate_backend_message, language)).strip().lower() in ['s', 'y']
@@ -159,11 +181,11 @@ def start(project_name, analyst_properties, language):
 
     # Creating developer agents and tester
     if generate_backend:
-        backend_developer = Developer(translate_string('main', 'backend_developer_name', language), llm_dev, language, interactive=interactive)
+        backend_developer = Developer(translate_string('main', 'backend_developer_name', language), llm_dev, development_style, language, interactive=interactive)
         agents[translate_string('main', 'backend_developer_name', language)] = backend_developer
 
     if generate_frontend:
-        frontend_developer = Developer(translate_string('main', 'frontend_developer_name', language), llm_dev, language, interactive=interactive)
+        frontend_developer = Developer(translate_string('main', 'frontend_developer_name', language), llm_dev, development_style, language, interactive=interactive)
         agents[translate_string('main', 'frontend_developer_name', language)] = frontend_developer
 
     if generate_tests:
@@ -257,8 +279,11 @@ def start(project_name, analyst_properties, language):
         f.write(readme_content)
 
 def main():
-    # Ask the user which language they want to use
+    # Ask the user which language to use
     LANGUAGE = select_language()
+
+    # Ask the user development style to use
+    DEVSTYLE = select_development_style()
 
     project_name_key = "project_folder_name_message"
     project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")
@@ -272,7 +297,7 @@ def main():
     project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
 
     try:
-        start(project_name, analyst_properties, LANGUAGE)
+        start(project_name, analyst_properties, DEVSTYLE, LANGUAGE)
     finally:
         # Restore the original stdout
         sys.stdout = original_stdout

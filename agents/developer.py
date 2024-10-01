@@ -15,6 +15,8 @@ Classes:
 - FrontendDeveloper: Subclass of Developer for frontend development tasks.
 """
 import os
+import io
+import sys
 import re
 import unidecode
 from .base_agent import BaseAgent
@@ -30,9 +32,10 @@ class Developer(BaseAgent):
             - name (str): Name of the developer (e.g., "Backend Developer", "Frontend Developer").
             - interactive (bool): Defines if the process should run with interactions with the user.
     """
-    def __init__(self, name, llm, language, interactive):
+    def __init__(self, name, llm, development_style, language, interactive):
         super().__init__(name, llm, language, interactive)
         self.prompts = DeveloperPrompts(self.language)
+        self.development_style = development_style
 
     def develop_code(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_instructions()}"
@@ -42,6 +45,90 @@ class Developer(BaseAgent):
         else:
             final_code = code
         return self._parse_code_response(final_code)
+    
+    def develop_code_with_tests(self, prompt):
+        final_prompt = f"{prompt}\n\n{self.prompts.develop_code_with_tests_instructions()}"
+        code = self.evaluate(final_prompt)
+        if self.interactive:
+            final_code = self.interact(code)
+        else:
+            final_code = code
+        return self._parse_code_response(final_code)
+    
+    def develop_code_with_correction(self, general_report):
+        print("Starting code generation with 01 cycle of testing and correction...")
+        generated_code_with_tests = self.develop_code_with_tests(general_report)
+        test_results = self.test_code(generated_code_with_tests)
+        if test_results.startswith('fail'):
+            print("Issues found during testing. Correcting...")
+            corrected_code_with_tests = self.correct_code(generated_code_with_tests, test_results)
+            print("Code generation cicle with corrections completed.")
+            return self._parse_code_response(corrected_code_with_tests)
+        else:
+            print("No issues found. Code generation cicle finishing successfully.")
+            return self._parse_code_response(generated_code_with_tests)
+
+    def test_code(self, generated_code_with_tests):
+        """
+        Tests the generated code by evaluating its syntax and executing it.
+
+        Args:
+            - generated_code_with_tests (str): The code and tests generated to be tested.
+
+        Returns:
+            - final_test_evaluation_results (str): success or error.
+        """
+        print("Testing the generated code...\n\n")
+        issues = []
+
+        # Step 1: Syntax Check
+        test_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.check_syntax_of_generated_code()}"
+        syntax_test_results = self.evaluate(test_execution_prompt)
+        if self.interactive:
+            final_syntax_test_results = self.interact(syntax_test_results)
+        else:
+            final_syntax_test_results = syntax_test_results
+        print("\n\nSyntax check finished.\n\n")
+
+        # Step 2: Code and Tests Execution Check
+        test_code_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.execute_tests_and_generated_code()}"
+        test_code_execution_results = self.evaluate(test_code_execution_prompt)
+        if self.interactive:
+            final_test_code_execution_results = self.interact(test_code_execution_results)
+        else:
+            final_test_code_execution_results = test_code_execution_results
+        print("\n\nCode execution test finished.\n\n")
+
+        # Join results
+        final_tests_results = f"{final_syntax_test_results}\n\n{final_test_code_execution_results}"
+
+        # Step 3: Evaluate Results
+        test_evaluation_prompt = f"{final_tests_results}\n\n{self.prompts.evaluate_test_results()}"
+        test_evaluation_results = self.evaluate(test_evaluation_prompt)
+        if self.interactive:
+            final_test_evaluation_results = self.interact(test_evaluation_results)
+        else:
+            final_test_evaluation_results = test_evaluation_results
+        print("\n\nTests Evaluation finished.\n\n")
+
+        return final_test_evaluation_results
+
+    def correct_code(self, generated_code_with_tests, test_results):
+        """
+        Corrects the issues found during testing by modifying the generated code.
+
+        Args:
+            - generated_code_with_tests (str): The code generated that had issues.
+
+        Returns:
+            - str: The corrected code.
+        """
+        # Generate a corrected version of the code
+        code_correction_prompt = f"{generated_code_with_tests}\n\n{test_results}\n\n{self.prompts.correct_code_based_on_test_results()}"
+        corrected_code_with_tests = self.develop_code_with_tests(code_correction_prompt)
+        print("\n\nCorrections applied.\n\n")
+
+        return self._parse_code_response(corrected_code_with_tests)
 
     def _parse_code_response(self, response):
         """
@@ -92,6 +179,39 @@ class Developer(BaseAgent):
             pattern = rf'\.{re.escape(extension)}\b'
             if re.search(pattern, line, re.IGNORECASE):
                 return extension
+        return None
+    
+    def detect_language_by_file_extension(self, text):
+        """
+        Detects the programming language based on the first occurrence of a file extension pattern.
+
+        Args:
+            - text (str): The text that contains the filename and extension.
+
+        Returns:
+            - str: Detected file extension or None if not found.
+        """
+        # List of common file extensions for different programming languages
+        language_extensions = [
+            'apl', 'asm', 'awk', 'bas', 'bat', 'c', 'clj', 'coffee', 'cpp', 'cr', 'd', 'dart',
+            'ex', 'f77', 'f95', 'forth', 'fsharp', 'go', 'groovy', 'hs', 'html', 'java', 'jl',
+            'js', 'kt', 'lisp', 'lua', 'm', 'ml', 'php', 'pl', 'pro', 'ps1', 'py', 'rb', 'r',
+            'scala', 'scm', 'sh', 'sql', 'st', 'swift', 'ts', 'vb', 'v', 'vbs', 'vim', 'vhd',
+            'xml'
+        ]
+
+        # Regex pattern to match filenames with extensions (e.g., filename.ext)
+        # The extension must match one of the valid language extensions
+        pattern = r'\b\w+\.(' + '|'.join(language_extensions) + r')\b'
+
+        # Search for the first occurrence of the filename with the correct extension
+        match = re.search(pattern, text, re.IGNORECASE)
+        
+        if match:
+            # Return the detected file extension
+            return match.group(1)
+
+        # If no extension is found, return None
         return None
     
     def is_comment_line(self, stripped_line, comment_prefixes):
@@ -202,7 +322,8 @@ class Developer(BaseAgent):
 
             # Identify the first line to determine the language
             if not block_language:
-                language_extension = self.detect_language_by_first_line(line.strip())
+                # language_extension = self.detect_language_by_first_line(line.strip())
+                language_extension = self.detect_language_by_file_extension(line.strip())
                 if language_extension:
                     block_language = language_extension
 
@@ -222,7 +343,7 @@ class Developer(BaseAgent):
             - str or dict: Code with corrected comment prefixes.
         """
         if isinstance(code, dict):
-            # Recursivamente corrige comentários em dicionários de código
+            # Recursively fix comments in dictionaries of code
             modified_code = {}
             for key, value in code.items():
                 modified_code[key] = self.fix_comments_prefix(value)
@@ -231,19 +352,20 @@ class Developer(BaseAgent):
         lines = code.split('\n')
         modified_lines = []
         block_language = None
-        comment_prefixes = {'single': '', 'multi_start': '', 'multi_end': ''}  # Inicialização padrão
+        comment_prefixes = {'single': '', 'multi_start': '', 'multi_end': ''}  # Default initialization
 
         for line in lines:
             stripped_line = line.strip()
 
             if not block_language:
-                # Detecta a linguagem com base na primeira linha relevante
-                language_extension = self.detect_language_by_first_line(stripped_line)
+                # Detect the language based on the first relevant line
+                # language_extension = self.detect_language_by_first_line(stripped_line)
+                language_extension = self.detect_language_by_file_extension(stripped_line)
                 if language_extension:
                     block_language = language_extension
                     comment_prefixes = self.get_comment_prefix(block_language)
                 else:
-                    # Mantém os prefixos padrão se a linguagem não for detectada
+                    # Keep default prefixes if language is not detected
                     comment_prefixes = {'single': '', 'multi_start': '', 'multi_end': ''}
 
             if not block_language:
@@ -296,36 +418,79 @@ class Developer(BaseAgent):
         code_processing_message = translate_string("developer", "code_processing_message", self.language)
         print(f"{code_processing_message}: {task_description}")
         try:
-            code = self.develop_code(code_prompt)
+            if self.development_style == "normal":
+                code = self.develop_code(code_prompt)
+            elif self.development_style == "tdd":
+                code = self.develop_code_with_tests(code_prompt)
+            elif self.development_style == "code-correction":
+                code = self.develop_code_with_correction(code_prompt)
         except Exception as e:
             error_message = translate_string("developer", "generate_and_write_code_error", self.language)
             print(f"{error_message}: {task_description}: {e}")
             return
 
+        # Prepare a list to hold the file 
+        # paths and corresponding code
+        file_paths_and_codes = []
+
         # Remove markup from generated code
         if isinstance(code, dict):
             for key, value in code.items():
-                code[key] = self.remove_markup_from_code(value)
+                # code[key] = self.remove_markup_from_code(value)
+                cleaned_code = self.remove_markup_from_code(value)
+                # Fix comment prefixes if necessary
+                cleaned_code = self.fix_comments_prefix(cleaned_code)
+                file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")  # Determine the file path for this key
+                file_paths_and_codes.append((file_path_for_key, cleaned_code))
         else:
-            code = self.remove_markup_from_code(code)
+            # code = self.remove_markup_from_code(code)
+            cleaned_code = self.remove_markup_from_code(code)
+            cleaned_code = self.fix_comments_prefix(cleaned_code)
+            file_paths_and_codes = [(file_path, cleaned_code)]  # Just one file path
 
-        # Fix comment prefixes if necessary
-        code = self.fix_comments_prefix(code)
-
-        try:
-            with open(file_path, 'w') as f:
-                if isinstance(code, dict):
-                    for key, value in code.items():
-                        f.write(f"{value}\n")
-                else:
-                    f.write(code)
-        except Exception as e:
-            error_message = translate_string("developer", "code_written_fail", self.language)
-            print(f"{error_message}: {file_path}: {e}")
-            return
+        # Write to all files
+        for path, content in file_paths_and_codes:
+            try:
+                with open(path, 'w') as f:
+                    f.write(content)
+            except Exception as e:
+                error_message = translate_string("developer", "code_written_fail", self.language)
+                print(f"{error_message}: {path}: {e}")
+                continue  # Continue to next file if one fails
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
-        print(f"{generate_code_message}: {file_path}")
+        print(f"{generate_code_message}: {', '.join([path for path, _ in file_paths_and_codes])}")
+        # # Fix comment prefixes if necessary
+        # code = self.fix_comments_prefix(code)
+
+        # try:
+        #     with open(file_path, 'w') as f:
+        #         if isinstance(code, dict):
+        #             for key, value in code.items():
+        #                 f.write(f"{value}\n")
+        #         else:
+        #             f.write(code)
+        # except Exception as e:
+        #     error_message = translate_string("developer", "code_written_fail", self.language)
+        #     print(f"{error_message}: {file_path}: {e}")
+        #     return
+
+        # generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
+        # print(f"{generate_code_message}: {file_path}")
+
+    def extract_test_file_name(self, main_file_name):
+        """
+        Generates the test file name based on the main file name.
+
+        Args:
+        - main_file_name (str): The name of the main file.
+
+        Returns:
+        - str: The corresponding test file name.
+        """
+        base, ext = os.path.splitext(main_file_name)
+        test_file_name = f"test_{base}{ext}"
+        return test_file_name
 
     def process_task(self, node, development_dir):
         """
@@ -333,9 +498,9 @@ class Developer(BaseAgent):
         Handles nested subnodes if provided.
         """
         task = node.name
+        file_name = None  # Initialize file_name at the start
             
         if "##" in task:
-            file_name = ''
             
             # Patterns list to be tested along with the right group indexes to be extracted
             patterns = [
@@ -348,7 +513,7 @@ class Developer(BaseAgent):
                 # 4. "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
                 (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
             ]
-
+                    
             # Iterate over the patterns to find a match
             for pattern, group_index in patterns:
                 match = re.search(pattern, task)
@@ -357,17 +522,17 @@ class Developer(BaseAgent):
                     file_name = match.group(group_index)  
                     break
 
-            if file_name != '':
-                file_name = self.sanitize_file_name(file_name)
-                file_path = os.path.join(development_dir, file_name)
-                os.makedirs(os.path.dirname(file_path), exist_ok=True)
-                
-                if file_path:
-                    all_subtasks = [subnode.name for subnode in node.subnodes]
-                    all_subtasks_str = "\n".join(all_subtasks)
-                    complete_task_description = f"{task}\n{all_subtasks_str}"
-                    self.generate_and_write_code(file_path, complete_task_description)
-           
+                if file_name != '':
+                    file_name = self.sanitize_file_name(file_name)
+                    file_path = os.path.join(development_dir, file_name)
+                    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                    
+                    if file_path:
+                        all_subtasks = [subnode.name for subnode in node.subnodes]
+                        all_subtasks_str = "\n".join(all_subtasks)
+                        complete_task_description = f"{task}\n{all_subtasks_str}"
+                        self.generate_and_write_code(file_path, complete_task_description)
+
     def get_source_code(self):
         # Get the source code of the base class
         # If the response is a simple string it is returned
