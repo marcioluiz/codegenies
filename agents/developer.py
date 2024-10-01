@@ -522,7 +522,7 @@ class Developer(BaseAgent):
                     file_name = match.group(group_index)  
                     break
 
-                if file_name != '':
+                if file_name != None:
                     file_name = self.sanitize_file_name(file_name)
                     file_path = os.path.join(development_dir, file_name)
                     os.makedirs(os.path.dirname(file_path), exist_ok=True)
