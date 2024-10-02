@@ -161,17 +161,18 @@ class Developer(BaseAgent):
                     # Iterate over the patterns to find a match
                     for pattern, group_index in patterns:
                         filename_match = re.search(pattern, line)
-                        if filename_match:
-                            if current_filename == None:
+                        if current_filename == None:
+                            if filename_match:
                                 # Update current filename
-                                current_filename = filename_match.group(group_index)  
+                                current_filename = filename_match.group(group_index) 
                         # Check for an end tag to finalize the code capture
-                        if 'end-' in line or filename_match.regs.count != 0:
-                            if (current_filename != None) and (current_code != []):
+                        if (current_filename != None) and (current_code != []):
+                            if ('end-' in line):
                                 # Save the current filename and its code
                                 parsed_code[current_filename] = "\n".join(current_code).strip()
                                 current_filename = None  # Reset filename
                                 current_code = []  # Reset code
+                                break
                     # Add line to the current code
                 elif current_filename:
                     current_code.append(line)
@@ -421,22 +422,24 @@ class Developer(BaseAgent):
         # Remove markup from generated code
         if isinstance(code, dict):
             for key, value in code.items():
-                # code[key] = self.remove_markup_from_code(value)
                 cleaned_code = self.remove_markup_from_code(value)
-                # Fix comment prefixes if necessary
                 cleaned_code = self.fix_comments_prefix(cleaned_code)
-                file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")  # Determine the file path for this key
-                file_paths_and_codes.append((file_path_for_key, cleaned_code))
+                file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")
+                
+                # Check if the file exists and determine the mode (append if exists, write if not)
+                file_mode = 'a' if os.path.exists(file_path_for_key) else 'w'
+                
+                file_paths_and_codes.append((file_path_for_key, cleaned_code, file_mode))
         else:
-            # code = self.remove_markup_from_code(code)
             cleaned_code = self.remove_markup_from_code(code)
             cleaned_code = self.fix_comments_prefix(cleaned_code)
-            file_paths_and_codes = [(file_path, cleaned_code)]  # Just one file path
+            file_mode = 'a' if os.path.exists(file_path) else 'w'
+            file_paths_and_codes = [(file_path, cleaned_code, file_mode)]
 
         # Write to all files
-        for path, content in file_paths_and_codes:
+        for path, content, mode in file_paths_and_codes:
             try:
-                with open(path, 'w') as f:
+                with open(path, mode) as f:
                     f.write(content)
             except Exception as e:
                 error_message = translate_string("developer", "code_written_fail", self.language)
@@ -444,7 +447,32 @@ class Developer(BaseAgent):
                 continue  # Continue to next file if one fails
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
-        print(f"{generate_code_message}: {', '.join([path for path, _ in file_paths_and_codes])}")
+        print(f"{generate_code_message}: {', '.join([path for path, _, _ in file_paths_and_codes])}")
+        # # Remove markup from generated code
+        # if isinstance(code, dict):
+        #     for key, value in code.items():
+        #         # code[key] = self.remove_markup_from_code(value)
+        #         cleaned_code = self.remove_markup_from_code(value)
+        #         # Fix comment prefixes if necessary
+        #         cleaned_code = self.fix_comments_prefix(cleaned_code)
+        #         file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")  # Determine the file path for this key
+        #         file_paths_and_codes.append((file_path_for_key, cleaned_code))
+        # else:
+        #     # code = self.remove_markup_from_code(code)
+        #     cleaned_code = self.remove_markup_from_code(code)
+        #     cleaned_code = self.fix_comments_prefix(cleaned_code)
+        #     file_paths_and_codes = [(file_path, cleaned_code)]  # Just one file path
+
+        # # Write to all files
+        # for path, content in file_paths_and_codes:
+        #     try:
+        #         with open(path, 'w') as f:
+        #             f.write(content)
+        #     except Exception as e:
+        #         error_message = translate_string("developer", "code_written_fail", self.language)
+        #         print(f"{error_message}: {path}: {e}")
+        #         continue  # Continue to next file if one fails
+
 
     def extract_test_file_name(self, main_file_name):
         """
