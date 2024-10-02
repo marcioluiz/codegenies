@@ -22,6 +22,7 @@ import unidecode
 from .base_agent import BaseAgent
 from .prompt_templates.developer_prompts import DeveloperPrompts
 from utils.translation_utils import translate_string
+from utils.pattern_matching import PatternMatching as pm
 
 class Developer(BaseAgent):
     """
@@ -140,11 +141,49 @@ class Developer(BaseAgent):
         Returns:
         - dict: Parsed response with translated 'Code' key.
         """
+        parsed_code = {}
+
         if isinstance(response, str):
-            translated_code_key = translate_string("developer", "translated_code_key", self.language) 
-            return {translated_code_key: response}
+            # Extract filenames and code content
+            lines = response.splitlines()
+            current_filename = None
+            current_code = []
+
+            # Patterns list to be tested along 
+            # with the right group indexes to be extracted
+            patterns = pm.filename_matching_patterns_no_hashtag()
+
+            for line in lines:
+                # loops through patterns 
+                # only if line begins with "##" or "#"
+                if (("##") or ("#")) in line:
+                    # Iterate over the patterns to find a match
+                    for pattern, group_index in patterns:
+                        filename_match = re.search(pattern, line)
+                        if filename_match:
+                            if not current_filename:
+                                # Update current filename
+                                current_filename = filename_match.group(group_index)  
+                        # Check for an end tag to finalize the code capture
+                        if 'end-' in line:
+                            if current_filename:
+                                # Save the current filename and its code
+                                parsed_code[current_filename] = "\n".join(current_code).strip()
+                            current_filename = None  # Reset filename
+                            current_code = []  # Reset code
+                    # Add line to the current code
+                elif current_filename:
+                    current_code.append(line)
+
+            # Save the last file's code if it exists
+            if current_filename:
+                parsed_code[current_filename] = "\n".join(current_code).strip()
+
+            return parsed_code
+
         elif isinstance(response, dict):
-            return response
+            return response  # Assuming this is already in the desired format
+
         else:
             translated_code_key = translate_string("developer", "translated_code_key", self.language)
             return {translated_code_key: response}
@@ -158,29 +197,6 @@ class Developer(BaseAgent):
         file_name = re.sub('##(\w+)\/', '', file_name)
         return file_name.lower()
     
-    def detect_language_by_first_line(self, line):
-        """
-        Detects the programming language based on the first line of code.
-
-        Args:
-            - line (str): The first line of code.
-
-        Returns:
-            - str: Language extension detected or None if not found.
-        """
-        language_extensions = [
-            'apl', 'asm', 'awk', 'bas', 'bat', 'c', 'clj', 'coffee', 'cpp', 'cr', 'd', 'dart',
-            'ex', 'f77', 'f95', 'forth', 'fsharp', 'go', 'groovy', 'hs', 'html', 'java', 'jl',
-            'js', 'kt', 'lisp', 'lua', 'm', 'ml', 'php', 'pl', 'pro', 'ps1', 'py', 'rb', 'r',
-            'scala', 'scm', 'sh', 'sql', 'st', 'swift', 'ts', 'vb', 'v', 'vbs', 'vim', 'vhd',
-            'xml'
-        ]
-        for extension in language_extensions:
-            pattern = rf'\.{re.escape(extension)}\b'
-            if re.search(pattern, line, re.IGNORECASE):
-                return extension
-        return None
-    
     def detect_language_by_file_extension(self, text):
         """
         Detects the programming language based on the first occurrence of a file extension pattern.
@@ -192,13 +208,7 @@ class Developer(BaseAgent):
             - str: Detected file extension or None if not found.
         """
         # List of common file extensions for different programming languages
-        language_extensions = [
-            'apl', 'asm', 'awk', 'bas', 'bat', 'c', 'clj', 'coffee', 'cpp', 'cr', 'd', 'dart',
-            'ex', 'f77', 'f95', 'forth', 'fsharp', 'go', 'groovy', 'hs', 'html', 'java', 'jl',
-            'js', 'kt', 'lisp', 'lua', 'm', 'ml', 'php', 'pl', 'pro', 'ps1', 'py', 'rb', 'r',
-            'scala', 'scm', 'sh', 'sql', 'st', 'swift', 'ts', 'vb', 'v', 'vbs', 'vim', 'vhd',
-            'xml'
-        ]
+        language_extensions = pm.language_extensions_list()
 
         # Regex pattern to match filenames with extensions (e.g., filename.ext)
         # The extension must match one of the valid language extensions
@@ -250,31 +260,7 @@ class Developer(BaseAgent):
         if not language_extension:
             return {'single': '', 'multi_start': '', 'multi_end': ''}
             
-        comment_styles = {
-            'css': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'html': {'single': '', 'multi_start': '<!--', 'multi_end': '-->'},
-            'xml': {'single': '', 'multi_start': '<!--', 'multi_end': '-->'},
-            'c': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'cpp': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'java': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'js': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'ts': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'py': {'single': '#', 'multi_start': '"""', 'multi_end': '"""'},
-            'rb': {'single': '#', 'multi_start': '=begin', 'multi_end': '=end'},
-            'sh': {'single': '#', 'multi_start': '', 'multi_end': ''},
-            'php': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'go': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'swift': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'scala': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'lua': {'single': '--', 'multi_start': '--[[', 'multi_end': ']]'},
-            'vb': {'single': "'", 'multi_start': '', 'multi_end': ''},
-            'vbs': {'single': "'", 'multi_start': '', 'multi_end': ''},
-            'v': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
-            'vhd': {'single': '--', 'multi_start': '', 'multi_end': ''},
-            'fsharp': {'single': '//', 'multi_start': '(*', 'multi_end': '*)'},
-            'lisp': {'single': ';', 'multi_start': '#|', 'multi_end': '|#'},
-            # Adicione mais linguagens conforme necessário
-        }
+        comment_styles = pm.comment_styles_list()
 
         return comment_styles.get(language_extension.lower(), {'single': '//', 'multi_start': '/*', 'multi_end': '*/'})
 
@@ -322,7 +308,6 @@ class Developer(BaseAgent):
 
             # Identify the first line to determine the language
             if not block_language:
-                # language_extension = self.detect_language_by_first_line(line.strip())
                 language_extension = self.detect_language_by_file_extension(line.strip())
                 if language_extension:
                     block_language = language_extension
@@ -358,8 +343,7 @@ class Developer(BaseAgent):
             stripped_line = line.strip()
 
             if not block_language:
-                # Detect the language based on the first relevant line
-                # language_extension = self.detect_language_by_first_line(stripped_line)
+                # Detect the language based on the file extension
                 language_extension = self.detect_language_by_file_extension(stripped_line)
                 if language_extension:
                     block_language = language_extension
@@ -502,25 +486,16 @@ class Developer(BaseAgent):
             
         if "##" in task:
             
-            # Patterns list to be tested along with the right group indexes to be extracted
-            patterns = [
-                # 1. "##filename.ext"
-                (r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1),
-                # 2. "##foldername/filename.ext" or "##folder-name/filename.ext" 
-                (r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-                # 3. "##folder/file.ext" or "##folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
-                (r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-                # 4. "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
-                (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
-            ]
+            # Patterns list to be tested along 
+            # with the right group indexes to be extracted
+            patterns = pm.filename_matching_patterns()
                     
             # Iterate over the patterns to find a match
             for pattern, group_index in patterns:
                 match = re.search(pattern, task)
                 if match:
-                    # Get the correct group that matched
-                    file_name = match.group(group_index)  
-                    break
+                    # Get the correct group that matched as filne name
+                    file_name = match.group(group_index)
 
                 if file_name != None:
                     file_name = self.sanitize_file_name(file_name)

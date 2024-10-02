@@ -82,7 +82,7 @@ def build_task_graph(backlog):
     
         elif line.startswith("*") or line.startswith("+"):
             # New function to be created inside a file
-            if current_task_node:
+            if current_task_node != None:
                 function_name = line
                 function_node = nodes.setdefault(function_name, Node(function_name))
                 current_task_node.add_subnode(function_node)
