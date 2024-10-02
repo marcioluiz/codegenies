@@ -167,11 +167,11 @@ class Developer(BaseAgent):
                                 current_filename = filename_match.group(group_index)  
                         # Check for an end tag to finalize the code capture
                         if 'end-' in line or filename_match.regs.count != 0:
-                            if (current_filename != None) and (current_code.__len__ != 0):
+                            if (current_filename != None) and (current_code != []):
                                 # Save the current filename and its code
                                 parsed_code[current_filename] = "\n".join(current_code).strip()
-                            current_filename = None  # Reset filename
-                            current_code = []  # Reset code
+                                current_filename = None  # Reset filename
+                                current_code = []  # Reset code
                     # Add line to the current code
                 elif current_filename:
                     current_code.append(line)
