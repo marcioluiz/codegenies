@@ -19,6 +19,7 @@ Main Functions:
 import re
 import os
 import unidecode
+from utils.pattern_matching import PatternMatching
 
 class Node:
     def __init__(self, name):
@@ -118,17 +119,10 @@ def process_task_graph(developer, task_graph, development_dir):
         - output_dir (str): Output directory where generated files will be saved.
     """
 
+    pm = PatternMatching()
+
     # List of folder name patterns to test
-    patterns = [
-        # 1. "##folder/filename"
-        (r'##(\w+)\/(\w+)', 0),
-        # 2. "##folder-name/filename"
-        (r'##(\w+)-(\w+)\/(\w+)', 1),
-        # 3. "##folder1/folder2/filename"
-        (r'##(\w+)\/(\w+)\/(\w+)', 2),
-        # 4. "##folder1/folder2-name/filename"
-        (r'##(\w+)\/(\w+)-(\w+)\/(\w+)', 3)
-    ]
+    patterns = pm.foldername_matching_patterns()
 
     # Find the index of the root node starting and ending with "**"
     root_index = None

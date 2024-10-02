@@ -162,12 +162,12 @@ class Developer(BaseAgent):
                     for pattern, group_index in patterns:
                         filename_match = re.search(pattern, line)
                         if filename_match:
-                            if not current_filename:
+                            if current_filename == None:
                                 # Update current filename
                                 current_filename = filename_match.group(group_index)  
                         # Check for an end tag to finalize the code capture
-                        if 'end-' in line:
-                            if current_filename:
+                        if 'end-' in line or filename_match.regs.count != 0:
+                            if (current_filename != None) and (current_code.__len__ != 0):
                                 # Save the current filename and its code
                                 parsed_code[current_filename] = "\n".join(current_code).strip()
                             current_filename = None  # Reset filename
@@ -285,7 +285,7 @@ class Developer(BaseAgent):
             if line.strip().startswith('**'):
                 # Remove asterisks only if the line starts with '**'
                 modified_line = re.sub(r'^\*\*|\*\*$', '', line.strip()).strip()
-                if block_language:
+                if block_language != None:
                     comment_prefix = self.get_comment_prefix(block_language)
                     if block_language.lower() in ['css', 'html', 'xml']:
                         modified_code_lines.append(f'{comment_prefix} {modified_line} */')
@@ -343,7 +343,7 @@ class Developer(BaseAgent):
         for line in lines:
             stripped_line = line.strip()
 
-            if not block_language:
+            if block_language == None:
                 # Detect the language based on the file extension
                 language_extension = self.detect_language_by_file_extension(stripped_line)
                 if language_extension:
@@ -445,23 +445,6 @@ class Developer(BaseAgent):
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
         print(f"{generate_code_message}: {', '.join([path for path, _ in file_paths_and_codes])}")
-        # # Fix comment prefixes if necessary
-        # code = self.fix_comments_prefix(code)
-
-        # try:
-        #     with open(file_path, 'w') as f:
-        #         if isinstance(code, dict):
-        #             for key, value in code.items():
-        #                 f.write(f"{value}\n")
-        #         else:
-        #             f.write(code)
-        # except Exception as e:
-        #     error_message = translate_string("developer", "code_written_fail", self.language)
-        #     print(f"{error_message}: {file_path}: {e}")
-        #     return
-
-        # generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
-        # print(f"{generate_code_message}: {file_path}")
 
     def extract_test_file_name(self, main_file_name):
         """
@@ -495,7 +478,7 @@ class Developer(BaseAgent):
             for pattern, group_index in patterns:
                 match = re.search(pattern, task)
                 if match:
-                    # Get the correct group that matched as filne name
+                    # Get the correct group that matched as file name
                     file_name = match.group(group_index)
 
                 if file_name != None:

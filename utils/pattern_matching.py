@@ -14,14 +14,16 @@ class PatternMatching:
         """
         # Patterns list to be tested along with the right group indexes to be extracted
         patterns = [
-            # 1. "##filename.ext"
-            (r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1),
-            # 2. "##foldername/filename.ext" or "##folder-name/filename.ext" 
-            (r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 4. "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
+            (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9),
             # 3. "##folder/file.ext" or "##folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
             (r'##((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-            # 4. "##folder1/folder2/filename.ext" or "##folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
-            (r'##(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
+            # 2. "##foldername/filename.ext" or "##folder-name/filename.ext" 
+            (r'##((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 1. "##foldername/filename.module.ext" or "##folder-name/filename.module.ext" 
+            (r'##((\w+\D\w+))\/((\w+)(\.)((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 1. "##filename.ext"
+            (r'##(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1)
         ]
         return patterns
     
@@ -34,14 +36,36 @@ class PatternMatching:
         """
         # Patterns list to be tested along with the right group indexes to be extracted
         patterns = [
-            # 1. "filename.ext"
-            (r'(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1),
-            # 2. "foldername/filename.ext" or "folder-name/filename.ext" 
-            (r'((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 4. "folder1/folder2/filename.ext" or "folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
+            (r'(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9),
             # 3. "folder/file.ext" or "folder-name/file.ext" and ending "file-name.ext" or "file-name.ext"
             (r'((\w+\D\w+))\/(((\w+\D\w+)|(\w+\D\w+\D\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 3),
-            # 4. "folder1/folder2/filename.ext" or "folder1/folder2-name/filename.ext" and ending "filename.ext" or "filename.ext"
-            (r'(((\w+)\/(\w+\D\w+))|((\w+)\/(\w+\D\w+)\/(\w+\D\w+)))\/((\w+\D\w+\D\w+|\w+\D\w+\D\w+\D\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 9)
+            # 2. "foldername/filename.ext" or "folder-name/filename.ext" 
+            (r'((\w+\D\w+))\/((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 1. "foldername/filename.module.ext" or "folder-name/filename.module.ext" 
+            (r'((\w+\D\w+))\/((\w+)(\.)((\w+)(\.)([a-z]{2}|[a-z]{3})\b)', 3),
+            # 0. "filename.ext"
+            (r'(((\w+)|(\w+\-\w+))(\.)([a-z]{2}|[a-z]{3})\b)', 1)
+        ]
+        return patterns
+    
+    def foldername_matching_patterns(self):
+        """
+        List of common folder name matching patterns with "#".
+
+        Returns:
+             - array[]: List of matching patterns with "#".
+        """
+        # List of folder name patterns to test
+        patterns = [
+            # 1. "##folder/filename"
+            (r'##(\w+)\/(\w+)', 0),
+            # 2. "##folder-name/filename"
+            (r'##(\w+)-(\w+)\/(\w+)', 1),
+            # 3. "##folder1/folder2/filename"
+            (r'##(\w+)\/(\w+)\/(\w+)', 2),
+            # 4. "##folder1/folder2-name/filename"
+            (r'##(\w+)\/(\w+)-(\w+)\/(\w+)', 3)
         ]
         return patterns
     
