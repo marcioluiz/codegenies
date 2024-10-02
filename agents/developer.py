@@ -22,7 +22,7 @@ import unidecode
 from .base_agent import BaseAgent
 from .prompt_templates.developer_prompts import DeveloperPrompts
 from utils.translation_utils import translate_string
-from utils.pattern_matching import PatternMatching as pm
+from utils.pattern_matching import PatternMatching
 
 class Developer(BaseAgent):
     """
@@ -37,6 +37,7 @@ class Developer(BaseAgent):
         super().__init__(name, llm, language, interactive)
         self.prompts = DeveloperPrompts(self.language)
         self.development_style = development_style
+        self.patterns = PatternMatching()
 
     def develop_code(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_instructions()}"
@@ -151,7 +152,7 @@ class Developer(BaseAgent):
 
             # Patterns list to be tested along 
             # with the right group indexes to be extracted
-            patterns = pm.filename_matching_patterns_no_hashtag()
+            patterns = self.patterns.filename_matching_patterns_no_hashtag()
 
             for line in lines:
                 # loops through patterns 
@@ -208,7 +209,7 @@ class Developer(BaseAgent):
             - str: Detected file extension or None if not found.
         """
         # List of common file extensions for different programming languages
-        language_extensions = pm.language_extensions_list()
+        language_extensions = self.patterns.language_extensions_list()
 
         # Regex pattern to match filenames with extensions (e.g., filename.ext)
         # The extension must match one of the valid language extensions
@@ -260,7 +261,7 @@ class Developer(BaseAgent):
         if not language_extension:
             return {'single': '', 'multi_start': '', 'multi_end': ''}
             
-        comment_styles = pm.comment_styles_list()
+        comment_styles = self.patterns.comment_styles_list()
 
         return comment_styles.get(language_extension.lower(), {'single': '//', 'multi_start': '/*', 'multi_end': '*/'})
 
@@ -488,7 +489,7 @@ class Developer(BaseAgent):
             
             # Patterns list to be tested along 
             # with the right group indexes to be extracted
-            patterns = pm.filename_matching_patterns()
+            patterns = self.patterns.filename_matching_patterns()
                     
             # Iterate over the patterns to find a match
             for pattern, group_index in patterns:

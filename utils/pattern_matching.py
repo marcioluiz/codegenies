@@ -6,6 +6,12 @@ class PatternMatching:
     """
 
     def filename_matching_patterns(self):
+        """
+        List of common file name matching patterns with "#".
+
+        Returns:
+             - array[]: List of matching patterns with "#".
+        """
         # Patterns list to be tested along with the right group indexes to be extracted
         patterns = [
             # 1. "##filename.ext"
@@ -20,6 +26,12 @@ class PatternMatching:
         return patterns
     
     def filename_matching_patterns_no_hashtag(self):
+        """
+        List of common file name matching patterns without "#".
+
+        Returns:
+             - array[]: List of matching patterns without "#".
+        """
         # Patterns list to be tested along with the right group indexes to be extracted
         patterns = [
             # 1. "filename.ext"
@@ -34,6 +46,12 @@ class PatternMatching:
         return patterns
     
     def comment_styles_list(self):
+        """
+        List of common file comment styles for different programming languages
+
+        Returns:
+            - object{}: List maping of comment styles.
+        """
         comment_styles = {
                 'css': {'single': '//', 'multi_start': '/*', 'multi_end': '*/'},
                 'html': {'single': '', 'multi_start': '<!--', 'multi_end': '-->'},
@@ -62,6 +80,13 @@ class PatternMatching:
         return comment_styles
     
     def language_extensions_list(self):
+        """
+        List of common file extensions for different programming languages
+
+        Returns:
+            - array[]: List of extensions.
+        """
+        # List of common file extensions for different programming languages
         language_extensions = [
                 'apl', 'asm', 'awk', 'bas', 'bat', 'c', 'clj', 'coffee', 'cpp', 'cr', 'd', 'dart',
                 'ex', 'f77', 'f95', 'forth', 'fsharp', 'go', 'groovy', 'hs', 'html', 'java', 'jl',
