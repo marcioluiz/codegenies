@@ -169,7 +169,7 @@ class Developer(BaseAgent):
                                 inside_code_block = True  # Enter the code block
                                 break
                 # 2nd conition: end of file
-                elif inside_code_block and line == '```':  # End of the code block
+                elif inside_code_block and ( ("##end##") in line or line == '```' ):  # End of the code block
                     # Save the current filename and its code
                     if current_filename:
                         # Save the current filename and its code
@@ -445,6 +445,9 @@ class Developer(BaseAgent):
         for path, content, mode in file_paths_and_codes:
             try:
                 with open(path, mode) as f:
+                    # If appending, add line breaks 
+                    if mode == 'a':  
+                        f.write("\n\n")
                     f.write(content)
             except Exception as e:
                 error_message = translate_string("developer", "code_written_fail", self.language)
