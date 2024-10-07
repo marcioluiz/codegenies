@@ -19,6 +19,7 @@ Functions:
 - if __name__ == "__main__": Script entry point when executed directly.
 """
 import inspect, os, shutil, sys
+import inquirer
 from io import StringIO
 from agents import Analyst, SquadLeader, Developer, Tester
 from graph import build_task_graph, process_task_graph
@@ -38,28 +39,43 @@ def select_language():
     Returns:
     - str: Language code ("pt-br" or "en-us").
     """
-    while True:
-        lang_input = input("Select language / Selecione o idioma (pt-br / en-us): ").strip().lower()
-        if lang_input in ["pt-br", "en-us"]:
-            return lang_input
-        else:
-            print("Invalid selection / Seleção inválida. Please select 'pt-br' or 'en-us'.")
-            continue
+    questions = [
+        inquirer.List(
+            'language',
+            message="Select language \n Selecione o idioma",
+            choices=["en-us", "pt-br"],
+        ),
+    ]
+    
+    answers = inquirer.prompt(questions)
+    return answers['language']
 
-def select_development_style():
+def select_development_style(language):
     """
     Prompt the user to select the development style for the project.
     
     Returns:
     - str: Language code ("normal", "tdd" or "code-correction").
     """
-    while True:
-        dev_style_input = input("Select Development Style / Selecione o estilo de desenvolvimento (normal, tdd or code-correction): ").strip().lower()
-        if dev_style_input in ["normal", "tdd", "code-correction"]:
-            return dev_style_input
-        else:
-            print("Invalid selection / Seleção inválida. Please select 'normal', 'tdd' or 'code-correction'.")
-            continue
+    if language == "en-us": 
+        questions = [
+            inquirer.List(
+                'dev_style',
+                message="Select Development Style",
+                choices=['normal', 'tdd', 'code-correction'],
+            )
+        ]
+    elif language == "pt-br": 
+        questions = [
+            inquirer.List(
+                'dev_style',
+                message="Selecione o estilo de desenvolvimento",
+                choices=['normal', 'tdd', 'code-correction'],
+            )
+        ]
+    
+    answer = inquirer.prompt(questions)
+    return answer['dev_style']
 
 class MultiOutput:
     def __init__(self, *outputs):
@@ -283,7 +299,7 @@ def main():
     LANGUAGE = select_language()
 
     # Ask the user development style to use
-    DEVSTYLE = select_development_style()
+    DEVSTYLE = select_development_style(LANGUAGE)
 
     project_name_key = "project_folder_name_message"
     project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")

@@ -149,36 +149,41 @@ class Developer(BaseAgent):
             lines = response.splitlines()
             current_filename = None
             current_code = []
+            inside_code_block = False  # Flag to check if execution is inside a code block
 
             # Patterns list to be tested along 
             # with the right group indexes to be extracted
             patterns = self.patterns.filename_matching_patterns_no_hashtag()
 
+            # iterates generated code
             for line in lines:
-                # loops through patterns 
-                # only if line begins with "##" or "#"
-                if (("##") or ("#")) in line:
+                # 1st condition: file name retrieval
+                if ("##begin##") in line:
                     # Iterate over the patterns to find a match
                     for pattern, group_index in patterns:
                         filename_match = re.search(pattern, line)
                         if current_filename == None:
                             if filename_match:
                                 # Update current filename
-                                current_filename = filename_match.group(group_index) 
-                        # Check for an end tag to finalize the code capture
-                        if (current_filename != None) and (current_code != []):
-                            if ('end-' in line):
-                                # Save the current filename and its code
-                                parsed_code[current_filename] = "\n".join(current_code).strip()
-                                current_filename = None  # Reset filename
-                                current_code = []  # Reset code
+                                current_filename = filename_match.group(group_index)
+                                inside_code_block = True  # Enter the code block
                                 break
-                    # Add line to the current code
-                elif current_filename:
+                # 2nd conition: end of file
+                elif inside_code_block and line == '```':  # End of the code block
+                    # Save the current filename and its code
+                    if current_filename:
+                        # Save the current filename and its code
+                        parsed_code[current_filename] = "\n".join(current_code).strip()
+                    current_filename = None  # Reset filename
+                    current_code = []  # Reset code
+                    inside_code_block = False # Reset code block flag
+                # 3rd condition: Add line to the current code block 
+                # (if inside a code block)
+                elif inside_code_block and current_filename and not line.startswith('```'):
                     current_code.append(line)
 
             # Save the last file's code if it exists
-            if current_filename:
+            if current_filename and current_filename:
                 parsed_code[current_filename] = "\n".join(current_code).strip()
 
             return parsed_code
@@ -448,31 +453,6 @@ class Developer(BaseAgent):
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
         print(f"{generate_code_message}: {', '.join([path for path, _, _ in file_paths_and_codes])}")
-        # # Remove markup from generated code
-        # if isinstance(code, dict):
-        #     for key, value in code.items():
-        #         # code[key] = self.remove_markup_from_code(value)
-        #         cleaned_code = self.remove_markup_from_code(value)
-        #         # Fix comment prefixes if necessary
-        #         cleaned_code = self.fix_comments_prefix(cleaned_code)
-        #         file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")  # Determine the file path for this key
-        #         file_paths_and_codes.append((file_path_for_key, cleaned_code))
-        # else:
-        #     # code = self.remove_markup_from_code(code)
-        #     cleaned_code = self.remove_markup_from_code(code)
-        #     cleaned_code = self.fix_comments_prefix(cleaned_code)
-        #     file_paths_and_codes = [(file_path, cleaned_code)]  # Just one file path
-
-        # # Write to all files
-        # for path, content in file_paths_and_codes:
-        #     try:
-        #         with open(path, 'w') as f:
-        #             f.write(content)
-        #     except Exception as e:
-        #         error_message = translate_string("developer", "code_written_fail", self.language)
-        #         print(f"{error_message}: {path}: {e}")
-        #         continue  # Continue to next file if one fails
-
 
     def extract_test_file_name(self, main_file_name):
         """
