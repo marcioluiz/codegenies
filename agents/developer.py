@@ -41,7 +41,7 @@ class Developer(BaseAgent):
 
     def develop_code(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_instructions()}"
-        code = self.evaluate(final_prompt)
+        code = self.generate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
         else:
@@ -50,7 +50,7 @@ class Developer(BaseAgent):
     
     def develop_code_with_tests(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_with_tests_instructions()}"
-        code = self.evaluate(final_prompt)
+        code = self.generate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
         else:
@@ -85,7 +85,7 @@ class Developer(BaseAgent):
 
         # Step 1: Syntax Check
         test_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.check_syntax_of_generated_code()}"
-        syntax_test_results = self.evaluate(test_execution_prompt)
+        syntax_test_results = self.generate(test_execution_prompt)
         if self.interactive:
             final_syntax_test_results = self.interact(syntax_test_results)
         else:
@@ -94,7 +94,7 @@ class Developer(BaseAgent):
 
         # Step 2: Code and Tests Execution Check
         test_code_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.execute_tests_and_generated_code()}"
-        test_code_execution_results = self.evaluate(test_code_execution_prompt)
+        test_code_execution_results = self.generate(test_code_execution_prompt)
         if self.interactive:
             final_test_code_execution_results = self.interact(test_code_execution_results)
         else:
@@ -106,7 +106,7 @@ class Developer(BaseAgent):
 
         # Step 3: Evaluate Results
         test_evaluation_prompt = f"{final_tests_results}\n\n{self.prompts.evaluate_test_results()}"
-        test_evaluation_results = self.evaluate(test_evaluation_prompt)
+        test_evaluation_results = self.generate(test_evaluation_prompt)
         if self.interactive:
             final_test_evaluation_results = self.interact(test_evaluation_results)
         else:
@@ -149,36 +149,41 @@ class Developer(BaseAgent):
             lines = response.splitlines()
             current_filename = None
             current_code = []
+            inside_code_block = False  # Flag to check if execution is inside a code block
 
             # Patterns list to be tested along 
             # with the right group indexes to be extracted
             patterns = self.patterns.filename_matching_patterns_no_hashtag()
 
+            # iterates generated code
             for line in lines:
-                # loops through patterns 
-                # only if line begins with "##" or "#"
-                if (("##") or ("#")) in line:
+                # 1st condition: file name retrieval
+                if ("##begin##") in line:
                     # Iterate over the patterns to find a match
                     for pattern, group_index in patterns:
                         filename_match = re.search(pattern, line)
                         if current_filename == None:
                             if filename_match:
                                 # Update current filename
-                                current_filename = filename_match.group(group_index) 
-                        # Check for an end tag to finalize the code capture
-                        if (current_filename != None) and (current_code != []):
-                            if ('end-' in line):
-                                # Save the current filename and its code
-                                parsed_code[current_filename] = "\n".join(current_code).strip()
-                                current_filename = None  # Reset filename
-                                current_code = []  # Reset code
+                                current_filename = filename_match.group(group_index)
+                                inside_code_block = True  # Enter the code block
                                 break
-                    # Add line to the current code
-                elif current_filename:
+                # 2nd conition: end of file
+                elif inside_code_block and ( ("##end##") in line or line == '```' ):  # End of the code block
+                    # Save the current filename and its code
+                    if current_filename:
+                        # Save the current filename and its code
+                        parsed_code[current_filename] = "\n".join(current_code).strip()
+                    current_filename = None  # Reset filename
+                    current_code = []  # Reset code
+                    inside_code_block = False # Reset code block flag
+                # 3rd condition: Add line to the current code block 
+                # (if inside a code block)
+                elif inside_code_block and current_filename and not line.startswith('```'):
                     current_code.append(line)
 
             # Save the last file's code if it exists
-            if current_filename:
+            if current_filename and current_filename:
                 parsed_code[current_filename] = "\n".join(current_code).strip()
 
             return parsed_code
@@ -384,8 +389,19 @@ class Developer(BaseAgent):
 
         modified_code = '\n'.join(modified_lines)
         return modified_code
-            
-    # Function to generate and write code to files
+
+    # Define a helper function to extract headers and code from content
+    def extract_headers(self, code_content):
+        lines = code_content.splitlines()
+        header_lines = []
+        code_lines = []
+        for line in lines:
+            if line.strip().startswith(("import ", "from ")):
+                header_lines.append(line)
+            else:
+                code_lines.append(line)
+        return header_lines, code_lines
+
     def generate_and_write_code(self, file_path, task_description):
         """
         Generates and writes code to a file.
@@ -399,6 +415,7 @@ class Developer(BaseAgent):
         - Removes markup from the generated code using the `remove_markup_from_code()` method.
         - Writes the cleaned code to the specified file path.
         - Corrects comment prefixes using `fix_comments_prefix()` if necessary.
+        - Checks for existing headers and appends new content after existing content.
         """
         code_prompt = f"{self.prompts.code_prompt_instruction()}{task_description}"
         code_processing_message = translate_string("developer", "code_processing_message", self.language)
@@ -415,64 +432,69 @@ class Developer(BaseAgent):
             print(f"{error_message}: {task_description}: {e}")
             return
 
-        # Prepare a list to hold the file 
-        # paths and corresponding code
+        # Prepare a list to hold the file paths and corresponding code
         file_paths_and_codes = []
 
-        # Remove markup from generated code
+        # Remove markup from generated code and fix comment prefixes
         if isinstance(code, dict):
-            for key, value in code.items():
-                cleaned_code = self.remove_markup_from_code(value)
+            # Iterate over the code items
+            for filename, file_content in code.items():
+                # Clean code content
+                cleaned_code = self.remove_markup_from_code(file_content)
                 cleaned_code = self.fix_comments_prefix(cleaned_code)
-                file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")
-                
-                # Check if the file exists and determine the mode (append if exists, write if not)
-                file_mode = 'a' if os.path.exists(file_path_for_key) else 'w'
-                
-                file_paths_and_codes.append((file_path_for_key, cleaned_code, file_mode))
+
+                # Determine file path
+                # If the filename is absolute, use it directly; otherwise, construct the path relative to file_path
+                if os.path.isabs(filename):
+                    full_path = filename
+                else:
+                    # Construct full path relative to the directory of file_path
+                    full_path = os.path.join(os.path.dirname(file_path), filename)
+
+                file_paths_and_codes.append((full_path, cleaned_code))
         else:
+            # For normal development style or single code output
             cleaned_code = self.remove_markup_from_code(code)
             cleaned_code = self.fix_comments_prefix(cleaned_code)
-            file_mode = 'a' if os.path.exists(file_path) else 'w'
-            file_paths_and_codes = [(file_path, cleaned_code, file_mode)]
+            file_paths_and_codes = [(file_path, cleaned_code)]
 
         # Write to all files
-        for path, content, mode in file_paths_and_codes:
+        for path, content in file_paths_and_codes:
             try:
-                with open(path, mode) as f:
-                    f.write(content)
+                existing_headers, existing_code = [], []
+                if os.path.exists(path):
+                    try:
+                        with open(path, 'r', encoding='utf-8') as f:
+                            existing_content = f.read()
+                    except UnicodeDecodeError:
+                        with open(path, 'r', encoding='iso-8859-1') as f:
+                            existing_content = f.read()
+                    existing_headers, existing_code = self.extract_headers(existing_content)
+                
+                new_headers, new_code = self.extract_headers(content)
+                
+                # Determine new headers to add (headers in new_headers but not in existing_headers)
+                headers_to_add = [h for h in new_headers if h not in existing_headers]
+                
+                # Combine headers
+                all_headers = existing_headers + headers_to_add
+                
+                # Prepare final content
+                final_content = '\n'.join(all_headers).strip()
+                if existing_code:
+                    final_content += '\n' + '\n'.join(existing_code).strip()
+                if new_code:
+                    final_content += '\n' + '\n'.join(new_code).strip()
+                
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(final_content.strip())
             except Exception as e:
                 error_message = translate_string("developer", "code_written_fail", self.language)
                 print(f"{error_message}: {path}: {e}")
                 continue  # Continue to next file if one fails
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
-        print(f"{generate_code_message}: {', '.join([path for path, _, _ in file_paths_and_codes])}")
-        # # Remove markup from generated code
-        # if isinstance(code, dict):
-        #     for key, value in code.items():
-        #         # code[key] = self.remove_markup_from_code(value)
-        #         cleaned_code = self.remove_markup_from_code(value)
-        #         # Fix comment prefixes if necessary
-        #         cleaned_code = self.fix_comments_prefix(cleaned_code)
-        #         file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")  # Determine the file path for this key
-        #         file_paths_and_codes.append((file_path_for_key, cleaned_code))
-        # else:
-        #     # code = self.remove_markup_from_code(code)
-        #     cleaned_code = self.remove_markup_from_code(code)
-        #     cleaned_code = self.fix_comments_prefix(cleaned_code)
-        #     file_paths_and_codes = [(file_path, cleaned_code)]  # Just one file path
-
-        # # Write to all files
-        # for path, content in file_paths_and_codes:
-        #     try:
-        #         with open(path, 'w') as f:
-        #             f.write(content)
-        #     except Exception as e:
-        #         error_message = translate_string("developer", "code_written_fail", self.language)
-        #         print(f"{error_message}: {path}: {e}")
-        #         continue  # Continue to next file if one fails
-
+        print(f"{generate_code_message}: {', '.join([path for path, _ in file_paths_and_codes])}")
 
     def extract_test_file_name(self, main_file_name):
         """

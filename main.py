@@ -19,6 +19,7 @@ Functions:
 - if __name__ == "__main__": Script entry point when executed directly.
 """
 import inspect, os, shutil, sys
+import inquirer
 from io import StringIO
 from agents import Analyst, SquadLeader, Developer, Tester
 from graph import build_task_graph, process_task_graph
@@ -38,28 +39,105 @@ def select_language():
     Returns:
     - str: Language code ("pt-br" or "en-us").
     """
-    while True:
-        lang_input = input("Select language / Selecione o idioma (pt-br / en-us): ").strip().lower()
-        if lang_input in ["pt-br", "en-us"]:
-            return lang_input
-        else:
-            print("Invalid selection / Seleção inválida. Please select 'pt-br' or 'en-us'.")
-            continue
+    original_stdout = sys.stdout
+    sys.stdout = sys.__stdout__  # Restore default stdout for inquirer
 
-def select_development_style():
+    questions = [
+        inquirer.List(
+            'language',
+            message="Select language \n Selecione o idioma",
+            choices=["en-us", "pt-br"],
+        ),
+    ]
+    
+    sys.stdout = original_stdout  # Restore the custom stdout (Tee)
+    answers = inquirer.prompt(questions)
+    return answers['language']
+
+def select_development_style(language):
     """
     Prompt the user to select the development style for the project.
     
     Returns:
     - str: Language code ("normal", "tdd" or "code-correction").
     """
+    if language == "en-us": 
+        questions = [
+            inquirer.List(
+                'dev_style',
+                message="Select Development Style",
+                choices=['normal', 'tdd', 'code-correction'],
+            )
+        ]
+    elif language == "pt-br": 
+        questions = [
+            inquirer.List(
+                'dev_style',
+                message="Selecione o estilo de desenvolvimento",
+                choices=['normal', 'tdd', 'code-correction'],
+            )
+        ]
+    
+    answer = inquirer.prompt(questions)
+    return answer['dev_style']
+
+def select_components_to_generate(language, development_style):
+    """
+    Prompt the user to select components to generate using a multi-selector with checkboxes.
+
+    Returns:
+    - list: List of components selected by the user.
+    """
+    original_stdout = sys.stdout
+    sys.stdout = sys.__stdout__  # Restore default stdout for inquirer
+
     while True:
-        dev_style_input = input("Select Development Style / Selecione o estilo de desenvolvimento (normal, tdd or code-correction): ").strip().lower()
-        if dev_style_input in ["normal", "tdd", "code-correction"]:
-            return dev_style_input
+        if language == "en-us":
+            if development_style == "normal":
+                message = "Select components to generate (Press space to select)"
+                choices = [
+                    ('Backend', 'backend'),
+                    ('Frontend', 'frontend'),
+                    ('Tests', 'tests')
+                ]
+            else:
+                message = "Select components to generate (Press space to select)"
+                choices = [
+                    ('Backend', 'backend'),
+                    ('Frontend', 'frontend')
+                ]
         else:
-            print("Invalid selection / Seleção inválida. Please select 'normal', 'tdd' or 'code-correction'.")
+            if development_style == "normal":
+                message = "Selecione os componentes para gerar (Pressione espaço para selecionar)"
+                choices = [
+                    ('Backend', 'backend'),
+                    ('Frontend', 'frontend'),
+                    ('Testes', 'tests')
+                ]
+            else:
+                message = "Selecione os componentes para gerar (Pressione espaço para selecionar)"
+                choices = [
+                    ('Backend', 'backend'),
+                    ('Frontend', 'frontend')
+                ]
+
+        questions = [
+            inquirer.Checkbox(
+                'components',
+                message=message,
+                choices=choices
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        if answers is None or not answers.get('components'):
+            if language == "en-us":
+                print("You must select at least one component.")
+            else:
+                print("Você deve selecionar pelo menos um componente.")
             continue
+        selected_components = answers.get('components', [])
+        sys.stdout = original_stdout  # Restore the custom stdout (Tee)
+        return selected_components
 
 class MultiOutput:
     def __init__(self, *outputs):
@@ -119,7 +197,12 @@ def start(project_name, analyst_properties, development_style, language):
     """
 
     # Define an interactive process
-    interactive = input(translate_string('main', 'execute_interactive_message', language)).strip().lower() in ['s', 'y']
+    if language == "en-us":
+        interactive_prompt = "Run interactive process? (y/n): "
+    else:
+        interactive_prompt = "Executar processo interativo? (s/n): "
+    interactive_input = input(interactive_prompt).strip().lower()
+    interactive = interactive_input in ['s', 'y', 'sim', 'yes']
     
     # variables that control the execution of developer agent blocks
     generate_backend = False
@@ -135,25 +218,41 @@ def start(project_name, analyst_properties, development_style, language):
     test_backlog = None
 
     # Define which agents should execute their routines
-    generate_all_routines_message = "generate_all_message"
-    generate_all = input(translate_string('main', generate_all_routines_message, language)).strip().lower() in ['s', 'y']
-    if (generate_all and development_style == "normal" ):
+    yes_inputs = ['s', 'y', 'sim', 'yes']
+    no_inputs = ['n', 'no', 'não', 'nao']
+
+    if language == "en-us":
+        generate_all_prompt = "Do you want to execute all processes? (y/n): "
+        invalid_input_message = "Please enter 'y' or 'n'"
+    else:
+        generate_all_prompt = "Deseja executar todos os processos? (s/n): "
+        invalid_input_message = "Por favor, digite 's' ou 'n'"
+
+    while True:
+        generate_all_input = input(generate_all_prompt).strip().lower()
+        if generate_all_input in yes_inputs:
+            generate_all = True
+            break
+        elif generate_all_input in no_inputs:
+            generate_all = False
+            break
+        else:
+            print(invalid_input_message)
+
+    if generate_all and development_style == "normal":
         generate_backend = True
         generate_frontend = True
         generate_tests = True
-    elif (generate_all and ( development_style == "tdd" or development_style == "code-correction")): 
+    elif generate_all and development_style in ["tdd", "code-correction"]:
         generate_backend = True
         generate_frontend = True
         generate_tests = False
     else:
-        generate_backend_message = "generate_backend_message"
-        generate_backend = generate_all or input(translate_string('main', generate_backend_message, language)).strip().lower() in ['s', 'y']
-        
-        generate_frontend_message = "generate_frontend_message"
-        generate_frontend = generate_all or input(translate_string('main', generate_frontend_message, language)).strip().lower() in ['s', 'y']
-
-        generate_tests_message = "generate_tests_message"
-        generate_tests = generate_all or input(translate_string('main', generate_tests_message, language)).strip().lower() in ['s', 'y']
+        # Prompt user to select components to generate
+        selected_components = select_components_to_generate(language, development_style)
+        generate_backend = 'backend' in selected_components
+        generate_frontend = 'frontend' in selected_components
+        generate_tests = 'tests' in selected_components if development_style == "normal" else False
 
     # Clean __pycache__ folders
     clean_pycache(os.path.dirname(__file__), language)
@@ -166,31 +265,36 @@ def start(project_name, analyst_properties, development_style, language):
     llm_sq = Ollama(model="llama3.1:8b-instruct-q4_K_M")
 
     # Initializing Analyst
-    analyst = Analyst(translate_string('main', 'analyst_name', language), llm_anl, analyst_properties, language, interactive=interactive)
+    analyst_name = translate_string('main', 'analyst_name', language)
+    analyst = Analyst(analyst_name, llm_anl, analyst_properties, language, interactive=interactive)
     analyst.generate_report()
     analyst_report = analyst.output
 
     # Initializing Squad Leader
-    squad_leader = SquadLeader(translate_string('main', 'squad_leader_name', language), llm_sq, analyst_properties, language, interactive=interactive)
+    squad_leader_name = translate_string('main', 'squad_leader_name', language)
+    squad_leader = SquadLeader(squad_leader_name, llm_sq, analyst_properties, language, interactive=interactive)
 
     # Agents array
     agents = {
-        translate_string('main', 'analyst_name', language): analyst,
-        translate_string('main', 'squad_leader_name', language): squad_leader
+        analyst_name: analyst,
+        squad_leader_name: squad_leader
     }
 
     # Creating developer agents and tester
     if generate_backend:
-        backend_developer = Developer(translate_string('main', 'backend_developer_name', language), llm_dev, development_style, language, interactive=interactive)
-        agents[translate_string('main', 'backend_developer_name', language)] = backend_developer
+        backend_developer_name = translate_string('main', 'backend_developer_name', language)
+        backend_developer = Developer(backend_developer_name, llm_dev, development_style, language, interactive=interactive)
+        agents[backend_developer_name] = backend_developer
 
     if generate_frontend:
-        frontend_developer = Developer(translate_string('main', 'frontend_developer_name', language), llm_dev, development_style, language, interactive=interactive)
-        agents[translate_string('main', 'frontend_developer_name', language)] = frontend_developer
+        frontend_developer_name = translate_string('main', 'frontend_developer_name', language)
+        frontend_developer = Developer(frontend_developer_name, llm_dev, development_style, language, interactive=interactive)
+        agents[frontend_developer_name] = frontend_developer
 
     if generate_tests:
-        tester = Tester(translate_string('main', 'frontend_developer_name', language), llm_dev, language, interactive=interactive)
-        agents[translate_string('main', 'tester_name', language)] = tester
+        tester_name = translate_string('main', 'tester_name', language)
+        tester = Tester(tester_name, llm_dev, development_style, language, interactive=interactive)
+        agents[tester_name] = tester
 
     # Creating folder structure in the build
     project_base_path = os.path.join(os.path.dirname(__file__), "build", project_name)
@@ -280,10 +384,12 @@ def start(project_name, analyst_properties, development_style, language):
 
 def main():
     # Ask the user which language to use
+    global LANGUAGE
     LANGUAGE = select_language()
 
     # Ask the user development style to use
-    DEVSTYLE = select_development_style()
+    global DEVSTYLE
+    DEVSTYLE = select_development_style(LANGUAGE)
 
     project_name_key = "project_folder_name_message"
     project_name = input(translate_string('main', project_name_key, LANGUAGE) + ": ")

@@ -18,11 +18,11 @@ from .prompt_templates.developer_prompts import DeveloperPrompts
 from utils.translation_utils import translate_string
 
 class Tester(Developer):
-    def __init__(self, name, llm, language, interactive):
+    def __init__(self, name, llm, language, development_style, interactive):
         """
         Initializes the Tester agent.            
         """
-        super().__init__(name, llm, language, interactive)
+        super().__init__(name, llm, language, development_style, interactive)
         self.prompts = DeveloperPrompts(self.language)
 
     def develop_tests(self, prompt):
