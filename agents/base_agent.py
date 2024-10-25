@@ -87,15 +87,16 @@ class BaseAgent:
         try:
             print(f"\n{translate_string('base_agent', 'base_agent_evaluating_prompt', self.language).format(name=self.name, prompt=prompt)}")
             output = self.llm.generate([prompt])
-            print(f"{translate_string('base_agent', 'base_agent_model_response', self.language).format(output=output)}")
+            print(f"{translate_string('base_agent', 'base_agent_model_response', self.language).format(output=output.generations[0][0].text)}")
             # Extract the text from the response (assuming it's in the first element of generations)
             if hasattr(output, 'generations') and output.generations:
-                final_response = output.generations[1][0]
-                self.output = final_response.text  # Get the text from the first generation
+                complete_response = output.generations[0][0]
+                final_response = complete_response.text
+                self.output = final_response  # Get the text from the first generation
             else:
                 print(f"No generations found in the response.")
                 return None
-            return output
+            return final_response
         except Exception as e:
             print(f"{translate_string('base_agent', 'base_agent_error_evaluating_prompt', self.language).format(error=e)}")
             return None

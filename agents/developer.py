@@ -391,7 +391,7 @@ class Developer(BaseAgent):
         return modified_code
 
     # Define a helper function to extract headers and code from content
-    def extract_headers(code_content):
+    def extract_headers(self, code_content):
         lines = code_content.splitlines()
         header_lines = []
         code_lines = []
@@ -437,24 +437,21 @@ class Developer(BaseAgent):
 
         # Remove markup from generated code and fix comment prefixes
         if isinstance(code, dict):
-            # Handle code and tests separately
-            code_content = code.get('code', '')
-            test_content = code.get('tests', '')
+            # Iterate over the code items
+            for filename, file_content in code.items():
+                # Clean code content
+                cleaned_code = self.remove_markup_from_code(file_content)
+                cleaned_code = self.fix_comments_prefix(cleaned_code)
 
-            # Clean code content
-            cleaned_code = self.remove_markup_from_code(code_content)
-            cleaned_code = self.fix_comments_prefix(cleaned_code)
-            file_paths_and_codes.append((file_path, cleaned_code))
+                # Determine file path
+                # If the filename is absolute, use it directly; otherwise, construct the path relative to file_path
+                if os.path.isabs(filename):
+                    full_path = filename
+                else:
+                    # Construct full path relative to the directory of file_path
+                    full_path = os.path.join(os.path.dirname(file_path), filename)
 
-            # Clean test content
-            if test_content:
-                cleaned_tests = self.remove_markup_from_code(test_content)
-                cleaned_tests = self.fix_comments_prefix(cleaned_tests)
-                # Create a test file path with a proper naming convention
-                original_filename = os.path.basename(file_path)
-                test_file_name = f"test_{original_filename}"
-                test_file_path = os.path.join(os.path.dirname(file_path), test_file_name)
-                file_paths_and_codes.append((test_file_path, cleaned_tests))
+                file_paths_and_codes.append((full_path, cleaned_code))
         else:
             # For normal development style or single code output
             cleaned_code = self.remove_markup_from_code(code)
@@ -483,7 +480,11 @@ class Developer(BaseAgent):
                 all_headers = existing_headers + headers_to_add
                 
                 # Prepare final content
-                final_content = '\n'.join(all_headers) + '\n' + '\n'.join(existing_code).rstrip('\n') + '\n' + '\n'.join(new_code)
+                final_content = '\n'.join(all_headers).strip()
+                if existing_code:
+                    final_content += '\n' + '\n'.join(existing_code).strip()
+                if new_code:
+                    final_content += '\n' + '\n'.join(new_code).strip()
                 
                 with open(path, 'w', encoding='utf-8') as f:
                     f.write(final_content.strip())
