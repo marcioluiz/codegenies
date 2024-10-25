@@ -55,11 +55,46 @@ class BaseAgent:
         self.output = ""
 
     def evaluate(self, prompt):
+        """
+        Queries the Ollama model using the invoke() function.
+
+        Parameters:
+            prompt (str): The prompt to be used for the query.
+
+        Returns:
+            str: The derived type or None if not found.
+        """
         try:
             print(f"\n{translate_string('base_agent', 'base_agent_evaluating_prompt', self.language).format(name=self.name, prompt=prompt)}")
             output = self.llm.invoke(prompt)
             print(f"{translate_string('base_agent', 'base_agent_model_response', self.language).format(output=output)}")
             self.output = output
+            return output
+        except Exception as e:
+            print(f"{translate_string('base_agent', 'base_agent_error_evaluating_prompt', self.language).format(error=e)}")
+            return None
+        
+    def generate(self, prompt):
+        """
+        Queries the Ollama model using the generate() function.
+
+        Parameters:
+            prompt (str): The prompt to be used for the query.
+
+        Returns:
+            str: The derived type or None if not found.
+        """
+        try:
+            print(f"\n{translate_string('base_agent', 'base_agent_evaluating_prompt', self.language).format(name=self.name, prompt=prompt)}")
+            output = self.llm.generate([prompt])
+            print(f"{translate_string('base_agent', 'base_agent_model_response', self.language).format(output=output)}")
+            # Extract the text from the response (assuming it's in the first element of generations)
+            if hasattr(output, 'generations') and output.generations:
+                final_response = output.generations[1][0]
+                self.output = final_response.text  # Get the text from the first generation
+            else:
+                print(f"No generations found in the response.")
+                return None
             return output
         except Exception as e:
             print(f"{translate_string('base_agent', 'base_agent_error_evaluating_prompt', self.language).format(error=e)}")

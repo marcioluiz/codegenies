@@ -41,7 +41,7 @@ class Developer(BaseAgent):
 
     def develop_code(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_instructions()}"
-        code = self.evaluate(final_prompt)
+        code = self.generate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
         else:
@@ -50,7 +50,7 @@ class Developer(BaseAgent):
     
     def develop_code_with_tests(self, prompt):
         final_prompt = f"{prompt}\n\n{self.prompts.develop_code_with_tests_instructions()}"
-        code = self.evaluate(final_prompt)
+        code = self.generate(final_prompt)
         if self.interactive:
             final_code = self.interact(code)
         else:
@@ -85,7 +85,7 @@ class Developer(BaseAgent):
 
         # Step 1: Syntax Check
         test_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.check_syntax_of_generated_code()}"
-        syntax_test_results = self.evaluate(test_execution_prompt)
+        syntax_test_results = self.generate(test_execution_prompt)
         if self.interactive:
             final_syntax_test_results = self.interact(syntax_test_results)
         else:
@@ -94,7 +94,7 @@ class Developer(BaseAgent):
 
         # Step 2: Code and Tests Execution Check
         test_code_execution_prompt = f"{generated_code_with_tests}\n\n{self.prompts.execute_tests_and_generated_code()}"
-        test_code_execution_results = self.evaluate(test_code_execution_prompt)
+        test_code_execution_results = self.generate(test_code_execution_prompt)
         if self.interactive:
             final_test_code_execution_results = self.interact(test_code_execution_results)
         else:
@@ -106,7 +106,7 @@ class Developer(BaseAgent):
 
         # Step 3: Evaluate Results
         test_evaluation_prompt = f"{final_tests_results}\n\n{self.prompts.evaluate_test_results()}"
-        test_evaluation_results = self.evaluate(test_evaluation_prompt)
+        test_evaluation_results = self.generate(test_evaluation_prompt)
         if self.interactive:
             final_test_evaluation_results = self.interact(test_evaluation_results)
         else:
@@ -486,7 +486,7 @@ class Developer(BaseAgent):
                 final_content = '\n'.join(all_headers) + '\n' + '\n'.join(existing_code).rstrip('\n') + '\n' + '\n'.join(new_code)
                 
                 with open(path, 'w', encoding='utf-8') as f:
-                    f.write(final_content)
+                    f.write(final_content.strip())
             except Exception as e:
                 error_message = translate_string("developer", "code_written_fail", self.language)
                 print(f"{error_message}: {path}: {e}")

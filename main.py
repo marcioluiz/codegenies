@@ -222,10 +222,10 @@ def start(project_name, analyst_properties, development_style, language):
     no_inputs = ['n', 'no', 'não', 'nao']
 
     if language == "en-us":
-        generate_all_prompt = "Do you want to generate all components? (y/n): "
+        generate_all_prompt = "Do you want to execute all processes? (y/n): "
         invalid_input_message = "Please enter 'y' or 'n'"
     else:
-        generate_all_prompt = "Deseja gerar todos os componentes? (s/n): "
+        generate_all_prompt = "Deseja executar todos os processos? (s/n): "
         invalid_input_message = "Por favor, digite 's' ou 'n'"
 
     while True:
