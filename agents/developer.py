@@ -389,8 +389,19 @@ class Developer(BaseAgent):
 
         modified_code = '\n'.join(modified_lines)
         return modified_code
-            
-    # Function to generate and write code to files
+
+    # Define a helper function to extract headers and code from content
+    def extract_headers(code_content):
+        lines = code_content.splitlines()
+        header_lines = []
+        code_lines = []
+        for line in lines:
+            if line.strip().startswith(("import ", "from ")):
+                header_lines.append(line)
+            else:
+                code_lines.append(line)
+        return header_lines, code_lines
+
     def generate_and_write_code(self, file_path, task_description):
         """
         Generates and writes code to a file.
@@ -404,6 +415,7 @@ class Developer(BaseAgent):
         - Removes markup from the generated code using the `remove_markup_from_code()` method.
         - Writes the cleaned code to the specified file path.
         - Corrects comment prefixes using `fix_comments_prefix()` if necessary.
+        - Checks for existing headers and appends new content after existing content.
         """
         code_prompt = f"{self.prompts.code_prompt_instruction()}{task_description}"
         code_processing_message = translate_string("developer", "code_processing_message", self.language)
@@ -420,42 +432,68 @@ class Developer(BaseAgent):
             print(f"{error_message}: {task_description}: {e}")
             return
 
-        # Prepare a list to hold the file 
-        # paths and corresponding code
+        # Prepare a list to hold the file paths and corresponding code
         file_paths_and_codes = []
 
-        # Remove markup from generated code
+        # Remove markup from generated code and fix comment prefixes
         if isinstance(code, dict):
-            for key, value in code.items():
-                cleaned_code = self.remove_markup_from_code(value)
-                cleaned_code = self.fix_comments_prefix(cleaned_code)
-                file_path_for_key = os.path.join(os.path.dirname(file_path), f"{key}")
-                
-                # Check if the file exists and determine the mode (append if exists, write if not)
-                file_mode = 'a' if os.path.exists(file_path_for_key) else 'w'
-                
-                file_paths_and_codes.append((file_path_for_key, cleaned_code, file_mode))
+            # Handle code and tests separately
+            code_content = code.get('code', '')
+            test_content = code.get('tests', '')
+
+            # Clean code content
+            cleaned_code = self.remove_markup_from_code(code_content)
+            cleaned_code = self.fix_comments_prefix(cleaned_code)
+            file_paths_and_codes.append((file_path, cleaned_code))
+
+            # Clean test content
+            if test_content:
+                cleaned_tests = self.remove_markup_from_code(test_content)
+                cleaned_tests = self.fix_comments_prefix(cleaned_tests)
+                # Create a test file path with a proper naming convention
+                original_filename = os.path.basename(file_path)
+                test_file_name = f"test_{original_filename}"
+                test_file_path = os.path.join(os.path.dirname(file_path), test_file_name)
+                file_paths_and_codes.append((test_file_path, cleaned_tests))
         else:
+            # For normal development style or single code output
             cleaned_code = self.remove_markup_from_code(code)
             cleaned_code = self.fix_comments_prefix(cleaned_code)
-            file_mode = 'a' if os.path.exists(file_path) else 'w'
-            file_paths_and_codes = [(file_path, cleaned_code, file_mode)]
+            file_paths_and_codes = [(file_path, cleaned_code)]
 
         # Write to all files
-        for path, content, mode in file_paths_and_codes:
+        for path, content in file_paths_and_codes:
             try:
-                with open(path, mode) as f:
-                    # If appending, add line breaks 
-                    if mode == 'a':  
-                        f.write("\n\n")
-                    f.write(content)
+                existing_headers, existing_code = [], []
+                if os.path.exists(path):
+                    try:
+                        with open(path, 'r', encoding='utf-8') as f:
+                            existing_content = f.read()
+                    except UnicodeDecodeError:
+                        with open(path, 'r', encoding='iso-8859-1') as f:
+                            existing_content = f.read()
+                    existing_headers, existing_code = self.extract_headers(existing_content)
+                
+                new_headers, new_code = self.extract_headers(content)
+                
+                # Determine new headers to add (headers in new_headers but not in existing_headers)
+                headers_to_add = [h for h in new_headers if h not in existing_headers]
+                
+                # Combine headers
+                all_headers = existing_headers + headers_to_add
+                
+                # Prepare final content
+                final_content = '\n'.join(all_headers) + '\n' + '\n'.join(existing_code).rstrip('\n') + '\n' + '\n'.join(new_code)
+                
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(final_content)
             except Exception as e:
                 error_message = translate_string("developer", "code_written_fail", self.language)
                 print(f"{error_message}: {path}: {e}")
                 continue  # Continue to next file if one fails
 
         generate_code_message = translate_string("developer", "generate_and_write_code_success", self.language)
-        print(f"{generate_code_message}: {', '.join([path for path, _, _ in file_paths_and_codes])}")
+        print(f"{generate_code_message}: {', '.join([path for path, _ in file_paths_and_codes])}")
 
     def extract_test_file_name(self, main_file_name):
         """
